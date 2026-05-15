@@ -1,0 +1,94 @@
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@* /*
+ * Sinh viên : Vũ Hoàng Chính
+ * Mã sinh viên: 2122110380
+ * Lớp: CCQ2211J
+ * Ngày tạo: 15/05/2026
+ * Version: 1.0
+ */ *@
+
+@model IEnumerable<CMS.Data.Entities.Product>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-dark">QUẢN LÝ SẢN PHẨM</h2>
+        <button class="btn btn-success btn-sm">+ Thêm sản phẩm mới</button>
+    </div>
+    <table class="table table-hover shadow-sm border">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Hình ảnh</th>
+                <th>Tên sản phẩm</th>
+                <th>Danh mục</th>
+                <th>Giá</th>
+                <th>Tồn kho</th>
+                <th>Mô tả</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>
+                        @if(!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            <img src="@item.ImageUrl" alt="@item.Name" style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px;" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">Không có ảnh</span>
+                        }
+                    </td>
+                    <td><strong>@item.Name</strong></td>
+                    <td>
+                        @if(item.CategoryProduct != null)
+                        {
+                            <span class="badge bg-primary">@item.CategoryProduct.Name</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">ID: @item.CategoryProductId</span>
+                        }
+                    </td>
+                    <td class="text-danger"><strong>@item.Price.ToString("N0") ₫</strong></td>
+                    <td>
+                        @if(item.StockQuantity > 10)
+                        {
+                            <span class="badge bg-success">@item.StockQuantity</span>
+                        }
+                        else if(item.StockQuantity > 0)
+                        {
+                            <span class="badge bg-warning text-dark">@item.StockQuantity</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Hết hàng</span>
+                        }
+                    </td>
+                    <td>
+                        @if(!string.IsNullOrEmpty(item.Description))
+                        {
+                            @(item.Description.Length > 50 ? item.Description.Substring(0, 50) + "..." : item.Description)
+                        }
+                        else
+                        {
+                            <span class="text-muted">Chưa có mô tả</span>
+                        }
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-warning">Sửa</button>
+                        <button class="btn btn-sm btn-outline-danger">Xóa</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

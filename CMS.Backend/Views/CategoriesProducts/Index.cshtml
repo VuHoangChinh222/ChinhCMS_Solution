@@ -1,9 +1,8 @@
-﻿@*
+@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
 }
-
 
 @* /*
  * Sinh viên : Vũ Hoàng Chính
@@ -13,40 +12,32 @@
  * Version: 1.0
  */ *@
 
-@model IEnumerable<CMS.Data.Entities.User>
+@model IEnumerable<CMS.Data.Entities.CategoryProduct>
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="text-dark">QUẢN LÝ THÀNH VIÊN</h2>
-        <button class="btn btn-success btn-sm">+ Thêm thành viên mới</button>
+        <h2 class="text-dark">QUẢN LÝ DANH MỤC SẢN PHẨM</h2>
+        <button class="btn btn-success btn-sm">+ Thêm danh mục mới</button>
     </div>
     <table class="table table-hover shadow-sm border">
         <thead class="table-light">
             <tr>
                 <th>ID</th>
-                <th>Tên đăng nhập</th>
-                <th>Họ và tên</th>
-                <th>Quyền hạn</th>
+                <th>Tên danh mục</th>
+                <th>Mô tả</th>
+                <th>Số sản phẩm</th>
                 <th>Thao tác</th>
             </tr>
         </thead>
         <tbody>
-            @foreach(var user in Model)
+            @foreach(var item in Model)
             {
                 <tr>
-                    <td>@user.Id</td>
-                    <td><strong>@user.Username</strong></td>
-                    <td>@user.FullName</td>
+                    <td>@item.Id</td>
+                    <td><strong>@item.Name</strong></td>
+                    <td>@(item.Description ?? "Chưa có mô tả")</td>
                     <td>
-                        @if(user.Role == "Admin")
-                        {
-                            <span class="badge bg-danger">@user.Role</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-info text-dark">@user.Role</span>    
-                        }
-
+                        <span class="badge bg-primary">@(item.Products != null ? item.Products.Count : 0)</span>
                     </td>
                     <td>
                         <button class="btn btn-sm btn-outline-warning">Sửa</button>

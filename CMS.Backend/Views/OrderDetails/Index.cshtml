@@ -1,0 +1,75 @@
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng";
+}
+
+@* /*
+ * Sinh viên : Vũ Hoàng Chính
+ * Mã sinh viên: 2122110380
+ * Lớp: CCQ2211J
+ * Ngày tạo: 15/05/2026
+ * Version: 1.0
+ */ *@
+
+@model IEnumerable<CMS.Data.Entities.OrderDetail>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-dark">CHI TIẾT ĐƠN HÀNG</h2>
+        <a asp-controller="Orders" asp-action="Index" class="btn btn-secondary btn-sm">Quay lại danh sách Đơn hàng</a>
+    </div>
+    <table class="table table-hover shadow-sm border">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Mã đơn hàng</th>
+                <th>Sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th>Thành tiền</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if(Model != null && Model.Any())
+            {
+                foreach(var item in Model)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>
+                            <span class="badge bg-secondary">#@item.OrderId</span>
+                        </td>
+                        <td>
+                            @if(item.Product != null)
+                            {
+                                <strong>@item.Product.Name</strong>
+                            }
+                            else
+                            {
+                                <span class="text-muted">ID: @item.ProductId</span>
+                            }
+                        </td>
+                        <td>@item.Quantity</td>
+                        <td>@item.UnitPrice.ToString("N0") ₫</td>
+                        <td>
+                            <strong class="text-danger">@((item.Quantity * item.UnitPrice).ToString("N0")) ₫</strong>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-warning">Sửa</button>
+                            <button class="btn btn-sm btn-outline-danger">Xóa</button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center text-muted">Không có dữ liệu chi tiết cho đơn hàng này.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
