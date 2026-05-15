@@ -11,6 +11,8 @@ using CMS.Data.Entities; // Kết nối tới lớp dữ liệu
 
 namespace CMS.Backend.Controllers
 {
+    // Controller CategoryController quản lý các hành động liên quan đến danh mục tin tức
+    // , ví dụ: hiển thị danh sách các danh mục.
     public class CategoryController : Controller
     {
         public IActionResult Index()
