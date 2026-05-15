@@ -6,8 +6,9 @@
  * Version: 1.0
  */
 
-using Microsoft.AspNetCore.Mvc;
+using CMS.Data;
 using CMS.Data.Entities; // Kết nối tới lớp dữ liệu 
+using Microsoft.AspNetCore.Mvc;
 
 namespace CMS.Backend.Controllers
 {
@@ -15,15 +16,19 @@ namespace CMS.Backend.Controllers
     // , ví dụ: hiển thị danh sách các danh mục.
     public class CategoryController : Controller
     {
+        private readonly ApplicationDbContext _context;
+
+        // "Tiêm" kết nối vào Controller
+        public CategoryController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
         public IActionResult Index()
         {
-            // Tạo danh sách các dữ liệu mẫu
-            var list = new List<Category> { 
-                new Category { Id = 1, Name = "Tin Giáo Dục", Description = "Các tin tức liên quan đến giáo dục" },
-                new Category { Id = 2, Name = "Tin Thể Thao", Description = "Các tin tức liên quan đến thể thao" },
-                new Category { Id = 3, Name = "Tin Công Nghệ", Description = "Các tin tức liên quan đến công nghệ" }
-            };
-            return View(list); // Truyền danh sách dữ liệu mẫu lên giao diện
+            // Lấy dữ liệu THẬT từ bảng Categories trong SQL
+            var data = _context.Categories.ToList();
+            return View(data);
         }
     }
 }

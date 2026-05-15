@@ -1,7 +1,22 @@
+﻿/*
+ * Sinh viên : Vũ Hoàng Chính
+ * Mã sinh viên: 2122110380
+ * Lớp: CCQ2211J
+ * Ngày tạo: 15/05/2026
+ * Version: 1.0
+ */
+
+using Microsoft.EntityFrameworkCore; // Thêm using cho Entity Framework Core
+using CMS.Data; // Thêm using cho ApplicationDbContext
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Đăng ký DbContext vào hệ thống
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
