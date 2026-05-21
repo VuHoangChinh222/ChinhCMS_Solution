@@ -9,6 +9,8 @@
 using CMS.Data;
 using CMS.Data.Entities; // Kết nối tới lớp dữ liệu 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace CMS.Backend.Controllers
 {
@@ -114,12 +116,14 @@ namespace CMS.Backend.Controllers
         // CHỨC NĂNG XÓA DANH MỤC (DELETE)
         // ==========================================
 
-        // Hàm GET: Tìm danh mục muốn xóa dựa theo mã số (Id) và hiển thị trang xác nhận xóa
+        // Hàm GET: Tìm danh mục muốn xóa dựa theo mã số (Id), nạp kèm danh sách bài viết và hiển thị trang xác nhận xóa
         [HttpGet]
         public IActionResult Delete(int id)
         {
-            // Tìm kiếm danh mục cần xóa theo mã số
-            var category = _context.Categories.Find(id);
+            // Tìm kiếm danh mục cần xóa theo mã số, đồng thời nạp kèm danh sách bài viết thuộc danh mục đó
+            var category = _context.Categories
+                                   .Include(c => c.Posts)
+                                   .FirstOrDefault(c => c.Id == id);
 
             // Nếu không tìm thấy danh mục bài viết
             if (category == null)
