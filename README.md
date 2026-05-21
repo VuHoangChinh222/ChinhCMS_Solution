@@ -41,11 +41,6 @@ Giải pháp `ChinhCMS_Solution` được phân chia thành ba dự án thành p
 
 ## 3. CÁC TÍNH NĂNG CHÍNH ĐÃ TRIỂN KHAI
 
-### Chức năng Mã hóa Mật khẩu Bảo mật
-- Tích hợp thư viện mã hóa `BCrypt.Net-Next` thông qua lớp hỗ trợ `PasswordHelper.cs`.
-- Hỗ trợ mã hóa mật khẩu một chiều bằng thuật toán băm Bcrypt trước khi lưu trữ vào cơ sở dữ liệu bảng `User`, đảm bảo an toàn tuyệt đối ngay cả khi dữ liệu bị lộ.
-- Cung cấp phương thức xác thực và so khớp mật khẩu khi đăng nhập.
-
 ### Chức năng Quản lý Đơn hàng và Chi tiết Đơn hàng
 - **Đơn hàng (`Orders`)**: Hiển thị bảng tổng hợp toàn bộ danh sách đơn hàng bao gồm mã đơn, ngày đặt, ghi chú, trạng thái đơn hàng (sử dụng các nhãn trạng thái trực quan của Bootstrap như Chờ duyệt, Đang giao, Đã xong).
 - **Chi tiết đơn hàng (`OrderDetails`)**: Tích hợp luồng điều hướng mượt mà. Khi người dùng bấm nút **"Chi tiết"** ở một đơn hàng cụ thể, hệ thống sẽ gọi phương thức `Details` lọc các dòng dữ liệu trong bảng `OrderDetails` theo đúng mã đơn hàng (`OrderId`), tính toán thành tiền của từng dòng sản phẩm (Số lượng x Đơn giá) và hiển thị lên giao diện chi tiết kèm theo nút quay lại danh sách nhanh chóng.
