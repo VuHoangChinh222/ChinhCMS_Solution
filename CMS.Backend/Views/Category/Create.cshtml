@@ -1,0 +1,74 @@
+@*
+    Thư mục chứa giao diện thêm mới danh mục bài viết
+*@
+@{
+    // Thiết lập tiêu đề trang hiển thị trên thẻ trình duyệt
+    ViewData["Title"] = "Thêm mới danh mục";
+}
+
+@* 
+   Thông tin sinh viên thực hiện dự án:
+   Sinh viên : Vũ Hoàng Chính
+   Mã sinh viên: 2122110380
+   Lớp: CCQ2211J
+   Ngày tạo: 21/05/2026
+   Phiên bản: 1.0
+*@
+
+@* Khai báo kiểu dữ liệu liên kết với biểu mẫu này là đối tượng danh mục bài viết *@
+@model CMS.Data.Entities.Category
+
+<div class="container mt-4">
+    <!-- Thanh điều hướng liên kết nhanh -->
+    <nav aria-label="Đường dẫn liên kết">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Category">Danh sách danh mục</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Thêm mới danh mục</li>
+        </ol>
+    </nav>
+
+    <!-- Tiêu đề lớn hiển thị trên trang nhập liệu -->
+    <h2 class="text-success fw-bold">THÊM MỚI DANH MỤC BÀI VIẾT</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Biểu mẫu gửi dữ liệu lên phương thức Create sử dụng giao thức POST -->
+            <form asp-action="Create" method="post" class="shadow-sm p-4 border rounded bg-white">
+                <!-- Khu vực hiển thị thông báo lỗi tổng hợp từ hệ thống kiểm tra dữ liệu -->
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <!-- Trường nhập liệu cho Tên danh mục bài viết -->
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label fw-bold">Tên danh mục bài viết:</label>
+                    <input asp-for="Name" class="form-control" placeholder="Ví dụ: Tin tức Công nghệ, Giáo dục..." />
+                    <!-- Hiển thị thông báo lỗi cụ thể cho trường Tên danh mục nếu kiểm tra thất bại -->
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+
+                <!-- Trường nhập liệu cho Mô tả danh mục bài viết -->
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label fw-bold">Mô tả chi tiết:</label>
+                    <textarea asp-for="Description" class="form-control" rows="4" placeholder="Nhập một vài mô tả ngắn về danh mục này..."></textarea>
+                    <!-- Hiển thị thông báo lỗi cụ thể cho trường Mô tả danh mục nếu kiểm tra thất bại -->
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+
+                <!-- Khu vực chứa các nút chức năng của biểu mẫu -->
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-success">
+                        Lưu danh mục mới
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        Hủy bỏ và quay lại
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* Nạp thêm thư viện hỗ trợ kiểm tra dữ liệu trực tiếp ở phía trình duyệt người dùng *@
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

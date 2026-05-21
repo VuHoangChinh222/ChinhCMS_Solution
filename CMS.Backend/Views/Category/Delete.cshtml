@@ -1,0 +1,70 @@
+@*
+    Thư mục chứa giao diện xác nhận xóa danh mục bài viết
+*@
+@{
+    // Thiết lập tiêu đề trang hiển thị trên thẻ trình duyệt
+    ViewData["Title"] = "Xác nhận xóa danh mục";
+}
+
+@* 
+   Thông tin sinh viên thực hiện dự án:
+   Sinh viên : Vũ Hoàng Chính
+   Mã sinh viên: 2122110380
+   Lớp: CCQ2211J
+   Ngày tạo: 21/05/2026
+   Phiên bản: 1.0
+*@
+
+@* Khai báo kiểu dữ liệu liên kết với trang hiển thị này là một đối tượng danh mục *@
+@model CMS.Data.Entities.Category
+
+<div class="container mt-4">
+    <!-- Thanh điều hướng liên kết nhanh -->
+    <nav aria-label="Đường dẫn liên kết">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Category">Danh sách danh mục</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Xác nhận xóa danh mục</li>
+        </ol>
+    </nav>
+
+    <!-- Hộp cảnh báo màu đỏ của Bootstrap nhắc nhở hành động xóa dữ liệu nguy hiểm -->
+    <div class="alert alert-danger d-flex align-items-center" role="alert">
+        <div>
+            <h4 class="alert-heading fw-bold">CẢNH BÁO: XÓA DỮ LIỆU VĨNH VIỄN!</h4>
+            <p class="mb-0">Bạn có chắc chắn muốn xóa danh mục này? Hành động này không thể hoàn tác và các bài viết thuộc danh mục này có thể bị ảnh hưởng.</p>
+        </div>
+    </div>
+
+    <!-- Hộp hiển thị chi tiết thông tin danh mục muốn xóa -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light fw-bold text-dark">
+            Chi tiết danh mục yêu cầu xóa
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3 fw-bold text-muted">Mã số danh mục (Id):</dt>
+                <dd class="col-sm-9">@Model.Id</dd>
+
+                <dt class="col-sm-3 fw-bold text-muted">Tên danh mục bài viết:</dt>
+                <dd class="col-sm-9 fw-bold text-danger">@Model.Name</dd>
+
+                <dt class="col-sm-3 fw-bold text-muted">Mô tả chi tiết:</dt>
+                <dd class="col-sm-9">@(Model.Description ?? "Không có mô tả nào cho danh mục này")</dd>
+            </dl>
+        </div>
+    </div>
+
+    <!-- Biểu mẫu gửi yêu cầu POST thực hiện xóa vĩnh viễn dữ liệu xuống cơ sở dữ liệu -->
+    <form asp-action="Delete" method="post">
+        <!-- Trường ẩn lưu trữ mã số danh mục cần xóa để gửi lên hàm DeleteConfirmed -->
+        <input type="hidden" asp-for="Id" />
+        
+        <!-- Các nút bấm xác nhận xóa hoặc hủy bỏ hành động -->
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger">
+                Xác nhận xóa vĩnh viễn
+            </button>
+            <a asp-action="Index" class="btn btn-secondary"> Hủy bỏ và quay lại </a>
+        </div>
+    </form>
+</div>

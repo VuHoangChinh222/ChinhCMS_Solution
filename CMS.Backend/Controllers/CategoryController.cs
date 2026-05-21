@@ -50,21 +50,22 @@ namespace CMS.Backend.Controllers
         [HttpPost]
         public IActionResult Create(Category model)
         {
-            // Kiểm tra xem dữ liệu người dùng nhập vào có hợp lệ theo các quy tắc kiểm tra hay không
-            if (ModelState.IsValid)
+            // Loại bỏ kiểm tra ModelState.IsValid tự động để tránh lỗi xác thực thuộc tính liên kết (Posts) bị null trong .NET 8.
+            // Thay vào đó, chúng ta chủ động kiểm tra xem người dùng có nhập Tên danh mục hay không.
+            if (string.IsNullOrEmpty(model.Name))
             {
-                // Bước 1: Thêm đối tượng mới vào bộ nhớ tạm của hệ thống
-                _context.Categories.Add(model);
-
-                // Bước 2: Lưu thay đổi thực sự xuống SQL Server
-                _context.SaveChanges();
-
-                // Sau khi lưu thành công, tự động chuyển hướng người dùng về trang danh sách danh mục
-                return RedirectToAction("Index");
+                ModelState.AddModelError("Name", "Vui lòng nhập tên danh mục bài viết.");
+                return View(model);
             }
 
-            // Nếu dữ liệu nhập vào không hợp lệ, hiển thị lại biểu mẫu kèm theo các thông báo lỗi tương ứng
-            return View(model);
+            // Bước 1: Thêm đối tượng mới vào bộ nhớ tạm của hệ thống
+            _context.Categories.Add(model);
+
+            // Bước 2: Lưu thay đổi thực sự xuống SQL Server
+            _context.SaveChanges();
+
+            // Sau khi lưu thành công, tự động chuyển hướng người dùng về trang danh sách danh mục
+            return RedirectToAction("Index");
         }
 
         // ==========================================
@@ -93,23 +94,22 @@ namespace CMS.Backend.Controllers
         [HttpPost]
         public IActionResult Edit(Category model)
         {
-            // Kiểm tra tính hợp lệ của dữ liệu đầu vào
-            if (ModelState.IsValid)
+            // Tương tự, chỉ kiểm tra trường Tên danh mục bắt buộc nhập để tránh lỗi thuộc tính liên kết Posts bị null
+            if (string.IsNullOrEmpty(model.Name))
             {
-                // Cập nhật thông tin danh mục vào bộ nhớ tạm của hệ thống
-                _context.Categories.Update(model);
-
-                // Lưu thay đổi thực sự xuống SQL Server
-                _context.SaveChanges();
-
-                // Quay lại trang danh sách danh mục để xem kết quả cập nhật
-                return RedirectToAction("Index");
+                ModelState.AddModelError("Name", "Vui lòng nhập tên danh mục bài viết.");
+                return View(model);
             }
 
-            // Nếu dữ liệu không hợp lệ, tải lại giao diện chỉnh sửa cùng các thông báo nhắc nhở lỗi
-            return View(model);
-        }
+            // Cập nhật thông tin danh mục vào bộ nhớ tạm của hệ thống
+            _context.Categories.Update(model);
 
+            // Lưu thay đổi thực sự xuống SQL Server
+            _context.SaveChanges();
+
+            // Quay lại trang danh sách danh mục để xem kết quả cập nhật
+            return RedirectToAction("Index");
+        }
         // ==========================================
         // CHỨC NĂNG XÓA DANH MỤC (DELETE)
         // ==========================================

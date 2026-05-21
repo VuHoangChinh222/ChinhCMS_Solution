@@ -1,0 +1,77 @@
+@*
+    Thư mục chứa giao diện chỉnh sửa thông tin danh mục bài viết
+*@
+@{
+    // Thiết lập tiêu đề trang hiển thị trên thẻ trình duyệt
+    ViewData["Title"] = "Chỉnh sửa danh mục";
+}
+
+@* 
+   Thông tin sinh viên thực hiện dự án:
+   Sinh viên : Vũ Hoàng Chính
+   Mã sinh viên: 2122110380
+   Lớp: CCQ2211J
+   Ngày tạo: 21/05/2026
+   Phiên bản: 1.0
+*@
+
+@* Khai báo kiểu dữ liệu liên kết với biểu mẫu này là đối tượng danh mục bài viết *@
+@model CMS.Data.Entities.Category
+
+<div class="container mt-4">
+    <!-- Thanh điều hướng liên kết nhanh -->
+    <nav aria-label="Đường dẫn liên kết">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Category">Danh sách danh mục</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa danh mục</li>
+        </ol>
+    </nav>
+
+    <!-- Tiêu đề lớn hiển thị trên trang chỉnh sửa -->
+    <h2 class="text-warning fw-bold">CHỈNH SỬA DANH MỤC BÀI VIẾT</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Biểu mẫu gửi dữ liệu cập nhật lên phương thức Edit sử dụng giao thức POST -->
+            <form asp-action="Edit" method="post" class="shadow-sm p-4 border rounded bg-white">
+                <!-- Khu vực hiển thị thông báo lỗi tổng hợp từ hệ thống kiểm tra dữ liệu -->
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <!-- Trường ẩn lưu trữ mã số (Id) của danh mục - cực kỳ quan trọng để hệ thống biết đang cập nhật dòng dữ liệu nào -->
+                <input type="hidden" asp-for="Id" />
+
+                <!-- Trường chỉnh sửa Tên danh mục bài viết -->
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label fw-bold">Tên danh mục bài viết:</label>
+                    <input asp-for="Name" class="form-control" />
+                    <!-- Hiển thị lỗi nếu người dùng nhập tên không hợp lệ -->
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+
+                <!-- Trường chỉnh sửa Mô tả danh mục bài viết -->
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label fw-bold">Mô tả chi tiết:</label>
+                    <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                    <!-- Hiển thị lỗi nếu người dùng nhập mô tả không hợp lệ -->
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+
+                <!-- Khu vực các nút bấm xác nhận cập nhật hoặc hủy bỏ -->
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-warning">
+                        Cập nhật thay đổi
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        Hủy bỏ và quay lại
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* Nạp thêm thư viện hỗ trợ kiểm tra dữ liệu trực tiếp ở trình duyệt người dùng *@
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
