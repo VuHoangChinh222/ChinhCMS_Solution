@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Sinh viên : Vũ Hoàng Chính
  * Mã sinh viên: 2122110380
  * Lớp: CCQ2211J
@@ -22,23 +22,59 @@ namespace CMS.Backend.Controllers
         {
             _context = context;
         }
-        // Hàm Index trả về danh sách các bài viết mẫu để hiển thị trên giao diện
-        public IActionResult Index()
+        // Hàm hiển thị danh sách bài viết, hỗ trợ lọc theo mã danh mục bài viết (CategoryId)
+        public IActionResult Index(int? id)
         {
-            // Lấy dữ liệu THẬT từ bảng Post trong SQL
-            var data = _context.Posts.ToList();
-            return View(data); // Truyền danh sách dữ liệu mẫu lên giao diện
+            // Nếu không truyền mã danh mục (id là null), hệ thống sẽ lấy toàn bộ danh sách bài viết
+            if (id == null)
+            {
+                // Truy vấn lấy toàn bộ bài viết từ cơ sở dữ liệu, sắp xếp theo ngày đăng mới nhất
+                // và nạp kèm thông tin danh mục tương ứng để tránh lỗi hiển thị tên danh mục
+                var allPosts = _context.Posts
+                                      .Include(p => p.Category)
+                                      .OrderByDescending(p => p.CreatedDate)
+                                      .ToList();
+
+                // Truyền danh sách tất cả bài viết sang giao diện hiển thị
+                return View(allPosts);
+            }
+
+            // Nếu có truyền mã danh mục, tiến hành lọc các bài viết thuộc danh mục đó
+            var filteredPosts = _context.Posts
+                                        .Where(p => p.CategoryId == id)
+                                        .Include(p => p.Category)
+                                        .OrderByDescending(p => p.CreatedDate)
+                                        .ToList();
+
+            // Truyền danh sách bài viết đã được lọc sang giao diện hiển thị
+            return View(filteredPosts);
         }
 
-        // Hàm Details trả về chi tiết của một bài viết dựa trên id được truyền vào
-        public IActionResult Details(int id)
+        // Hàm hiển thị chi tiết của một bài viết dựa vào mã bài viết được truyền từ URL
+        public IActionResult Details(int? id)
         {
-            var data = _context.Posts.ToList();
-            // Lấy dữ liệu Post dưa theo ID 
-            var detailPost = data.FirstOrDefault(p => p.Id == id);
+            // Kiểm tra xem mã bài viết truyền vào có hợp lệ hay không
+            if (id == null)
+            {
+                // Trả về thông báo lỗi nếu không nhận được mã bài viết từ yêu cầu của trình duyệt
+                return BadRequest("Vui lòng cung cấp mã bài viết.");
+            }
+
+            // Truy vấn lấy thông tin bài viết theo mã bài viết
+            // Sử dụng lệnh nạp chồng để lấy kèm thông tin danh mục liên quan của bài viết đó
+            var detailPost = _context.Posts
+                                     .Include(p => p.Category)
+                                     .FirstOrDefault(p => p.Id == id);
+
+            // Kiểm tra xem có tìm thấy bài viết trong cơ sở dữ liệu hay không
             if (detailPost == null)
-                return NotFound(); // Trả về lỗi 404 nếu không tìm thấy bài viết
-            return View(detailPost); // Truyền dữ liệu mẫu lên giao diện chi tiết
+            {
+                // Trả về lỗi không tìm thấy trang nếu bài viết không tồn tại trong hệ thống
+                return NotFound("Không tìm thấy bài viết này trong hệ thống.");
+            }
+
+            // Truyền thông tin chi tiết bài viết sang giao diện chi tiết
+            return View(detailPost);
         }
     }
 }
