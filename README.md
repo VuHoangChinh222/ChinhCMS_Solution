@@ -18,15 +18,6 @@ Hệ thống quản trị nội dung (CMS) và quản lý kinh doanh chuyên ngh
 ## 🏗️ KIẾN TRÚC DỰ ÁN (SOLUTION ARCHITECTURE)
 
 Giải pháp `ChinhCMS_Solution` được tổ chức thành 3 phân lớp chuyên biệt nhằm đảm bảo tính tái sử dụng, dễ bảo trì và nâng cấp:
-<!-- 
-
-```mermaid
-graph TD
-    A[cms.frontend - ReactJS] -->|Kết nối API / JSON| B[CMS.Backend - ASP.NET Core 8.0 MVC]
-    B -->|Tương tác SQL Server| C[CMS.Data - Entity Framework Core]
-    C -->|Ánh xạ thực thể| D[(ChinhCMS_DB)]
-```
- -->
 
 ### 📂 Cấu trúc chi tiết các lớp:
 1.  **`CMS.Data` (Lớp Dữ liệu - Class Library)**:
@@ -64,11 +55,8 @@ graph TD
     *   *Trang danh sách (Post/Index) và Trang chủ (Home/Index):* Sử dụng biểu thức chính quy (Regex) `@System.Text.RegularExpressions.Regex.Replace(..., "<.*?>", string.Empty)` để lọc sạch hoàn toàn các thẻ HTML được tạo bởi CKEditor, giúp phần văn bản tóm tắt bài viết trên các card Bootstrap luôn sạch sẽ, thẳng hàng và không làm vỡ bố cục.
     *   *Trang chi tiết (Post/Details):* Áp dụng cú pháp `@Html.Raw(Model.Content)` giúp trình duyệt biên dịch và hiển thị bài viết tin tức đầy đủ định dạng bắt mắt nhất.
 
-### 🛡️ 3. Mã Hóa Mật Khẩu Thành Viên Bảo Mật
-*   Tích hợp thư viện bảo mật `BCrypt.Net-Next` thông qua lớp tiện ích `PasswordHelper.cs`.
-*   Hỗ trợ băm mật khẩu một chiều an toàn tuyệt đối trước khi lưu trữ vào bảng dữ liệu `User` ở SQL Server.
 
-### 📦 4. Quản Lý Danh Mục Tin Tức Khóa An Toàn
+### 📦 3. Quản Lý Danh Mục Tin Tức Khóa An Toàn
 *   Áp dụng liên kết bảng sâu `.Include(c => c.Posts)`. Nếu danh mục tin tức đang chứa bài viết liên quan, hệ thống sẽ hiển thị bảng thống kê các bài viết và vô hiệu hóa nút xóa danh mục để bảo vệ toàn vẹn dữ liệu hệ thống.
 
 ---
