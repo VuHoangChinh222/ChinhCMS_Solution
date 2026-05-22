@@ -52,8 +52,13 @@
                 </div>
 
                 <!-- Phần hiển thị nội dung đầy đủ của bài viết -->
-                <div class="post-content fs-5 lh-lg" style="white-space: pre-line;">
-                    @Model.Content
+                <div class="post-content fs-5 lh-lg">
+                    @* 
+                       Sử dụng @Html.Raw để hiển thị nội dung bài viết có định dạng HTML 
+                       do người dùng soạn thảo từ trình biên tập giàu tính năng CKEditor 5,
+                       tránh việc hiển thị thô các thẻ HTML như <p>, <strong> ra trình duyệt.
+                    *@
+                    @Html.Raw(Model.Content)
                 </div>
 
                 <!-- Nút quay lại danh sách bài viết -->

@@ -1,0 +1,128 @@
+@*
+    Giao diện chỉnh sửa thông tin bài viết cũ
+*@
+@model CMS.Data.Entities.Post
+
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Chỉnh sửa bài viết";
+}
+
+@* 
+   Thông tin sinh viên thực hiện dự án:
+   Sinh viên : Vũ Hoàng Chính
+   Mã sinh viên: 2122110380
+   Lớp: CCQ2211J
+   Ngày tạo: 21/05/2026
+   Phiên bản: 1.0 (Đồng bộ cấu trúc 2 cột theo tài liệu học tập & tích hợp CKEditor 5)
+*@
+
+<div class="container mt-4">
+    <!-- Thẻ Card bao quanh form nhập liệu có đổ bóng sang trọng -->
+    <div class="card shadow">
+        <div class="card-header bg-warning text-dark py-3">
+            <h4 class="mb-0 fw-bold"><i class="bi bi-pencil-square"></i> CHỈNH SỬA THÔNG TIN BÀI VIẾT</h4>
+        </div>
+        <div class="card-body">
+            
+            <!-- Biểu mẫu gửi dữ liệu dạng POST, có enctype để hỗ trợ tải tệp tin ảnh vật lý thay thế -->
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                
+                <!-- Hiển thị bảng tổng hợp lỗi nếu có -->
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <!-- Thẻ ẩn lưu giữ mã Id của bài viết phục vụ truy vấn cập nhật -->
+                <input type="hidden" asp-for="Id" />
+                
+                <!-- Thẻ ẩn lưu giữ đường dẫn ảnh cũ phòng trường hợp người dùng không upload ảnh mới -->
+                <input type="hidden" asp-for="ImageUrl" />
+
+                <!-- Thẻ ẩn lưu giữ ngày tạo bài viết gốc -->
+                <input type="hidden" asp-for="CreatedDate" />
+
+                <!-- Cấu trúc hàng chia làm 2 cột chuẩn theo tài liệu gốc (col-md-8 và col-md-4) -->
+                <div class="row">
+                    
+                    <!-- Cột bên trái (col-md-8): Tiêu đề và Nội dung chi tiết -->
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tiêu đề bài viết:</label>
+                            <input asp-for="Title" class="form-control" placeholder="Nhập tiêu đề..." required />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nội dung chi tiết:</label>
+                            <!-- Kích hoạt CKEditor 5 trên phần tử textarea này thông qua ID editor -->
+                            <textarea asp-for="Content" id="editor" class="form-control" rows="10"></textarea>
+                            <span asp-validation-for="Content" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Cột bên phải (col-md-4): Chuyên mục, Ảnh đại diện, Ngày đăng và nút điều khiển -->
+                    <div class="col-md-4 border-start">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Chuyên mục:</label>
+                            <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryList" required>
+                                <option value="">-- Chọn danh mục --</option>
+                            </select>
+                            <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                        </div>
+                        
+                        <!-- Đường dẫn URL của ảnh đại diện (giữ nguyên theo tài liệu gốc) -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Link ảnh đại diện (URL):</label>
+                            <input asp-for="ImageUrl" class="form-control" placeholder="https://..." disabled />
+                            <div class="form-text text-muted small">Trường này tự động lưu vết đường dẫn ảnh.</div>
+                        </div>
+
+                        <!-- Thêm ô tải tệp tin vật lý để thay đổi ảnh của bài viết -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Thay thế ảnh mới:</label>
+                            <input type="file" name="uploadImage" class="form-control" accept="image/*" />
+                            <div class="form-text text-muted small">Nếu để trống, hệ thống sẽ tự động giữ lại hình ảnh cũ.</div>
+                        </div>
+
+                        <!-- Hiển thị hình ảnh hiện tại của bài viết -->
+                        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                        {
+                            <div class="mb-3 text-center">
+                                <span class="d-block small text-muted mb-1 fw-bold text-start">Ảnh hiện tại:</span>
+                                <img src="@Model.ImageUrl" class="img-thumbnail shadow-sm" alt="Ảnh hiện tại" style="max-height: 120px; object-fit: cover;" />
+                            </div>
+                        }
+
+                        <hr />
+                        
+                        <!-- Nhóm nút bấm điều khiển hành động -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-warning text-dark fw-bold">
+                                <i class="bi bi-cloud-arrow-up"></i> Lưu thay đổi
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Quay lại danh sách
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* Khu vực nạp các Script bổ sung cuối Layout *@
+@section Scripts {
+    <!-- Nạp thư viện trình soạn thảo CKEditor 5 từ CDN -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+    
+    <script>
+        // Kích hoạt khởi tạo trình soạn thảo giàu nội dung CKEditor 5
+        ClassicEditor
+            .create(document.querySelector('#editor'), {
+                placeholder: 'Hãy viết nội dung bài viết phong phú và chuyên nghiệp tại đây...'
+            })
+            .catch(error => {
+                console.error('Lỗi khi khởi tạo CKEditor 5: ', error);
+            });
+    </script>
+}

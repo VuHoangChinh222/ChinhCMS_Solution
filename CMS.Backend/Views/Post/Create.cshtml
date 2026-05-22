@@ -1,0 +1,117 @@
+@*
+    Giao diện thêm mới bài viết quản trị
+*@
+@model CMS.Data.Entities.Post
+
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Thêm bài viết mới";
+}
+
+@* 
+   Thông tin sinh viên thực hiện dự án:
+   Sinh viên : Vũ Hoàng Chính
+   Mã sinh viên: 2122110380
+   Lớp: CCQ2211J
+   Ngày tạo: 21/05/2026
+   Phiên bản: 1.0 (Đồng bộ cấu trúc 2 cột theo tài liệu học tập & tích hợp CKEditor 5)
+*@
+
+<div class="container mt-4">
+    <!-- Thẻ Card bao quanh form nhập liệu có đổ bóng sang trọng -->
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0 fw-bold"><i class="bi bi-file-earmark-plus"></i> THÊM BÀI VIẾT MỚI</h4>
+        </div>
+        <div class="card-body">
+            
+            <!-- Biểu mẫu gửi dữ liệu dạng POST, có enctype để hỗ trợ tải tệp tin ảnh vật lý -->
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+                
+                <!-- Hiển thị bảng tổng hợp lỗi nếu có -->
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <!-- Cấu trúc hàng chia làm 2 cột chuẩn theo tài liệu gốc (col-md-8 và col-md-4) -->
+                <div class="row">
+                    
+                    <!-- Cột bên trái (col-md-8): Tiêu đề và Nội dung chi tiết -->
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tiêu đề bài viết:</label>
+                            <input asp-for="Title" class="form-control" placeholder="Nhập tiêu đề..." required />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nội dung chi tiết:</label>
+                            <!-- Kích hoạt CKEditor 5 trên phần tử textarea này thông qua ID editor -->
+                            <textarea asp-for="Content" id="editor" class="form-control" rows="10" placeholder="Viết nội dung tại đây..."></textarea>
+                            <span asp-validation-for="Content" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Cột bên phải (col-md-4): Chuyên mục, Ảnh đại diện, Ngày đăng và nút điều khiển -->
+                    <div class="col-md-4 border-start">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Chuyên mục:</label>
+                            <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryList" required>
+                                <option value="">-- Chọn danh mục --</option>
+                            </select>
+                            <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                        </div>
+                        
+                        @* Chức năng sẽ được thêm sau này *@
+                        @* <!-- Đường dẫn URL của ảnh đại diện (giữ nguyên theo tài liệu gốc) -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Link ảnh đại diện (URL):</label>
+                            <input asp-for="ImageUrl" class="form-control" placeholder="https://..." />
+                            <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+                        </div> *@
+
+                        <!-- Thêm ô tải tệp tin vật lý để tính năng upload file của Controller chạy được trên thực tế -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Hoặc tải ảnh từ thiết bị:</label>
+                            <input type="file" name="uploadImage" class="form-control" accept="image/*" />
+                        </div>
+
+                        <!-- Ô nhập ngày đăng bài viết -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Ngày đăng:</label>
+                            <input asp-for="CreatedDate" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                            <span asp-validation-for="CreatedDate" class="text-danger small"></span>
+                        </div>
+
+                        <hr />
+                        
+                        <!-- Nhóm nút bấm điều khiển hành động -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-cloud-arrow-up"></i> Lưu và Đăng bài
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Quay lại danh sách
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* Khu vực nạp các Script bổ sung cuối Layout *@
+@section Scripts {
+    <!-- Nạp thư viện trình soạn thảo CKEditor 5 từ CDN -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+    
+    <script>
+        // Kích hoạt khởi tạo trình soạn thảo giàu nội dung CKEditor 5
+        ClassicEditor
+            .create(document.querySelector('#editor'), {
+                placeholder: 'Hãy viết nội dung bài viết phong phú và chuyên nghiệp tại đây...'
+            })
+            .catch(error => {
+                console.error('Lỗi khi khởi tạo CKEditor 5: ', error);
+            });
+    </script>
+}

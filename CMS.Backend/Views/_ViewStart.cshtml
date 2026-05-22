@@ -1,3 +1,15 @@
-﻿@{
-    Layout = "_Layout";
+@{
+    <!-- // Truy cập dữ liệu định tuyến để xác định Controller hiện tại đang được gọi
+    var controller = ViewContext.RouteData.Values["Controller"]?.ToString();
+
+    // Nếu người dùng đang ở trang chủ thuộc HomeController, sử dụng giao diện chính của trang chủ (_Layout)
+    if (controller == "Home")
+    {
+        Layout = "_Layout";
+    }
+    else -->
+    {
+        // Đối với toàn bộ các trang quản trị thực thể khác (Danh mục, Bài viết, Đơn hàng...), tự động áp dụng giao diện quản trị (_LayoutAdmin)
+        Layout = "_LayoutAdmin";
+    }
 }

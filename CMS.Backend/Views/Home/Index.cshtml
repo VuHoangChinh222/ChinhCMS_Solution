@@ -55,7 +55,9 @@
                             <h5 class="card-title fw-bold text-dark">@item.Title</h5>
                             
                             <!-- Tóm tắt nội dung bài viết, tự động cắt ngắn nếu nội dung quá dài -->
-                            <p class="card-text text-truncate flex-grow-1 text-muted">@item.Content</p>
+                            <p class="card-text text-truncate flex-grow-1 text-muted"> 
+                            @System.Text.RegularExpressions.Regex.Replace(item.Content ?? "", "<.*?>", string.Empty)
+                            </p>
                             
                             <!-- Nút chuyển tới trang xem chi tiết bài viết -->
                             <a href="@Url.Action("Details", "Post", new { id = item.Id })" class="btn btn-outline-danger btn-sm w-100 mt-3">
