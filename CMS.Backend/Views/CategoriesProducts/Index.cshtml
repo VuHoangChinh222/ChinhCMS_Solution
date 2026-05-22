@@ -69,12 +69,9 @@
                             {
                                 int productCount = item.Products != null ? item.Products.Count : 0;
                                 <tr>
-                                    <td class="ps-4 fw-semibold text-secondary">#@item.Id</td>
+                                    <td class="ps-4 fw-semibold text-secondary">@item.Id</td>
                                     <td>
                                         <div class="d-flex align-items-center gap-2">
-                                            <span class="p-2 rounded bg-primary bg-opacity-10 text-primary">
-                                                <i class="bi bi-tag-fill"></i>
-                                            </span>
                                             <span class="fw-semibold text-dark">@item.Name</span>
                                         </div>
                                     </td>

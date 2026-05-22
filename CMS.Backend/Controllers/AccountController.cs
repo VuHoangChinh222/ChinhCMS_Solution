@@ -51,8 +51,18 @@ namespace CMS.Backend.Controllers
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-                // 4. Thực thi Đăng nhập và lưu Cookie vào trình duyệt
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+                // 4. Thiết lập thuộc tính Cookie duy trì lâu dài
+                var authProperties = new AuthenticationProperties
+                {
+                    IsPersistent = true, // Giúp cookie được lưu trên ổ đĩa trình duyệt (không bị mất khi đóng trình duyệt hoặc restart app)
+                    ExpiresUtc = System.DateTimeOffset.UtcNow.AddDays(7) // Lưu trong vòng 7 ngày
+                };
+
+                // 5. Thực thi Đăng nhập và lưu Cookie vào trình duyệt
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme, 
+                    new ClaimsPrincipal(claimsIdentity), 
+                    authProperties);
 
                 return RedirectToAction("Index", "Home");
             }

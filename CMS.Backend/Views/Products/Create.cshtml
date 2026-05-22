@@ -1,0 +1,141 @@
+@model CMS.Data.Entities.Product
+
+@{
+    ViewData["Title"] = "Thêm Mới Sản Phẩm";
+    Layout = "_LayoutAdmin";
+}
+
+@* /*
+ * Sinh viên : Vũ Hoàng Chính
+ * Mã sinh viên: 2122110380
+ * Lớp: CCQ2211J
+ * Ngày tạo: 22/05/2026
+ * Version: 1.0
+ */ *@
+
+<div class="container-fluid mt-4">
+    <!-- Thanh điều hướng liên kết nhanh -->
+    <nav aria-label="Đường dẫn liên kết" class="mb-4">
+        <ol class="breadcrumb bg-light p-3 rounded-3 shadow-sm border border-light">
+            <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-primary"><i class="bi bi-box-seam"></i> Quản lý sản phẩm</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Thêm sản phẩm mới</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow-sm rounded-3">
+                <!-- Tiêu đề thẻ -->
+                <div class="card-header bg-white border-0 pt-4 px-4 pb-2">
+                    <h3 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                        <span class="p-2 rounded bg-success bg-opacity-10 text-success">
+                            <i class="bi bi-box-fill"></i>
+                        </span>
+                        THÊM MỚI SẢN PHẨM VÀO KHO
+                    </h3>
+                    <p class="text-muted small mb-0">Điền thông tin chi tiết của sản phẩm để lưu kho hệ thống kinh doanh.</p>
+                    <hr class="mt-3 mb-0 border-light" />
+                </div>
+
+                <div class="card-body p-4">
+                    <!-- Biểu mẫu gửi dữ liệu với thuộc tính enctype để upload file ảnh -->
+                    <form asp-action="Create" method="post" enctype="multipart/form-data">
+                        <!-- Khu vực hiển thị thông báo lỗi tổng hợp -->
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="row">
+                            <!-- Cột bên trái: Thông tin cơ bản -->
+                            <div class="col-md-7 border-end border-light pe-md-4">
+                                <!-- Tên sản phẩm -->
+                                <div class="mb-4">
+                                    <label asp-for="Name" class="form-label fw-bold text-dark">Tên sản phẩm <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-tag-fill"></i></span>
+                                        <input asp-for="Name" class="form-control border-start-0 ps-0" placeholder="Ví dụ: Giày 1..." style="background-color: #fff;" />
+                                    </div>
+                                    <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+                                </div>
+
+                                <!-- Chọn danh mục -->
+                                <div class="mb-4">
+                                    <label asp-for="CategoryProductId" class="form-label fw-bold text-dark">Danh mục sản phẩm <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-grid-fill"></i></span>
+                                        <select asp-for="CategoryProductId" asp-items="ViewBag.CategoryProductList" class="form-select border-start-0 ps-0" style="background-color: #fff;">
+                                            <option value="">-- Chọn danh mục sản phẩm --</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="CategoryProductId" class="text-danger small mt-1 d-block"></span>
+                                </div>
+
+                                <!-- Giá bán và Số lượng tồn kho (Chia làm 2 cột) -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label asp-for="Price" class="form-label fw-bold text-dark">Giá bán (VNĐ) <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-currency-dollar"></i></span>
+                                            <input asp-for="Price" type="number" class="form-control border-start-0 ps-0" placeholder="Nhập giá bán..." style="background-color: #fff;" />
+                                        </div>
+                                        <span asp-validation-for="Price" class="text-danger small mt-1 d-block"></span>
+                                    </div>
+
+                                    <div class="col-md-6 mb-4">
+                                        <label asp-for="StockQuantity" class="form-label fw-bold text-dark">Số lượng tồn kho <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-archive-fill"></i></span>
+                                            <input asp-for="StockQuantity" type="number" class="form-control border-start-0 ps-0" placeholder="Số lượng nhập..." style="background-color: #fff;" />
+                                        </div>
+                                        <span asp-validation-for="StockQuantity" class="text-danger small mt-1 d-block"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Mô tả chi tiết -->
+                                <div class="mb-4">
+                                    <label asp-for="Description" class="form-label fw-bold text-dark">Mô tả sản phẩm</label>
+                                    <textarea asp-for="Description" class="form-control" rows="5" placeholder="Nhập cấu hình, đặc điểm nổi bật, thông số kỹ thuật của sản phẩm..."></textarea>
+                                    <span asp-validation-for="Description" class="text-danger small mt-1 d-block"></span>
+                                </div>
+                            </div>
+
+                            <!-- Cột bên phải: Quản lý hình ảnh -->
+                            <div class="col-md-5 ps-md-4">
+                                <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-image"></i> HÌNH ẢNH SẢN PHẨM</h5>
+                                
+                                <!-- Upload ảnh file -->
+                                <div class="card bg-light border-dashed rounded-3 p-4 mb-4 text-center">
+                                    <div class="card-body">
+                                        <i class="bi bi-cloud-arrow-up-fill fs-1 text-primary mb-2"></i>
+                                        <h6 class="fw-bold text-dark">Tải ảnh lên từ thiết bị</h6>
+                                        <p class="text-muted small">Chấp nhận file PNG, JPG, JPEG kích thước tối đa 5MB</p>
+                                        <input type="file" name="uploadImage" class="form-control mt-3" accept="image/*" />
+                                    </div>
+                                </div>
+
+                                <div class="text-center text-muted my-3 fw-bold">Hoặc</div>
+                            </div>
+                        </div>
+
+                        <!-- Các nút lưu/hủy -->
+                        <div class="d-flex gap-2 justify-content-end mt-3 border-top pt-4">
+                            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 py-2 d-inline-flex align-items-center gap-1">
+                                <i class="bi bi-x-circle"></i> Hủy bỏ
+                            </a>
+                            <button type="submit" class="btn btn-success rounded-pill px-4 py-2 shadow-sm d-inline-flex align-items-center gap-1" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none;">
+                                <i class="bi bi-save-fill"></i> Tạo sản phẩm
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Chân trang hiển thị thông tin tác giả -->
+                <div class="card-footer bg-white border-0 py-3 text-center text-muted small border-top border-light">
+                    Sinh viên thực hiện: <strong>Vũ Hoàng Chính - 2122110380</strong> | Lớp: CCQ2211J
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

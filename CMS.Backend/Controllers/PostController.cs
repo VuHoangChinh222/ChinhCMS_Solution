@@ -189,6 +189,25 @@ namespace CMS.Backend.Controllers
             // Xử lý tải ảnh vật lý mới lên máy chủ trước khi kiểm tra ModelState.IsValid
             if (uploadImage != null && uploadImage.Length > 0)
             {
+                // Tìm kiếm thông tin bài viết cũ để xóa tệp tin ảnh vật lý cũ khỏi ổ cứng máy chủ
+                var oldPost = _context.Posts.AsNoTracking().FirstOrDefault(p => p.Id == model.Id);
+                if (oldPost != null && !string.IsNullOrEmpty(oldPost.ImageUrl) && oldPost.ImageUrl.StartsWith("/uploads/"))
+                {
+                    string oldRelativePath = oldPost.ImageUrl.TrimStart('/');
+                    string oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", oldRelativePath);
+                    if (System.IO.File.Exists(oldFilePath))
+                    {
+                        try
+                        {
+                            System.IO.File.Delete(oldFilePath);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Lỗi khi xóa tệp ảnh vật lý cũ: " + ex.Message);
+                        }
+                    }
+                }
+
                 string folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
                 if (!Directory.Exists(folder))
                 {

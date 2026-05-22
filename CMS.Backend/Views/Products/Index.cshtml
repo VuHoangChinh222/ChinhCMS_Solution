@@ -1,94 +1,145 @@
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@model IEnumerable<CMS.Data.Entities.Product>
+
 @{
+    ViewData["Title"] = "Quản Lý Sản Phẩm Kho Hàng";
+    Layout = "_LayoutAdmin";
 }
 
 @* /*
  * Sinh viên : Vũ Hoàng Chính
  * Mã sinh viên: 2122110380
  * Lớp: CCQ2211J
- * Ngày tạo: 15/05/2026
+ * Ngày tạo: 22/05/2026
  * Version: 1.0
  */ *@
 
-@model IEnumerable<CMS.Data.Entities.Product>
-
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="text-dark">QUẢN LÝ SẢN PHẨM</h2>
-        <button class="btn btn-success btn-sm">+ Thêm sản phẩm mới</button>
+<div class="container-fluid mt-4">
+    <!-- Tiêu đề & Nút thêm mới -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4">
+        <div class="card-body p-4 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">QUẢN LÝ SẢN PHẨM</h3>
+                <p class="text-muted small mb-0">Quản lý, theo dõi số lượng tồn kho, giá bán và phân loại sản phẩm trong hệ thống</p>
+            </div>
+            <a asp-action="Create" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm d-inline-flex align-items-center gap-2" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); border: none;">
+                <i class="bi bi-plus-circle-fill"></i> Thêm sản phẩm mới
+            </a>
+        </div>
     </div>
-    <table class="table table-hover shadow-sm border">
-        <thead class="table-light">
-            <tr>
-                <th>ID</th>
-                <th>Hình ảnh</th>
-                <th>Tên sản phẩm</th>
-                <th>Danh mục</th>
-                <th>Giá</th>
-                <th>Tồn kho</th>
-                <th>Mô tả</th>
-                <th>Thao tác</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach(var item in Model)
-            {
-                <tr>
-                    <td>@item.Id</td>
-                    <td>
-                        @if(!string.IsNullOrEmpty(item.ImageUrl))
+
+    <!-- Bảng danh sách sản phẩm -->
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="min-width: 1000px;">
+                    <thead class="table-light text-uppercase text-secondary" style="font-size: 12px; letter-spacing: 0.5px;">
+                        <tr>
+                            <th class="ps-4 py-3" style="width: 80px;">ID</th>
+                            <th class="py-3" style="width: 100px;">Hình ảnh</th>
+                            <th class="py-3">Tên sản phẩm</th>
+                            <th class="py-3">Danh mục</th>
+                            <th class="py-3 text-end" style="width: 140px;">Giá bán</th>
+                            <th class="py-3 text-center" style="width: 140px;">Tồn kho</th>
+                            <th class="py-3">Mô tả ngắn</th>
+                            <th class="pe-4 py-3 text-end" style="width: 200px;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
                         {
-                            <img src="@item.ImageUrl" alt="@item.Name" style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px;" />
+                            <tr>
+                                <td colspan="8" class="text-center py-5 text-muted">
+                                    <i class="bi bi-box-seam fs-1 d-block mb-3 text-secondary"></i>
+                                    Chưa có sản phẩm nào được nhập kho.
+                                </td>
+                            </tr>
                         }
                         else
                         {
-                            <span class="text-muted">Không có ảnh</span>
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-semibold text-secondary">#@item.Id</td>
+                                    <td>
+                                        <div class="d-flex align-items-center justify-content-center bg-light rounded-3 overflow-hidden border" style="width: 60px; height: 60px;">
+                                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                            {
+                                                <img src="@item.ImageUrl" alt="@item.Name" style="width: 100%; height: 100%; object-fit: cover;" />
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-image text-secondary fs-4"></i>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-dark d-block">@item.Name</span>
+                                    </td>
+                                    <td>
+                                        @if (item.CategoryProduct != null)
+                                        {
+                                            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-semibold">
+                                                @item.CategoryProduct.Name
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">Không rõ danh mục</span>
+                                        }
+                                    </td>
+                                    <td class="text-end fw-bold text-danger">
+                                        @item.Price.ToString("N0") đ
+                                    </td>
+                                    <td class="text-center">
+                                        @if (item.StockQuantity > 10)
+                                        {
+                                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-bold">
+                                                @item.StockQuantity chiếc
+                                            </span>
+                                        }
+                                        else if (item.StockQuantity > 0)
+                                        {
+                                            <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-2 fw-bold">
+                                                @item.StockQuantity chiếc (Ít hàng)
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2 fw-bold">
+                                                Hết hàng
+                                            </span>
+                                        }
+                                    </td>
+                                    <td class="text-muted text-truncate" style="max-width: 250px;">
+                                        @if (!string.IsNullOrEmpty(item.Description))
+                                        {
+                                            @item.Description
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">Chưa có mô tả</span>
+                                        }
+                                    </td>
+                                    <td class="pe-4 text-end">
+                                        <div class="d-inline-flex gap-2">
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning rounded-pill px-3 d-inline-flex align-items-center gap-1">
+                                                <i class="bi bi-pencil-square"></i> Sửa
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger rounded-pill px-3 d-inline-flex align-items-center gap-1">
+                                                <i class="bi bi-trash3-fill"></i> Xóa
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
                         }
-                    </td>
-                    <td><strong>@item.Name</strong></td>
-                    <td>
-                        @if(item.CategoryProduct != null)
-                        {
-                            <span class="badge bg-primary">@item.CategoryProduct.Name</span>
-                        }
-                        else
-                        {
-                            <span class="text-muted">ID: @item.CategoryProductId</span>
-                        }
-                    </td>
-                    <td class="text-danger"><strong>@item.Price.ToString("N0") ₫</strong></td>
-                    <td>
-                        @if(item.StockQuantity > 10)
-                        {
-                            <span class="badge bg-success">@item.StockQuantity</span>
-                        }
-                        else if(item.StockQuantity > 0)
-                        {
-                            <span class="badge bg-warning text-dark">@item.StockQuantity</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-danger">Hết hàng</span>
-                        }
-                    </td>
-                    <td>
-                        @if(!string.IsNullOrEmpty(item.Description))
-                        {
-                            @(item.Description.Length > 50 ? item.Description.Substring(0, 50) + "..." : item.Description)
-                        }
-                        else
-                        {
-                            <span class="text-muted">Chưa có mô tả</span>
-                        }
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-warning">Sửa</button>
-                        <button class="btn btn-sm btn-outline-danger">Xóa</button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Chân trang hiển thị thông tin tác giả -->
+        <div class="card-footer bg-white border-0 py-3 text-center text-muted small border-top border-light">
+            Sinh viên thực hiện: <strong>Vũ Hoàng Chính - 2122110380</strong> | Lớp: CCQ2211J
+        </div>
+    </div>
 </div>

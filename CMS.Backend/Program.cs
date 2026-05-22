@@ -9,11 +9,18 @@
 using Microsoft.EntityFrameworkCore; // Thêm using cho Entity Framework Core
 using CMS.Data; // Thêm using cho ApplicationDbContext
 using Microsoft.AspNetCore.Authentication.Cookies; // Thêm using cho Cookie Authentication
+using Microsoft.AspNetCore.DataProtection;
+using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Cấu hình lưu trữ khóa Data Protection cố định trong thư mục dự án
+// Giúp Cookie duy trì trạng thái xác thực và không bị mất khi biên dịch lại (rebuild) hoặc khởi động lại server
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "App_Data", "Keys")));
 
 // Đăng ký DbContext vào hệ thống
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
