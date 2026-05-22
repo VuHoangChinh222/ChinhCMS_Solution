@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Sinh viên : Vũ Hoàng Chính
  * Mã sinh viên: 2122110380
  * Lớp: CCQ2211J
@@ -8,10 +8,12 @@
 
 using CMS.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CMS.Backend.Controllers
 {
     // Controller ProductsController quản lý các hành động liên quan đến sản phẩm, ví dụ: hiển thị danh sách sản phẩm.
+    [Authorize]
     public class ProductsController : Controller
     {
         // Khai báo biến _context để truy cập vào cơ sở dữ liệu thông qua ApplicationDbContext.

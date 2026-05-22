@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Sinh viên : Vũ Hoàng Chính
  * Mã sinh viên: 2122110380
  * Lớp: CCQ2211J
@@ -8,6 +8,7 @@
 
 using Microsoft.EntityFrameworkCore; // Thêm using cho Entity Framework Core
 using CMS.Data; // Thêm using cho ApplicationDbContext
+using Microsoft.AspNetCore.Authentication.Cookies; // Thêm using cho Cookie Authentication
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,14 @@ builder.Services.AddControllersWithViews();
 // Đăng ký DbContext vào hệ thống
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Đăng ký dịch vụ xác thực Cookie
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login"; // Đường dẫn đến trang đăng nhập nếu chưa xác thực
+        options.AccessDeniedPath = "/Account/AccessDenied"; // Đường dẫn đến trang báo lỗi khi không đủ quyền hạn
+    });
 
 var app = builder.Build();
 
@@ -33,6 +42,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication(); // Bật tính năng xác thực (phải nằm trước UseAuthorization)
 app.UseAuthorization();
 
 app.MapControllerRoute(

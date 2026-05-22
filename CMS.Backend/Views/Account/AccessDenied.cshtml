@@ -1,0 +1,71 @@
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Không Có Quyền Truy Cập (403)";
+}
+
+@* /*
+ * Sinh viên : Vũ Hoàng Chính
+ * Mã sinh viên: 2122110380
+ * Lớp: CCQ2211J
+ * Ngày tạo: 22/05/2026
+ * Version: 1.0
+ */ *@
+
+<div class="container-fluid d-flex align-items-center justify-content-center" style="min-height: 75vh;">
+    <div class="text-center p-5 rounded-4 shadow-sm bg-white border border-light" style="max-width: 520px;">
+        <!-- Biểu tượng cảnh báo dạng Khiên Neon cực đẹp -->
+        <div class="mb-4">
+            <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-danger bg-opacity-10 text-danger animate-pulse" style="width: 90px; height: 90px;">
+                <i class="bi bi-shield-slash-fill" style="font-size: 45px;"></i>
+            </span>
+        </div>
+
+        <!-- Mã lỗi 403 -->
+        <h1 class="display-3 fw-bold text-danger mb-2">403</h1>
+        
+        <!-- Tiêu đề tiếng Việt -->
+        <h3 class="fw-bold text-dark mb-3">KHÔNG CÓ QUYỀN TRUY CẬP</h3>
+        
+        <!-- Giải thích chi tiết lịch sự chuẩn UI/UX -->
+        <p class="text-muted fs-6 mb-4 px-3" style="line-height: 1.6;">
+            Xin lỗi, tài khoản của bạn hiện đang thuộc nhóm quyền hạn không được phép truy cập vào khu vực quản trị này. Vui lòng quay lại hoặc liên hệ với Quản trị viên để được cấp quyền.
+        </p>
+
+        <!-- Nút hướng dẫn quay về trang chủ Admin -->
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a href="@Url.Action("Index", "Home")" class="btn btn-primary btn-sm px-4 py-2 rounded-pill shadow-sm d-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); border: none;">
+                <i class="bi bi-house-door-fill"></i> Quay lại Trang chủ
+            </a>
+            <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm px-4 py-2 rounded-pill d-flex align-items-center justify-content-center gap-2">
+                <i class="bi bi-arrow-left-short fs-5"></i> Trở về trang trước
+            </a>
+        </div>
+
+        <!-- Chân trang cá nhân -->
+        <div class="mt-5 pt-3 border-top border-light text-muted small">
+            <span>Sinh viên thực hiện: Vũ Hoàng Chính - Lớp: CCQ2211J</span>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Hiệu ứng nhấp nháy chuyển động cho Icon Khiên */
+    .animate-pulse {
+        animation: pulse 2s infinite ease-in-out;
+    }
+
+    @@keyframes pulse {
+        0% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+        }
+        70% {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 15px rgba(220, 53, 69, 0);
+        }
+        100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+        }
+    }
+</style>

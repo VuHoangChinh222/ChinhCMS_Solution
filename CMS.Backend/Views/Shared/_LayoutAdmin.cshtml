@@ -139,6 +139,26 @@
             <h5 class="offcanvas-title text-primary fw-bold" id="mobileSidebarLabel">ChinhCMS Admin</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
+        
+        <!-- Khối thông tin người dùng trên di động -->
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div class="px-3 py-3 border-bottom border-secondary bg-black bg-opacity-25">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="bi bi-person-circle fs-4 me-2 text-primary"></i>
+                    <div>
+                        <div class="fw-semibold text-white" style="font-size: 14px;">@User.FindFirst("FullName")?.Value</div>
+                        <span class="badge @(User.IsInRole("Admin") ? "bg-danger" : "bg-info text-dark") mt-1" style="font-size: 10px;">
+                            @User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value
+                        </span>
+                    </div>
+                </div>
+                <a class="btn btn-outline-danger btn-sm w-100 mt-2" asp-controller="Account" asp-action="Logout">
+                    <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                </a>
+            </div>
+        }
+
         <!-- Nội dung menu di động - hoàn toàn giống menu trên Desktop -->
         <div class="offcanvas-body p-0">
             <a href="@Url.Action("Index", "Home")" class="nav-link-item d-flex align-items-center gap-2 px-3 py-2 text-decoration-none @(currentController == "Home" && currentAction == "Index" ? "active bg-primary text-white fw-bold" : "text-light")">
@@ -179,6 +199,26 @@
         <div class="brand-title text-center text-primary">
             ChinhCMS Admin
         </div>
+        
+        <!-- Khối thông tin người dùng trên Desktop (giống di động) -->
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div class="px-3 py-3 border-bottom border-secondary bg-black bg-opacity-25 mb-2">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="bi bi-person-circle fs-4 me-2 text-primary"></i>
+                    <div>
+                        <div class="fw-semibold text-white" style="font-size: 14px;">@User.FindFirst("FullName")?.Value</div>
+                        <span class="badge @(User.IsInRole("Admin") ? "bg-danger" : "bg-info text-dark") mt-1" style="font-size: 10px;">
+                            @User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value
+                        </span>
+                    </div>
+                </div>
+                <a class="btn btn-outline-danger btn-sm w-100 mt-2" asp-controller="Account" asp-action="Logout">
+                    <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                </a>
+            </div>
+        }
+
         <div class="mt-2">
             <!-- Mục 1: Bảng điều khiển chung -->
             <a asp-controller="Home" asp-action="Index" class="nav-link-item @(currentController == "Home" && currentAction == "Index" ? "active" : "")">

@@ -8,10 +8,12 @@
 
 using CMS.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CMS.Backend.Controllers
 {
     // Controller OrdersController quản lý các hành động liên quan đến đơn hàng, ví dụ: hiển thị danh sách đơn hàng.
+    [Authorize]
     public class OrdersController : Controller
     {
         // Khai báo biến _context để truy cập vào cơ sở dữ liệu thông qua ApplicationDbContext.

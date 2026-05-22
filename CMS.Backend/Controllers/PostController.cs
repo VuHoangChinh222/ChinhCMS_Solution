@@ -12,11 +12,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering; // Thư viện cần thiết để sử dụng danh sách chọn SelectList
 using System.IO; // Thư viện để thao tác với file và đường dẫn thư mục
+using Microsoft.AspNetCore.Authorization;
 
 namespace CMS.Backend.Controllers
 {
     // Controller PostController quản lý các hành động liên quan đến bài viết tin tức
     // , ví dụ: hiển thị danh sách các bài viết.
+    [Authorize]
     public class PostController : Controller
     {
         private readonly ApplicationDbContext _context;

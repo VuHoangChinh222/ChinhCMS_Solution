@@ -6,15 +6,17 @@
  * Version: 1.0
  */
 
+using CMS.Backend.Helpers; // Kết nối tới lớp Helper để băm mật khẩu
 using CMS.Data;
 using CMS.Data.Entities; // Kết nối tới lớp dữ liệu
-using CMS.Backend.Helpers; // Kết nối tới lớp Helper để băm mật khẩu
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore; // Hỗ trợ AsNoTracking
 using System.Linq;
 
 namespace CMS.Backend.Controllers
 {
+    [Authorize(Roles = "Admin")]
     // Controller UserController quản lý các hành động liên quan đến thành viên, ví dụ: hiển thị danh sách thành viên.
     public class UserController : Controller
     {

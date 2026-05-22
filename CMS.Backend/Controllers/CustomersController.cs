@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Sinh viên : Vũ Hoàng Chính
  * Mã sinh viên: 2122110380
  * Lớp: CCQ2211J
@@ -8,10 +8,12 @@
 
 using CMS.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CMS.Backend.Controllers
 {
     // Controller CustomersController quản lý các hành động liên quan đến khách hàng, ví dụ: hiển thị danh sách khách hàng.
+    [Authorize(Roles = "Admin")]
     public class CustomersController : Controller
     {
         // Khai báo biến _context để truy cập vào cơ sở dữ liệu thông qua ApplicationDbContext.

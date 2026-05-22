@@ -10,12 +10,13 @@ using CMS.Data;
 using CMS.Data.Entities; // Kết nối tới lớp dữ liệu 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Authorization;
 
 namespace CMS.Backend.Controllers
 {
     // Controller CategoryController quản lý các hành động liên quan đến danh mục tin tức
     // , ví dụ: hiển thị danh sách các danh mục.
+    [Authorize(Roles = "Admin")]
     public class CategoryController : Controller
     {
         private readonly ApplicationDbContext _context;

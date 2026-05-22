@@ -12,10 +12,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore; // Thư viện hỗ trợ phương thức Include tải kèm bảng liên quan
 using System.Diagnostics;
 using System.Linq; // Thư viện hỗ trợ các câu lệnh truy vấn LINQ
+using Microsoft.AspNetCore.Authorization;
 
 namespace CMS.Backend.Controllers
 {
     // Controller HomeController quản lý trang chủ và các trang thông tin chung của hệ thống.
+    [Authorize]
     public class HomeController : Controller
     {
         // Khai báo đối tượng kết nối cơ sở dữ liệu
@@ -55,6 +57,7 @@ namespace CMS.Backend.Controllers
         }
 
         // Hàm hiển thị trang báo lỗi khi hệ thống xảy ra sự cố ngoài ý muốn
+        [AllowAnonymous]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

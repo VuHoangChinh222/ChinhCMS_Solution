@@ -1,50 +1,116 @@
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@model IEnumerable<CMS.Data.Entities.CategoryProduct>
+
 @{
+    ViewData["Title"] = "Quản Lý Danh Mục Sản Phẩm";
+    Layout = "_LayoutAdmin";
 }
 
 @* /*
  * Sinh viên : Vũ Hoàng Chính
  * Mã sinh viên: 2122110380
  * Lớp: CCQ2211J
- * Ngày tạo: 15/05/2026
+ * Ngày tạo: 22/05/2026
  * Version: 1.0
  */ *@
 
-@model IEnumerable<CMS.Data.Entities.CategoryProduct>
+<div class="container-fluid mt-4">
+    <!-- Hộp thông báo lỗi nếu có -->
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm border-0 d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-4 me-3 text-danger"></i>
+            <div>
+                <strong>Lỗi hệ thống:</strong> @TempData["ErrorMessage"]
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="text-dark">QUẢN LÝ DANH MỤC SẢN PHẨM</h2>
-        <button class="btn btn-success btn-sm">+ Thêm danh mục mới</button>
+    <!-- Tiêu đề & Nút thêm mới -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4">
+        <div class="card-body p-4 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">DANH MỤC SẢN PHẨM</h3>
+                <p class="text-muted small mb-0">Quản lý và phân loại các mặt hàng kinh doanh trong hệ thống</p>
+            </div>
+            <a asp-action="Create" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm d-inline-flex align-items-center gap-2" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); border: none;">
+                <i class="bi bi-plus-circle-fill"></i> Thêm danh mục mới
+            </a>
+        </div>
     </div>
-    <table class="table table-hover shadow-sm border">
-        <thead class="table-light">
-            <tr>
-                <th>ID</th>
-                <th>Tên danh mục</th>
-                <th>Mô tả</th>
-                <th>Số sản phẩm</th>
-                <th>Thao tác</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach(var item in Model)
-            {
-                <tr>
-                    <td>@item.Id</td>
-                    <td><strong>@item.Name</strong></td>
-                    <td>@(item.Description ?? "Chưa có mô tả")</td>
-                    <td>
-                        <span class="badge bg-primary">@(item.Products != null ? item.Products.Count : 0)</span>
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-warning">Sửa</button>
-                        <button class="btn btn-sm btn-outline-danger">Xóa</button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+
+    <!-- Bảng danh sách danh mục -->
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="min-width: 800px;">
+                    <thead class="table-light text-uppercase text-secondary" style="font-size: 12px; letter-spacing: 0.5px;">
+                        <tr>
+                            <th class="ps-4 py-3" style="width: 80px;">ID</th>
+                            <th class="py-3">Tên danh mục</th>
+                            <th class="py-3">Mô tả chi tiết</th>
+                            <th class="py-3 text-center" style="width: 150px;">Số sản phẩm</th>
+                            <th class="pe-4 py-3 text-end" style="width: 200px;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <i class="bi bi-folder-x fs-1 d-block mb-3 text-secondary"></i>
+                                    Chưa có danh mục sản phẩm nào được tạo.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var item in Model)
+                            {
+                                int productCount = item.Products != null ? item.Products.Count : 0;
+                                <tr>
+                                    <td class="ps-4 fw-semibold text-secondary">#@item.Id</td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="p-2 rounded bg-primary bg-opacity-10 text-primary">
+                                                <i class="bi bi-tag-fill"></i>
+                                            </span>
+                                            <span class="fw-semibold text-dark">@item.Name</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-muted text-truncate" style="max-width: 300px;">
+                                        @(item.Description ?? "Chưa có mô tả")
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge @(productCount > 0 ? "bg-primary bg-opacity-10 text-primary" : "bg-secondary bg-opacity-10 text-secondary") rounded-pill px-3 py-2 fw-bold" style="font-size: 13px;">
+                                            @productCount sản phẩm
+                                        </span>
+                                    </td>
+                                    <td class="pe-4 text-end">
+                                        <div class="d-inline-flex gap-2">
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning rounded-pill px-3 d-inline-flex align-items-center gap-1">
+                                                <i class="bi bi-pencil-square"></i> Sửa
+                                            </a>
+                                            
+                                            @* Nếu số lượng sản phẩm > 0 thì ẩn hoàn toàn nút Xóa *@
+                                            @if (productCount == 0)
+                                            {
+                                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger rounded-pill px-3 d-inline-flex align-items-center gap-1">
+                                                    <i class="bi bi-trash3-fill"></i> Xóa
+                                                </a>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Chân trang hiển thị thông tin tác giả -->
+        <div class="card-footer bg-white border-0 py-3 text-center text-muted small border-top border-light">
+            Sinh viên thực hiện: <strong>Vũ Hoàng Chính - 2122110380</strong> | Lớp: CCQ2211J
+        </div>
+    </div>
 </div>
