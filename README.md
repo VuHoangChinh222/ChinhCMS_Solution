@@ -38,20 +38,19 @@ Giải pháp `ChinhCMS_Solution` được tổ chức thành 3 phân lớp chuy�
 *   **Liên kết Controller thực tế:** Tích hợp đầy đủ các danh mục quản trị thực tế bao gồm Quản lý danh mục, Bài viết, Thành viên, Danh mục sản phẩm, Sản phẩm, Khách hàng và Đơn hàng.
 *   **Đáp ứng (Responsive) 100%:** Thiết kế tương thích hoàn hảo trên mọi kích thước màn hình từ Desktop, Tablet đến Smartphone:
     *   *Trên màn hình Desktop:* Sidebar hiển thị cố định 240px chuyên nghiệp ở bên trái.
-    *   *Trên màn hình di động:* Sidebar tự động thu gọn thành nút Menu 3 dấu gạch ngang (Hamburger Menu) ở thanh tiêu đề phía trên. Khi nhấn nút, Sidebar sẽ trượt ra mượt mà dưới dạng ngăn kéo nền tối (**Offcanvas Menu**) sang trọng, giải quyết triệt để lỗi mất thanh bar hoặc nền trắng/màn hình xám trên di động.
+    *   *Trên màn hình di động:* Sidebar tự động thu gọn thành nút Menu 3 dấu gạch ngang (Hamburger Menu) ở thanh tiêu đề phía trên. Khi nhấn nút, Sidebar sẽ trượt ra mượt mà dưới dạng ngăn kéo nền tối (**Offcanvas Menu**) sang trọng, hỗ trợ màn hình di động.
 
 ### 📝 2. Quản Lý Bài Viết Tin Tức Nâng Cao (Post CRUD)
 *   **Cấu trúc 2 cột chuẩn khoa học:** Giao diện Thêm mới (`Create.cshtml`) và Chỉnh sửa (`Edit.cshtml`) được thiết kế đồng bộ theo tỷ lệ vàng `col-md-8` (Tiêu đề, Ô soạn thảo nội dung bên trái) và `col-md-4` (Chuyên mục, Ảnh đại diện, Ngày đăng, Nút hành động bên phải) chuẩn xác theo tài liệu học tập của thầy Nguyễn Cao Thái.
 *   **Tích hợp Trình soạn thảo CKEditor 5:** Biến ô nhập văn bản thô truyền thống thành trình soạn thảo văn bản phong phú (Rich Text Editor) chuyên nghiệp qua mạng CDN, hỗ trợ định dạng in đậm, in nghiêng, căn lề, danh sách tự động...
 *   **Cơ chế tải và quản lý ảnh vật lý thông minh:**
-    *   **Tải ảnh đĩa cứng:** Cho phép người dùng vừa dán link URL ảnh, vừa chọn tải ảnh trực tiếp từ máy tính lên. Ảnh tải lên được lưu vật lý vào thư mục cục bộ `CMS.Backend/wwwroot/uploads/`.
+    *   **Tải ảnh đĩa cứng:** Cho phép người dùng chọn tải ảnh trực tiếp từ máy tính lên. Ảnh tải lên được lưu vật lý vào thư mục cục bộ `CMS.Backend/wwwroot/uploads/`.
     *   **Sinh tên file duy nhất:** Tự động tạo tên file ảnh bằng chuỗi ngẫu nhiên `Guid.NewGuid()` kết hợp đuôi mở rộng gốc để chống ghi đè ảnh trùng tên khi upload cùng lúc.
-    *   **Chống lỗi bắt buộc nhập URL:** Xử lý và lưu ảnh vật lý lên đĩa cứng trước khi kiểm tra trạng thái ModelState, giải quyết triệt để lỗi không lưu được dữ liệu khi người dùng chọn tải ảnh từ máy tính thay vì nhập link URL.
     *   **Giữ ảnh cũ khi sửa:** Trong trang Chỉnh sửa, hệ thống có khung xem trước hình ảnh cũ. Nếu người dùng không tải ảnh mới lên, hệ thống tự động sử dụng `.AsNoTracking()` truy vấn để giữ nguyên hình ảnh cũ mà không ghi đè giá trị rỗng.
-*   **Tự động dọn dẹp ảnh mồ côi khi xóa bài viết:**
+*   **Tự động dọn dẹp ảnh của bài viết đó khi xóa bài viết:**
     *   Khi bạn thực thi xóa một bài viết ra khỏi cơ sở dữ liệu, bộ điều khiển sẽ tự động kiểm tra xem ảnh của bài viết đó có phải là ảnh cục bộ nằm trong thư mục `/uploads/` hay không. 
     *   Nếu đúng, hệ thống sẽ sử dụng lệnh `System.IO.File.Delete` xóa sạch tệp tin ảnh đó khỏi ổ cứng máy chủ trước khi xóa bản ghi khỏi SQL Server, tránh lãng phí dung lượng bộ nhớ máy chủ.
-*   **Trình diễn hiển thị bài viết hoàn mỹ:**
+*   **Hiển thị bài viết :**
     *   *Trang danh sách (Post/Index) và Trang chủ (Home/Index):* Sử dụng biểu thức chính quy (Regex) `@System.Text.RegularExpressions.Regex.Replace(..., "<.*?>", string.Empty)` để lọc sạch hoàn toàn các thẻ HTML được tạo bởi CKEditor, giúp phần văn bản tóm tắt bài viết trên các card Bootstrap luôn sạch sẽ, thẳng hàng và không làm vỡ bố cục.
     *   *Trang chi tiết (Post/Details):* Áp dụng cú pháp `@Html.Raw(Model.Content)` giúp trình duyệt biên dịch và hiển thị bài viết tin tức đầy đủ định dạng bắt mắt nhất.
 
