@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Sinh viên : Vũ Hoàng Chính
  * Mã sinh viên: 2122110380
  * Lớp: CCQ2211J
@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations; // Thêm thư viện validation
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,9 +20,17 @@ namespace CMS.Data.Entities
     public class User
     {
         public int Id { get; set; } // Khóa chính và tự động tăng
+
+        [Required(ErrorMessage = "Vui lòng nhập tên đăng nhập")]
         public string Username { get; set; } // Tên đăng nhập của người dùng
-        public string PasswordHash { get; set; } // Mật khẩu hiện chưa được sử dụng hash
+
+        [Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
+        public string PasswordHash { get; set; } // Mật khẩu
+
+        [Required(ErrorMessage = "Vui lòng nhập họ và tên")]
         public string FullName { get; set; } // Họ và tên đầy đủ của người dùng
+
+        [Required(ErrorMessage = "Vui lòng chọn vai trò")]
         public string Role { get; set; } // Quản trị viên hoặc Biên tập viên
     }
 }

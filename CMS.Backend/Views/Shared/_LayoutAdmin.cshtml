@@ -210,9 +210,9 @@
             <a asp-controller="Orders" asp-action="Index" class="nav-link-item @(currentController == "Orders" ? "active" : "")">
                 <i class="bi bi-receipt"></i> Đơn hàng tổng hợp
             </a>
-            <a asp-controller="OrderDetails" asp-action="Index" class="nav-link-item @(currentController == "OrderDetails" ? "active" : "")">
+            @* <a asp-controller="OrderDetails" asp-action="Index" class="nav-link-item @(currentController == "OrderDetails" ? "active" : "")">
                 <i class="bi bi-list-check"></i> Đơn hàng chi tiết
-            </a>
+            </a> *@
             <!-- Nhóm chức năng quảng lý nhân sự editer ...-->
             <div class="menu-section-title">Nhân sự</div>
             <a asp-controller="User" asp-action="Index" class="nav-link-item @(currentController == "User" ? "active" : "")">

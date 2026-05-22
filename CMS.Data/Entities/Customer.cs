@@ -25,7 +25,7 @@ namespace CMS.Data.Entities
         [Required]
         public string FullName { get; set; } // Họ và tên đầy đủ của khách hàng
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng nhập Email")]
         [EmailAddress]
         public string Email { get; set; } // Địa chỉ email của khách hàng, có định dạng hợp lệ
 
@@ -33,8 +33,8 @@ namespace CMS.Data.Entities
 
         public string? Address { get; set; } // Địa chỉ của khách hàng, có thể để trống
 
-        [Required]
-        public string Password { get; set; } // Lưu mật khẩu thô theo yêu cầu tối giản
+        [Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
+        public string Password { get; set; } // Mật khẩu 
 
         public virtual ICollection<Order>? Orders { get; set; } // Quan hệ: Một khách hàng có thể có nhiều đơn hàng
     }

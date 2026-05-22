@@ -26,5 +26,6 @@ namespace CMS.Backend.Controllers
             var data = _context.Products.ToList(); // Lấy dữ liệu THẬT từ bảng Products trong SQL
             return View(data);
         }
+        
     }
 }

@@ -1,10 +1,10 @@
-# 🚀 HỆ THỐNG QUẢN TRỊ NỘI DUNG VÀ BÁN HÀNG - CHINHCMS
+# HỆ THỐNG QUẢN LÝ NỘI DUNG VÀ BÁN HÀNG - CHINHCMS
 
-Hệ thống quản trị nội dung (CMS) và quản lý kinh doanh chuyên nghiệp, được xây dựng trên nền tảng **ASP.NET Core 8.0 MVC** kết hợp **Entity Framework Core**. Giải pháp được thiết kế theo kiến trúc phân lớp chuẩn mực, áp dụng các cơ chế bảo mật tối tân (mã hóa băm Bcrypt), tối ưu hóa truy vấn dữ liệu (LINQ nâng cao), và sở hữu giao diện quản trị Admin Panel tương thích toàn diện (Responsive) tích hợp trình biên tập văn bản giàu tính năng **CKEditor 5**.
+Hệ thống quản lý nội dung (CMS) và bán hàng được xây dựng trên nền tảng **ASP.NET Core 8.0 MVC** và **Entity Framework Core**. Dự án được thiết kế theo cấu trúc 3 lớp, giúp dễ quản lý, nâng cấp và tích hợp trình soạn thảo văn bản **CKEditor 5** cho việc viết bài.
 
 ---
 
-## 👨‍💻 THÔNG TIN TÁC GIẢ
+## THÔNG TIN SINH VIÊN
 
 *   **Sinh viên thực hiện:** Vũ Hoàng Chính
 *   **Mã số sinh viên:** 2122110380
@@ -15,91 +15,93 @@ Hệ thống quản trị nội dung (CMS) và quản lý kinh doanh chuyên ngh
 
 ---
 
-## 🏗️ KIẾN TRÚC DỰ ÁN (SOLUTION ARCHITECTURE)
+## CẤU TRÚC DỰ ÁN (SOLUTION)
 
-Giải pháp `ChinhCMS_Solution` được tổ chức thành 3 phân lớp chuyên biệt nhằm đảm bảo tính tái sử dụng, dễ bảo trì và nâng cấp:
+Dự án `ChinhCMS_Solution` được chia làm 3 dự án nhỏ bên trong:
 
-### 📂 Cấu trúc chi tiết các lớp:
-1.  **`CMS.Data` (Lớp Dữ liệu - Class Library)**:
-    *   Quản lý các thực thể ánh xạ xuống Database: `User`, `Category`, `Post`, `Customer`, `Product`, `ProductCategory`, `Order`, `OrderDetail`.
-    *   Lớp ngữ cảnh dữ liệu `ApplicationDbContext` thiết lập quan hệ ràng buộc và liên kết khóa ngoại chặt chẽ.
-2.  **`CMS.Backend` (Lớp Quản trị - ASP.NET Core 8.0 MVC)**:
-    *   Trái tim vận hành của hệ thống quản trị (Admin Panel).
-    *   Quản lý luồng xử lý (Controllers), định dạng hiển thị (Views) và lưu trữ tĩnh (wwwroot).
-3.  **`cms.frontend` (Lớp Giao diện Người dùng - ReactJS)**:
-    *   Ứng dụng độc lập phục vụ hiển thị tin tức và tương tác cho độc giả bên ngoài, kết nối và lấy nguyên liệu thô (JSON) từ các cổng API của Backend.
-
----
-
-## ✨ CÁC TÍNH NĂNG NỔI BẬT ĐÃ HOÀN THÀNH
-
-### 📺 1. Giao Diện Quản Trị Toàn Diện & Tương Thích (`_LayoutAdmin.cshtml`)
-*   **Sidebar Cố định Thông minh:** Tự động so khớp tuyến đường (Route) để tô màu nổi bật (`active`) liên kết đang duyệt, giúp định hướng thao tác trực quan.
-*   **Liên kết Controller thực tế:** Tích hợp đầy đủ các danh mục quản trị thực tế bao gồm Quản lý danh mục, Bài viết, Thành viên, Danh mục sản phẩm, Sản phẩm, Khách hàng và Đơn hàng.
-*   **Đáp ứng (Responsive) 100%:** Thiết kế tương thích hoàn hảo trên mọi kích thước màn hình từ Desktop, Tablet đến Smartphone:
-    *   *Trên màn hình Desktop:* Sidebar hiển thị cố định 240px chuyên nghiệp ở bên trái.
-    *   *Trên màn hình di động:* Sidebar tự động thu gọn thành nút Menu 3 dấu gạch ngang (Hamburger Menu) ở thanh tiêu đề phía trên. Khi nhấn nút, Sidebar sẽ trượt ra mượt mà dưới dạng ngăn kéo nền tối (**Offcanvas Menu**) sang trọng, hỗ trợ màn hình di động.
-
-### 📝 2. Quản Lý Bài Viết Tin Tức Nâng Cao (Post CRUD)
-*   **Cấu trúc 2 cột chuẩn khoa học:** Giao diện Thêm mới (`Create.cshtml`) và Chỉnh sửa (`Edit.cshtml`) được thiết kế đồng bộ theo tỷ lệ vàng `col-md-8` (Tiêu đề, Ô soạn thảo nội dung bên trái) và `col-md-4` (Chuyên mục, Ảnh đại diện, Ngày đăng, Nút hành động bên phải) chuẩn xác theo tài liệu học tập của thầy Nguyễn Cao Thái.
-*   **Tích hợp Trình soạn thảo CKEditor 5:** Biến ô nhập văn bản thô truyền thống thành trình soạn thảo văn bản phong phú (Rich Text Editor) chuyên nghiệp qua mạng CDN, hỗ trợ định dạng in đậm, in nghiêng, căn lề, danh sách tự động...
-*   **Cơ chế tải và quản lý ảnh vật lý thông minh:**
-    *   **Tải ảnh đĩa cứng:** Cho phép người dùng chọn tải ảnh trực tiếp từ máy tính lên. Ảnh tải lên được lưu vật lý vào thư mục cục bộ `CMS.Backend/wwwroot/uploads/`.
-    *   **Sinh tên file duy nhất:** Tự động tạo tên file ảnh bằng chuỗi ngẫu nhiên `Guid.NewGuid()` kết hợp đuôi mở rộng gốc để chống ghi đè ảnh trùng tên khi upload cùng lúc.
-    *   **Giữ ảnh cũ khi sửa:** Trong trang Chỉnh sửa, hệ thống có khung xem trước hình ảnh cũ. Nếu người dùng không tải ảnh mới lên, hệ thống tự động sử dụng `.AsNoTracking()` truy vấn để giữ nguyên hình ảnh cũ mà không ghi đè giá trị rỗng.
-*   **Tự động dọn dẹp ảnh của bài viết đó khi xóa bài viết:**
-    *   Khi bạn thực thi xóa một bài viết ra khỏi cơ sở dữ liệu, bộ điều khiển sẽ tự động kiểm tra xem ảnh của bài viết đó có phải là ảnh cục bộ nằm trong thư mục `/uploads/` hay không. 
-    *   Nếu đúng, hệ thống sẽ sử dụng lệnh `System.IO.File.Delete` xóa sạch tệp tin ảnh đó khỏi ổ cứng máy chủ trước khi xóa bản ghi khỏi SQL Server, tránh lãng phí dung lượng bộ nhớ máy chủ.
-*   **Hiển thị bài viết :**
-    *   *Trang danh sách (Post/Index) và Trang chủ (Home/Index):* Sử dụng biểu thức chính quy (Regex) `@System.Text.RegularExpressions.Regex.Replace(..., "<.*?>", string.Empty)` để lọc sạch hoàn toàn các thẻ HTML được tạo bởi CKEditor, giúp phần văn bản tóm tắt bài viết trên các card Bootstrap luôn sạch sẽ, thẳng hàng và không làm vỡ bố cục.
-    *   *Trang chi tiết (Post/Details):* Áp dụng cú pháp `@Html.Raw(Model.Content)` giúp trình duyệt biên dịch và hiển thị bài viết tin tức đầy đủ định dạng bắt mắt nhất.
-
-
-### 📦 3. Quản Lý Danh Mục Tin Tức Khóa An Toàn
-*   Áp dụng liên kết bảng sâu `.Include(c => c.Posts)`. Nếu danh mục tin tức đang chứa bài viết liên quan, hệ thống sẽ hiển thị bảng thống kê các bài viết và vô hiệu hóa nút xóa danh mục để bảo vệ toàn vẹn dữ liệu hệ thống.
+1.  **`CMS.Data` (Lớp dữ liệu)**:
+    *   Chứa các bảng dữ liệu: `User` (Thành viên), `Category` (Danh mục bài viết), `Post` (Bài viết), `Customer` (Khách hàng), `Product` (Sản phẩm), `CategoryProduct` (Danh mục sản phẩm), `Order` (Đơn hàng), `OrderDetail` (Chi tiết đơn hàng).
+    *   Sử dụng `ApplicationDbContext` để kết nối và cấu hình quan hệ giữa các bảng.
+2.  **`CMS.Backend` (Trang quản trị)**:
+    *   Xây dựng bằng ASP.NET Core 8.0 MVC để làm trang quản trị (Admin Panel) cho người điều hành.
+    *   Gồm các bộ điều khiển (Controllers), giao diện (Views) và tài nguyên tĩnh (hình ảnh, css nằm trong wwwroot).
+3.  **`cms.frontend` (Giao diện người dùng)**:
+    *   Trang hiển thị tin tức cho người xem được viết bằng ReactJS, lấy dữ liệu thông qua API từ Backend.
 
 ---
 
-## 🛠️ HƯỚNG DẪN CẤU HÌNH VÀ VẬN HÀNH DỰ ÁN
+## CÁC TÍNH NĂNG ĐÃ HOÀN THÀNH
 
-### 1. Yêu cầu hệ thống:
-*   Visual Studio 2022 (phiên bản 17.8 trở lên).
+### 1. Giao diện quản trị (Admin Layout)
+*   **Thanh điều hướng bên cạnh (Sidebar):** Hiển thị danh sách các mục quản lý như Danh mục, Bài viết, Thành viên, Danh mục sản phẩm, Sản phẩm, Khách hàng và Đơn hàng.
+*   **Tự động nhận diện trang:** Sidebar sẽ tự động tô đậm mục đang được chọn để người dùng dễ nhận biết.
+*   **Hỗ trợ giao diện điện thoại (Responsive):** 
+    *   Trên máy tính: Sidebar hiển thị cố định ở bên trái.
+    *   Trên điện thoại: Sidebar tự động thu gọn lại, người dùng có thể nhấn vào nút Menu ở góc trên để mở danh sách chức năng dưới dạng trượt (Offcanvas).
+
+### 2. Quản lý thành viên (User CRUD)
+*   **Danh sách thành viên:** Hiển thị rõ danh sách các tài khoản trong hệ thống kèm nhãn phân quyền nổi bật (Quản trị viên / Biên tập viên).
+*   **Thêm mới thành viên:** Form nhập đầy đủ thông tin với các ô nhập tên đăng nhập, họ tên, vai trò và ô ẩn mật khẩu.
+*   **Chỉnh sửa thông tin linh hoạt:** 
+    *   Không cho sửa tên đăng nhập để giữ an toàn hệ thống.
+    *   Hỗ trợ ô nhập mật khẩu mới tùy chọn: Nếu muốn đổi mật khẩu thì nhập vào ô mật khẩu mới, nếu để trống thì hệ thống tự động giữ nguyên mật khẩu cũ trong database.
+*   **Thông báo lỗi thân thiện:** Đã Việt hóa toàn bộ các thông báo lỗi xác thực của hệ thống (ví dụ: hiển thị "Vui lòng nhập mật khẩu" thay vì các câu thông báo mặc định bằng tiếng Anh).
+*   **Xóa tài khoản:** Tích hợp hộp thoại hỏi ý kiến xác nhận trước khi xóa, tránh trường hợp người dùng ấn nhầm nút xóa.
+
+### 3. Quản lý bài viết tin tức (Post CRUD)
+*   **Giao diện nhập liệu tiện lợi:** Chia làm 2 phần gồm phần soạn thảo nội dung (bên trái) và phần thiết lập như danh mục, ảnh đại diện, ngày đăng (bên phải).
+*   **Trình soạn thảo CKEditor 5:** Tích hợp trực tiếp giúp viết bài có thể định dạng chữ đậm, chữ nghiêng, căn lề, danh sách đầu dòng.
+*   **Tải ảnh trực tiếp lên máy chủ:**
+    *   Hỗ trợ tải file ảnh từ máy tính lên thư mục `wwwroot/uploads/` trên máy chủ.
+    *   Tự động đổi tên file ảnh bằng chuỗi ngẫu nhiên `Guid` để tránh việc file mới tải lên đè lên file cũ trùng tên.
+    *   Giữ lại ảnh cũ khi chỉnh sửa nếu người dùng không chọn ảnh mới.
+*   **Tự động xóa file ảnh khi xóa bài viết:** Khi xóa bài viết khỏi cơ sở dữ liệu, file ảnh lưu trong thư mục `uploads` cũng tự động được xóa đi để tiết kiệm dung lượng ổ cứng.
+*   **Lọc thẻ HTML khi xem tóm tắt:** Sử dụng Regex để loại bỏ các thẻ HTML khi hiển thị tóm tắt bài viết trên trang danh sách, giúp giao diện gọn gàng và không bị vỡ khung. Hiển thị đầy đủ định dạng HTML trong trang chi tiết bài viết.
+
+### 4. Quản lý danh mục bài viết
+*   **Xóa danh mục an toàn:** Khi xóa danh mục tin tức, hệ thống sẽ kiểm tra xem danh mục đó có chứa bài viết nào không. Nếu có bài viết, nút xóa sẽ bị khóa để tránh làm lỗi dữ liệu.
+
+---
+
+## HƯỚNG DẪN CÀI ĐẶT VÀ KHỞI CHẠY
+
+### 1. Chuẩn bị:
+*   Visual Studio 2022.
 *   .NET 8.0 SDK.
-*   SQL Server (phiên bản 2016 trở lên, khuyến nghị dùng LocalDB).
+*   SQL Server (khuyến nghị dùng LocalDB).
 
-### 2. Cài đặt các thư viện lõi (NuGet Packages):
-Mở cửa sổ `Package Manager Console` trong Visual Studio và chạy các lệnh sau:
+### 2. Cài đặt các thư viện (NuGet Packages):
+Mở `Package Manager Console` trong Visual Studio và cài đặt các thư viện:
 ```powershell
-Install-Package BCrypt.Net-Next
 Install-Package Microsoft.EntityFrameworkCore.SqlServer
 Install-Package Microsoft.EntityFrameworkCore.Tools
 ```
 
-### 3. Cấu hình Chuỗi kết nối Cơ sở dữ liệu:
-Mở tệp tin `CMS.Backend/appsettings.json` và cấu hình kết nối SQL Server của bạn. Theo mặc định hệ thống đang kết nối qua LocalDB cực kỳ tiện lợi:
+### 3. Cấu hình kết nối cơ sở dữ liệu:
+Mở file `CMS.Backend/appsettings.json` và điều chỉnh chuỗi kết nối đến SQL Server của bạn. Mặc định hệ thống sử dụng LocalDB:
 ```json
 "ConnectionStrings": {
   "DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=ChinhCMS_DB;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"
 }
 ```
 
-### 4. Các bước khởi chạy dự án:
-1.  Khởi chạy Visual Studio 2022 và mở tệp giải pháp `ChinhCMS_Solution.sln`.
-2.  Nhấp chuột phải vào dự án **`CMS.Backend`** ở cây thư mục bên phải và chọn **Set as Startup Project**.
-3.  Đảm bảo cơ sở dữ liệu `ChinhCMS_DB` của bạn đã được thiết lập đúng cấu trúc bảng.
-4.  Nhấn nút **Play (IIS Express / CMS.Backend)** hoặc nhấn phím `F5` để biên dịch dự án. Giao diện trang quản trị sẽ tự động bật lên trên trình duyệt web của bạn.
+### 4. Khởi chạy:
+1.  Mở file giải pháp `ChinhCMS_Solution.sln` bằng Visual Studio 2022.
+2.  Nhấp chuột phải vào dự án **`CMS.Backend`** và chọn **Set as Startup Project**.
+3.  Đảm bảo cơ sở dữ liệu `ChinhCMS_DB` đã được tạo và có sẵn dữ liệu.
+4.  Nhấn nút **Play** (hoặc phím `F5`) trên Visual Studio để chạy chương trình.
 
 ---
 
-## 📈 TIẾN TRÌNH THỰC HIỆN DỰ ÁN (MILESTONES)
+## TIẾN ĐỘ THỰC HIỆN DỰ ÁN
 
-| Buổi Học | Nội Dung Công Việc | Trạng Thái | Chi Tiết |
+| Buổi Học | Nội Dung Thực Hiện | Trạng Thái | Chi Tiết |
 | :--- | :--- | :---: | :--- |
-| **Buổi 1** | Khởi tạo cấu trúc giải pháp 3 phân lớp, thiết lập cơ sở dữ liệu `ChinhCMS_DB`. | **Đã hoàn thành** | Tạo các thực thể và cấu hình liên kết DbContext. |
-| **Buổi 2** | Triển khai mã hóa mật khẩu băm Bcrypt, quản lý đơn hàng & chi tiết đơn hàng trực quan. | **Đã hoàn thành** | Xây dựng class PasswordHelper, hiển thị danh sách hóa đơn theo trạng thái. |
-| **Buổi 3** | Xây dựng tính năng CRUD Danh mục an toàn, lọc bài viết tiêu điểm trên Trang chủ. | **Đã hoàn thành** | Khóa xóa danh mục chứa bài viết, truy vấn LINQ lấy 3 bài viết mới nhất. |
-| **Buổi 4** | Thiết kế Layout quản trị Admin Panel tương thích, tích hợp upload ảnh và CKEditor 5. | **Đang triển khai** | Hoàn thành Layout Admin, Menu Offcanvas di động, CKEditor 5, Tự động dọn dẹp ảnh mồ côi. |
+| **Buổi 1** | Khởi tạo cấu trúc dự án 3 lớp, thiết lập cơ sở dữ liệu `ChinhCMS_DB`. | **Đã hoàn thành** | Tạo các thực thể và cấu hình kết nối database. |
+| **Buổi 2** | Quản lý đơn hàng và chi tiết đơn hàng trực quan. | **Đã hoàn thành** | Thiết kế bảng hiển thị danh sách hóa đơn theo trạng thái. |
+| **Buổi 3** | Xây dựng chức năng CRUD Danh mục an toàn, lọc bài viết mới nhất lên Trang chủ. | **Đã hoàn thành** | Khóa xóa danh mục chứa bài viết, dùng LINQ lấy 3 bài viết mới nhất. |
+| **Buổi 4** | Thiết kế giao diện quản trị Admin Panel, tích hợp tải ảnh và trình soạn thảo CKEditor 5. | **Đã hoàn thành** | Hoàn thiện các trang quản lý: Danh mục, Bài viết, Đơn hàng, Thành viên (User CRUD). |
 
 ---
 
-*Hệ thống được thiết kế và phát triển bởi sinh viên Vũ Hoàng Chính - CCQ2211J.*
+*Dự án được thực hiện bởi sinh viên Vũ Hoàng Chính - CCQ2211J.*
