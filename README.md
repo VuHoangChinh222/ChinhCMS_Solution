@@ -18,6 +18,7 @@ Hệ thống quản trị nội dung (CMS) và quản lý kinh doanh chuyên ngh
 ## 🏗️ KIẾN TRÚC DỰ ÁN (SOLUTION ARCHITECTURE)
 
 Giải pháp `ChinhCMS_Solution` được tổ chức thành 3 phân lớp chuyên biệt nhằm đảm bảo tính tái sử dụng, dễ bảo trì và nâng cấp:
+<!-- 
 
 ```mermaid
 graph TD
@@ -25,6 +26,7 @@ graph TD
     B -->|Tương tác SQL Server| C[CMS.Data - Entity Framework Core]
     C -->|Ánh xạ thực thể| D[(ChinhCMS_DB)]
 ```
+ -->
 
 ### 📂 Cấu trúc chi tiết các lớp:
 1.  **`CMS.Data` (Lớp Dữ liệu - Class Library)**:
