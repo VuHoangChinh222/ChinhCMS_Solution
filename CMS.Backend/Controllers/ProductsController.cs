@@ -32,12 +32,25 @@ namespace CMS.Backend.Controllers
         // ==========================================
         // 1. TRANG DANH SÁCH SẢN PHẨM (INDEX)
         // ==========================================
-        public IActionResult Index()
+        public IActionResult Index(int page = 1)
         {
-            // Nạp kèm danh mục CategoryProduct của sản phẩm
-            var data = _context.Products
-                               .Include(p => p.CategoryProduct)
-                               .ToList();
+            if (page < 1) page = 1;
+            int pageSize = 10;
+
+            var query = _context.Products.Include(p => p.CategoryProduct);
+            int totalItems = query.Count();
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            if (page > totalPages && totalPages > 0) page = totalPages;
+
+            var data = query.OrderByDescending(p => p.Id)
+                            .Skip((page - 1) * pageSize)
+                            .Take(pageSize)
+                            .ToList();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.TotalItems = totalItems;
+
             return View(data);
         }
 

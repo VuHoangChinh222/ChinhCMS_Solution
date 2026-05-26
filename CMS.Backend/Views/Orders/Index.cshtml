@@ -1,73 +1,270 @@
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@model IEnumerable<CMS.Data.Entities.Order>
+
 @{
+    ViewData["Title"] = "Quản lý Đơn Hàng";
+    Layout = "_LayoutAdmin";
+    
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int totalItems = ViewBag.TotalItems ?? 0;
+    
+    int pendingCount = ViewBag.PendingCount ?? 0;
+    int shippingCount = ViewBag.ShippingCount ?? 0;
+    int completedCount = ViewBag.CompletedCount ?? 0;
+    int cancelledCount = ViewBag.CancelledCount ?? 0;
+    decimal totalRevenue = ViewBag.TotalRevenue ?? 0;
 }
 
 @* /*
  * Sinh viên : Vũ Hoàng Chính
  * Mã sinh viên: 2122110380
  * Lớp: CCQ2211J
- * Ngày tạo: 15/05/2026
- * Version: 1.0
+ * Ngày tạo: 26/05/2026
+ * Version: 1.2
  */ *@
 
-@model IEnumerable<CMS.Data.Entities.Order>
-
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="text-dark">QUẢN LÝ ĐƠN HÀNG</h2>
-        <button class="btn btn-success btn-sm">+ Tạo đơn hàng mới</button>
+<div class="container-fluid mt-4">
+    <!-- Tiêu đề cấp cao -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4">
+        <div class="card-body p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h3 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                    <span class="p-2 rounded bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-cart-check-fill"></i>
+                    </span>
+                    HỆ THỐNG QUẢN LÝ ĐƠN HÀNG
+                </h3>
+                <p class="text-muted small mb-0">Theo dõi, duyệt giao dịch, giám sát tiến độ giao hàng và doanh số bán hàng của hệ thống ChinhCMS.</p>
+            </div>
+            <div class="bg-indigo bg-opacity-10 text-indigo rounded-pill px-4 py-2 fw-bold d-inline-flex align-items-center gap-2" style="color: #4f46e5; background-color: rgba(79, 70, 229, 0.1);">
+                <i class="bi bi-calendar3"></i> Hôm nay: @DateTime.Now.ToString("dd/MM/yyyy")
+            </div>
+        </div>
     </div>
-    <table class="table table-hover shadow-sm border">
-        <thead class="table-light">
-            <tr>
-                <th>ID</th>
-                <th>Ngày đặt hàng</th>
-                <th>Khách hàng</th>
-                <th>Trạng thái</th>
-                <th>Ghi chú</th>
-                <th>Thao tác</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach(var item in Model)
-            {
-                <tr>
-                    <td>@item.Id</td>
-                    <td>@item.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
-                    <td>
-                        @if(item.Customer != null)
+
+    <!-- Hộp thống kê doanh số & trạng thái (Dashboard Stats Cards) -->
+    <div class="row g-3 mb-4">
+        <!-- Tổng số đơn hàng -->
+        <div class="col-6 col-lg-3 col-xl-2">
+            <div class="card border-0 shadow-sm h-100 rounded-3" style="border-left: 4px solid #4f46e5 !important;">
+                <div class="card-body p-3">
+                    <span class="text-muted small fw-bold text-uppercase d-block mb-1">Tổng đơn hàng</span>
+                    <h3 class="fw-bold text-dark mb-0">@totalItems</h3>
+                    <small class="text-indigo small font-medium"><i class="bi bi-receipt"></i> Tất cả các trạng thái</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chờ duyệt -->
+        <div class="col-6 col-lg-3 col-xl-2">
+            <div class="card border-0 shadow-sm h-100 rounded-3" style="border-left: 4px solid #f59e0b !important;">
+                <div class="card-body p-3">
+                    <span class="text-muted small fw-bold text-uppercase d-block mb-1">Chờ duyệt</span>
+                    <h3 class="fw-bold text-warning mb-0">@pendingCount</h3>
+                    <small class="text-muted small"><i class="bi bi-hourglass-split"></i> Cần xử lý gấp</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Đang giao hàng -->
+        <div class="col-6 col-lg-3 col-xl-2">
+            <div class="card border-0 shadow-sm h-100 rounded-3" style="border-left: 4px solid #06b6d4 !important;">
+                <div class="card-body p-3">
+                    <span class="text-muted small fw-bold text-uppercase d-block mb-1">Đang giao</span>
+                    <h3 class="fw-bold text-info mb-0">@shippingCount</h3>
+                    <small class="text-muted small"><i class="bi bi-truck"></i> Đang trên đường</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Đã hoàn thành -->
+        <div class="col-6 col-lg-3 col-xl-2">
+            <div class="card border-0 shadow-sm h-100 rounded-3" style="border-left: 4px solid #10b981 !important;">
+                <div class="card-body p-3">
+                    <span class="text-muted small fw-bold text-uppercase d-block mb-1">Đã xong</span>
+                    <h3 class="fw-bold text-success mb-0">@completedCount</h3>
+                    <small class="text-muted small"><i class="bi bi-check-circle-fill"></i> Giao thành công</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Đã hủy -->
+        <div class="col-6 col-lg-3 col-xl-2">
+            <div class="card border-0 shadow-sm h-100 rounded-3" style="border-left: 4px solid #ef4444 !important;">
+                <div class="card-body p-3">
+                    <span class="text-muted small fw-bold text-uppercase d-block mb-1">Đã hủy</span>
+                    <h3 class="fw-bold text-danger mb-0">@cancelledCount</h3>
+                    <small class="text-muted small"><i class="bi bi-x-circle-fill"></i> Đã hủy giao dịch</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doanh thu thành công -->
+        <div class="col-12 col-lg-9 col-xl-2">
+            <div class="card border-0 shadow-sm h-100 rounded-3 bg-success bg-opacity-10" style="border-left: 4px solid #059669 !important;">
+                <div class="card-body p-3">
+                    <span class="text-success small fw-bold text-uppercase d-block mb-1">Doanh thu (Thực nhận)</span>
+                    <h4 class="fw-bold text-success mb-0 text-truncate">@totalRevenue.ToString("N0") đ</h4>
+                    <small class="text-muted small"><i class="bi bi-piggy-bank-fill text-success"></i> Từ đơn Đã xong</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bảng danh sách đơn hàng -->
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="min-width: 950px;">
+                    <thead class="table-light text-uppercase text-secondary" style="font-size: 12px; letter-spacing: 0.5px;">
+                        <tr>
+                            <th class="ps-4 py-3" style="width: 80px;">Mã đơn</th>
+                            <th class="py-3">Thời gian đặt</th>
+                            <th class="py-3">Thông tin khách hàng</th>
+                            <th class="py-3" style="width: 160px;">Trạng thái đơn</th>
+                            <th class="py-3">Ghi chú giao nhận</th>
+                            <th class="pe-4 py-3 text-end" style="width: 250px;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
                         {
-                            <strong>@item.Customer.FullName</strong>
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-receipt fs-1 d-block mb-3 text-secondary"></i>
+                                    Chưa có đơn đặt hàng nào trong trang này.
+                                </td>
+                            </tr>
                         }
                         else
                         {
-                            <span class="text-muted">ID: @item.CustomerId</span>
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-bold text-secondary">#@item.Id</td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <span class="text-dark fw-bold"><i class="bi bi-clock-fill text-muted me-1"></i> @item.OrderDate.ToString("dd/MM/yyyy")</span>
+                                            <span class="text-muted small">@item.OrderDate.ToString("HH:mm:ss")</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if (item.Customer != null)
+                                        {
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="p-2 rounded bg-light text-secondary">
+                                                    <i class="bi bi-person-fill"></i>
+                                                </span>
+                                                <div class="d-flex flex-column">
+                                                    <strong class="text-dark">@item.Customer.FullName</strong>
+                                                    <span class="text-muted small">@item.Customer.Email</span>
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">Mã Khách: #@item.CustomerId</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (item.Status == 0)
+                                        {
+                                            <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 rounded-pill fw-bold d-inline-flex align-items-center gap-1">
+                                                <span class="spinner-grow spinner-grow-sm text-warning" role="status" style="width: 8px; height: 8px;"></span> Chờ duyệt
+                                            </span>
+                                        }
+                                        else if (item.Status == 1)
+                                        {
+                                            <span class="badge bg-info bg-opacity-10 text-info px-3 py-2 rounded-pill fw-bold d-inline-flex align-items-center gap-1">
+                                                <i class="bi bi-truck text-info"></i> Đang giao
+                                            </span>
+                                        }
+                                        else if (item.Status == 2)
+                                        {
+                                            <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill fw-bold d-inline-flex align-items-center gap-1">
+                                                <i class="bi bi-check-circle-fill text-success"></i> Đã xong
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill fw-bold d-inline-flex align-items-center gap-1">
+                                                <i class="bi bi-x-circle-fill text-danger"></i> Đã hủy
+                                            </span>
+                                        }
+                                    </td>
+                                    <td class="text-muted small text-truncate" style="max-width: 250px;">
+                                        @(item.Notes ?? "Không có ghi chú")
+                                    </td>
+                                    <td class="pe-4 text-end">
+                                        <div class="d-inline-flex gap-2">
+                                            <!-- Chi tiết -->
+                                            <a asp-action="Details" asp-route-id="@item.Id" 
+                                               class="btn btn-sm btn-light text-primary rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" 
+                                               style="width: 34px; height: 34px; border: 1px solid rgba(13, 110, 253, 0.15); background-color: #f8fafc;" 
+                                               title="Xem chi tiết đơn hàng">
+                                                <i class="bi bi-eye-fill" style="font-size: 14px;"></i>
+                                            </a>
+                                            <!-- Cập nhật trạng thái -->
+                                            <a asp-action="Edit" asp-route-id="@item.Id" 
+                                               class="btn btn-sm btn-light text-warning rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" 
+                                               style="width: 34px; height: 34px; border: 1px solid rgba(217, 119, 6, 0.25); background-color: #f8fafc;" 
+                                               title="Cập nhật trạng thái">
+                                                <i class="bi bi-pencil-square" style="font-size: 14px; color: #d97706;"></i>
+                                            </a>
+                                            <!-- Xóa -->
+                                            <a asp-action="Delete" asp-route-id="@item.Id" 
+                                               class="btn btn-sm btn-light text-danger rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" 
+                                               style="width: 34px; height: 34px; border: 1px solid rgba(220, 53, 69, 0.15); background-color: #f8fafc;" 
+                                               title="Xóa đơn hàng" 
+                                               onclick="return confirm('Bạn có chắc chắn muốn xóa đơn hàng này?')">
+                                                <i class="bi bi-trash3-fill" style="font-size: 14px;"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
                         }
-                    </td>
-                    <td>
-                        @if(item.Status == 0)
-                        {
-                            <span class="badge bg-warning text-dark">Chờ duyệt</span>
-                        }
-                        else if(item.Status == 1)
-                        {
-                            <span class="badge bg-info text-dark">Đang giao</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-success">Đã xong</span>
-                        }
-                    </td>
-                    <td>@(item.Notes ?? "Không có ghi chú")</td>
-                    <td>
-                        <a href="@Url.Action("Details", "Orders", new { id = item.Id })" class="btn btn-sm btn-outline-primary">Chi tiết</a>
-                        <button class="btn btn-sm btn-outline-warning">Sửa</button>
-                        <button class="btn btn-sm btn-outline-danger">Xóa</button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Chân trang & Phân trang -->
+        <div class="card-footer bg-white border-0 py-3 px-4 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 border-top border-light">
+            <div class="text-muted small">
+                Hiển thị trang <strong>@currentPage</strong> trên tổng số <strong>@totalPages</strong> trang (Tổng cộng <strong>@totalItems</strong> đơn hàng)
+            </div>
+            
+            <nav aria-label="Điều hướng phân trang">
+                <ul class="pagination pagination-sm mb-0 justify-content-center">
+                    <!-- Trang trước -->
+                    <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                        <a class="page-link rounded-start-pill px-3" href="?page=@(currentPage - 1)" aria-label="Trang trước">
+                            <span aria-hidden="true">&laquo; Trước</span>
+                        </a>
+                    </li>
+                    
+                    <!-- Số trang -->
+                    @for (int i = 1; i <= Math.Max(1, totalPages); i++)
+                    {
+                        <li class="page-item @(currentPage == i ? "active" : "")">
+                            <a class="page-link px-3" href="?page=@i">@i</a>
+                        </li>
+                    }
+                    
+                    <!-- Trang sau -->
+                    <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                        <a class="page-link rounded-end-pill px-3" href="?page=@(currentPage + 1)" aria-label="Trang sau">
+                            <span aria-hidden="true">Sau &raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        
+        <!-- Chân trang hiển thị thông tin tác giả -->
+        <div class="card-footer bg-white border-0 py-3 text-center text-muted small border-top border-light">
+            Sinh viên thực hiện: <strong>Vũ Hoàng Chính - 2122110380</strong> | Lớp: CCQ2211J
+        </div>
+    </div>
 </div>

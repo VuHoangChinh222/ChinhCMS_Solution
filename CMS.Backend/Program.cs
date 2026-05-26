@@ -34,10 +34,31 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = "/Account/AccessDenied"; // Đường dẫn đến trang báo lỗi khi không đủ quyền hạn
     });
 
+// 1. Khai báo chính sách CORS
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowAll", policy => {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
+// Đăng ký dịch vụ Swagger/OpenAPI
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "CMS Backend API v1");
+    });
+}
+else
 {
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
@@ -49,9 +70,14 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// 2. Kích hoạt chính sách CORS đã khai báo ở trên (nằm giữa UseRouting và UseAuthentication/UseAuthorization)
+app.UseCors("AllowAll");
+
 app.UseAuthentication(); // Bật tính năng xác thực (phải nằm trước UseAuthorization)
 app.UseAuthorization();
 
+// Ánh xạ các Controller (hỗ trợ cả API Attribute Routes và MVC default route)
+app.MapControllers();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

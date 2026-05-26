@@ -28,10 +28,24 @@ namespace CMS.Backend.Controllers
         }
 
         // Hàm Index hiển thị danh sách toàn bộ danh mục tin tức hiện có
-        public IActionResult Index()
+        public IActionResult Index(int page = 1)
         {
-            // Lấy dữ liệu thực tế từ bảng Categories trong cơ sở dữ liệu
-            var data = _context.Categories.ToList();
+            if (page < 1) page = 1;
+            int pageSize = 10;
+
+            var query = _context.Categories;
+            int totalItems = query.Count();
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            if (page > totalPages && totalPages > 0) page = totalPages;
+
+            var data = query.OrderByDescending(c => c.Id)
+                            .Skip((page - 1) * pageSize)
+                            .Take(pageSize)
+                            .ToList();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.TotalItems = totalItems;
             
             // Truyền danh sách danh mục sang giao diện hiển thị
             return View(data);

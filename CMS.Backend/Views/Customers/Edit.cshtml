@@ -1,0 +1,209 @@
+@model CMS.Data.Entities.Customer
+
+@{
+    ViewData["Title"] = "Sửa Khách Hàng";
+    Layout = "_LayoutAdmin";
+}
+
+@* /*
+ * Sinh viên : Vũ Hoàng Chính
+ * Mã sinh viên: 2122110380
+ * Lớp: CCQ2211J
+ * Ngày tạo: 26/05/2026
+ * Version: 1.0
+ */ *@
+
+<div class="container-fluid mt-4">
+    <!-- Thanh điều hướng liên kết nhanh -->
+    <nav aria-label="Đường dẫn liên kết" class="mb-4">
+        <ol class="breadcrumb bg-light p-3 rounded-3 shadow-sm border border-light">
+            <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-primary"><i class="bi bi-people-fill"></i> Quản lý khách hàng</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa khách hàng</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-3">
+                <!-- Tiêu đề thẻ -->
+                <div class="card-header bg-white border-0 pt-4 px-4 pb-2">
+                    <h3 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                        <span class="p-2 rounded bg-warning bg-opacity-10 text-warning">
+                            <i class="bi bi-pencil-square"></i>
+                        </span>
+                        CHỈNH SỬA TÀI KHOẢN KHÁCH HÀNG
+                    </h3>
+                    <p class="text-muted small mb-0">Cập nhật thông tin liên lạc hoặc đổi mật khẩu mới cho khách hàng.</p>
+                    <hr class="mt-3 mb-0 border-light" />
+                </div>
+
+                <div class="card-body p-4">
+                    <form asp-action="Edit" method="post">
+                        <!-- Vùng hiển thị lỗi tổng hợp -->
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <!-- Trường ẩn giữ Id -->
+                        <input type="hidden" asp-for="Id" />
+
+                        <!-- Họ tên khách hàng -->
+                        <div class="mb-3">
+                            <label asp-for="FullName" class="form-label fw-bold text-dark">Họ và tên đầy đủ <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-person"></i></span>
+                                <input asp-for="FullName" class="form-control border-start-0 ps-0" placeholder="Nhập họ và tên..." style="background-color: #fff;" />
+                            </div>
+                            <span asp-validation-for="FullName" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <!-- Email liên lạc -->
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label fw-bold text-dark">Địa chỉ Email <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-envelope"></i></span>
+                                <input asp-for="Email" type="email" class="form-control border-start-0 ps-0" placeholder="email@viethoc.com..." style="background-color: #fff;" />
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <!-- Số điện thoại -->
+                        <div class="mb-3">
+                            <label asp-for="Phone" class="form-label fw-bold text-dark">Số điện thoại</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-telephone"></i></span>
+                                <input asp-for="Phone" class="form-control border-start-0 ps-0" placeholder="Nhập số điện thoại..." style="background-color: #fff;" />
+                            </div>
+                            <span asp-validation-for="Phone" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <!-- Địa chỉ -->
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label fw-bold text-dark">Địa chỉ giao hàng mặc định</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-geo-alt"></i></span>
+                                <input asp-for="Address" class="form-control border-start-0 ps-0" placeholder="Nhập địa chỉ..." style="background-color: #fff;" />
+                            </div>
+                            <span asp-validation-for="Address" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <!-- Đổi mật khẩu tùy chọn -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark">Mật khẩu mới (Bỏ trống nếu giữ nguyên mật khẩu cũ)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-shield-lock"></i></span>
+                                <input type="password" name="NewPassword" class="form-control border-start-0 ps-0" placeholder="Chỉ nhập khi muốn đổi mật khẩu mới..." style="background-color: #fff;" />
+                            </div>
+                            <span class="text-muted small mt-1 d-block"><i class="bi bi-info-circle-fill text-info"></i> Để trống ô này nếu bạn không muốn cập nhật lại mật khẩu cho khách hàng này.</span>
+                        </div>
+
+                        <!-- Các nút thao tác -->
+                        <div class="d-flex gap-2 justify-content-end mt-4 border-top pt-4">
+                            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 py-2 d-inline-flex align-items-center gap-1">
+                                <i class="bi bi-x-circle"></i> Hủy bỏ
+                            </a>
+                            <button type="submit" class="btn btn-warning rounded-pill px-4 py-2 shadow-sm d-inline-flex align-items-center gap-1 text-dark" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border: none; font-weight: 500;">
+                                <i class="bi bi-check-circle-fill"></i> Cập nhật khách hàng
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Chân trang hiển thị thông tin tác giả -->
+                <div class="card-footer bg-white border-0 py-3 text-center text-muted small border-top border-light">
+                    Sinh viên thực hiện: <strong>Vũ Hoàng Chính - 2122110380</strong> | Lớp: CCQ2211J
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        $(document).ready(function () {
+            // Định nghĩa các biểu thức chính quy (Regex)
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            const phoneRegex = /^(0[3|5|7|8|9])+([0-9]{8})$/;
+
+            // Lắng nghe sự kiện gõ phím trên ô Email để kích hoạt trigger kiểm tra tức thời
+            $("#Email").on("input change blur", function () {
+                const val = $(this).val().trim();
+                const parentGroup = $(this).closest(".mb-3");
+                const errorSpan = parentGroup.find("[data-valmsg-for='Email']");
+
+                if (val === "") {
+                    showInputError($(this), errorSpan, "Vui lòng nhập địa chỉ Email.");
+                } else if (!emailRegex.test(val)) {
+                    showInputError($(this), errorSpan, "Định dạng email không hợp lệ. Ví dụ: khachhang@@example.com");
+                } else {
+                    showInputSuccess($(this), errorSpan);
+                }
+            });
+
+            // Lắng nghe sự kiện trên ô Số điện thoại
+            $("#Phone").on("input change blur", function () {
+                const val = $(this).val().trim();
+                const parentGroup = $(this).closest(".mb-3");
+                const errorSpan = parentGroup.find("[data-valmsg-for='Phone']");
+
+                if (val === "") {
+                    $(this).removeClass("is-invalid is-valid");
+                    errorSpan.text("").removeClass("field-validation-error").addClass("field-validation-valid");
+                } else if (!phoneRegex.test(val)) {
+                    showInputError($(this), errorSpan, "Số điện thoại Việt Nam không hợp lệ (bắt đầu bằng 03, 05, 07, 08, 09 và gồm 10 chữ số).");
+                } else {
+                    showInputSuccess($(this), errorSpan);
+                }
+            });
+
+            // Lắng nghe sự kiện trên ô Họ tên
+            $("#FullName").on("input change blur", function () {
+                const val = $(this).val().trim();
+                const parentGroup = $(this).closest(".mb-3");
+                const errorSpan = parentGroup.find("[data-valmsg-for='FullName']");
+
+                if (val === "") {
+                    showInputError($(this), errorSpan, "Vui lòng nhập họ và tên khách hàng.");
+                } else if (val.length > 100) {
+                    showInputError($(this), errorSpan, "Họ và tên không được vượt quá 100 ký tự.");
+                } else {
+                    showInputSuccess($(this), errorSpan);
+                }
+            });
+
+            // Lắng nghe sự kiện trên ô Mật khẩu mới (Tùy chọn)
+            $("input[name='NewPassword']").on("input change blur", function () {
+                const val = $(this).val();
+                const parentGroup = $(this).closest(".mb-4");
+                const errorSpan = parentGroup.find(".text-muted"); // Vì ô này không có thuộc tính asp-for cho mật khẩu gốc
+
+                if (val !== "" && val.length < 6) {
+                    $(this).removeClass("is-valid").addClass("is-invalid");
+                    errorSpan.removeClass("text-info").addClass("text-danger").html('<i class="bi bi-exclamation-circle-fill"></i> Mật khẩu mới phải chứa ít nhất 6 ký tự.');
+                } else if (val !== "") {
+                    $(this).removeClass("is-invalid").addClass("is-valid");
+                    errorSpan.removeClass("text-danger").addClass("text-success").html('<i class="bi bi-check-circle-fill"></i> Mật khẩu hợp lệ.');
+                } else {
+                    $(this).removeClass("is-invalid is-valid");
+                    errorSpan.removeClass("text-danger text-success").addClass("text-info").html('<i class="bi bi-info-circle-fill text-info"></i> Để trống ô này nếu bạn không muốn cập nhật lại mật khẩu.');
+                }
+            });
+
+            // Hàm hiển thị trạng thái lỗi
+            function showInputError(input, span, message) {
+                input.removeClass("is-valid").addClass("is-invalid");
+                span.removeClass("field-validation-valid text-success")
+                    .addClass("field-validation-error text-danger")
+                    .text(message);
+            }
+
+            // Hàm hiển thị trạng thái hợp lệ
+            function showInputSuccess(input, span) {
+                input.removeClass("is-invalid").addClass("is-valid");
+                span.removeClass("field-validation-error text-danger")
+                    .addClass("field-validation-valid text-success")
+                    .html('<i class="bi bi-check-circle-fill"></i> Thông tin hợp lệ!');
+            }
+        });
+    </script>
+}

@@ -26,32 +26,33 @@ namespace CMS.Backend.Controllers
         {
             _context = context;
         }
-        // Hàm hiển thị danh sách bài viết, hỗ trợ lọc theo mã danh mục bài viết (CategoryId)
-        public IActionResult Index(int? id)
+        // Hàm hiển thị danh sách bài viết, hỗ trợ lọc theo mã danh mục bài viết (CategoryId) và phân trang
+        public IActionResult Index(int? id, int page = 1)
         {
-            // Nếu không truyền mã danh mục (id là null), hệ thống sẽ lấy toàn bộ danh sách bài viết
-            if (id == null)
-            {
-                // Truy vấn lấy toàn bộ bài viết từ cơ sở dữ liệu, sắp xếp theo ngày đăng mới nhất
-                // và nạp kèm thông tin danh mục tương ứng để tránh lỗi hiển thị tên danh mục
-                var allPosts = _context.Posts
-                                      .Include(p => p.Category)
-                                      .OrderByDescending(p => p.CreatedDate)
-                                      .ToList();
+            if (page < 1) page = 1;
+            int pageSize = 10;
 
-                // Truyền danh sách tất cả bài viết sang giao diện hiển thị
-                return View(allPosts);
+            IQueryable<Post> query = _context.Posts.Include(p => p.Category);
+            if (id != null)
+            {
+                query = query.Where(p => p.CategoryId == id);
             }
 
-            // Nếu có truyền mã danh mục, tiến hành lọc các bài viết thuộc danh mục đó
-            var filteredPosts = _context.Posts
-                                        .Where(p => p.CategoryId == id)
-                                        .Include(p => p.Category)
-                                        .OrderByDescending(p => p.CreatedDate)
-                                        .ToList();
+            int totalItems = query.Count();
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            if (page > totalPages && totalPages > 0) page = totalPages;
 
-            // Truyền danh sách bài viết đã được lọc sang giao diện hiển thị
-            return View(filteredPosts);
+            var data = query.OrderByDescending(p => p.CreatedDate)
+                            .Skip((page - 1) * pageSize)
+                            .Take(pageSize)
+                            .ToList();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.TotalItems = totalItems;
+            ViewBag.CategoryId = id;
+
+            return View(data);
         }
 
         // Hàm hiển thị chi tiết của một bài viết dựa vào mã bài viết được truyền từ URL

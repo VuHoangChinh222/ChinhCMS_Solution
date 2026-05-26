@@ -26,10 +26,26 @@ namespace CMS.Backend.Controllers
             _context = context;
         }
 
-        // Hàm Index trả về danh sách các thành viên từ Database để hiển thị trên giao diện
-        public IActionResult Index()
+        // Hàm Index trả về danh sách các thành viên từ Database để hiển thị trên giao diện và phân trang
+        public IActionResult Index(int page = 1)
         {
-            var users = _context.Users.ToList(); // Lấy dữ liệu THẬT từ bảng Users trong SQL
+            if (page < 1) page = 1;
+            int pageSize = 10;
+
+            var query = _context.Users;
+            int totalItems = query.Count();
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            if (page > totalPages && totalPages > 0) page = totalPages;
+
+            var users = query.OrderByDescending(u => u.Id)
+                             .Skip((page - 1) * pageSize)
+                             .Take(pageSize)
+                             .ToList(); // Lấy dữ liệu THẬT từ bảng Users trong SQL
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.TotalItems = totalItems;
+
             return View(users);
         }
 
