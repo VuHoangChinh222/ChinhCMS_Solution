@@ -119,7 +119,7 @@ Mở file `CMS.Backend/appsettings.json` và điều chỉnh chuỗi kết nối
 | **Buổi 3** | Xây dựng chức năng CRUD Danh mục an toàn, lọc bài viết mới nhất lên Trang chủ. | **Đã hoàn thành** | Khóa xóa danh mục chứa bài viết, dùng LINQ lấy 3 bài viết mới nhất. |
 | **Buổi 4** | Thiết kế giao diện quản trị Admin Panel, tích hợp tải ảnh và trình soạn thảo CKEditor 5. | **Đã hoàn thành** | Hoàn thiện các trang quản lý: Danh mục, Bài viết, Đơn hàng, Thành viên (User CRUD). |
 | **Buổi 5** | Bảo mật Cookie nâng cao, Phân quyền chi tiết, Quản lý sản phẩm & Danh mục sản phẩm. | **Đã hoàn thành** | **Xác thực Cookie, mã hóa BCrypt, dọn rác ảnh cũ, cố định ổ khóa Data Protection, phân trang, ẩn nút Xóa nếu chứa sản phẩm.** |
-| **Buổi 6** | Phát triển Web API RESTful & cấu hình CORS, tích hợp bộ tạo tài liệu tự động Swagger UI. | **Xây dựng `ApiPostController` (`/api/post`), nạp danh sách, lọc danh mục, xem chi tiết bài viết, kích hoạt CORS, cài đặt Swashbuckle.** |
+| **Buổi 6** | Phát triển Web API RESTful & cấu hình CORS, tích hợp bộ tạo tài liệu tự động Swagger UI. | **Đang làm** |**Xây dựng `ApiPostController` (`/api/post`), nạp danh sách, lọc danh mục, xem chi tiết bài viết, kích hoạt CORS, cài đặt Swashbuckle.** |
 
 ---
 
