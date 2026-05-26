@@ -76,13 +76,39 @@ Dự án `ChinhCMS_Solution` được chia làm 3 dự án nhỏ bên trong:
 *   **Đổi mật khẩu tùy chọn**: Cho phép bỏ trống trường mật khẩu mới khi sửa tài khoản để hệ thống tự động giữ nguyên mật khẩu cũ trong database, loại bỏ hoàn toàn các thông báo lỗi xác thực khó chịu.
 
 ### 7. Web API & RESTful Service (Buổi 6) - [MỚI]
-*   **API Controller độc lập (`ApiPostController.cs`)**: Xây dựng cầu nối dữ liệu Backend bằng API RESTful phục vụ dữ liệu thô định dạng **JSON** qua đường dẫn được rút gọn đẹp mắt: `/api/post`.
-*   **3 API Endpoint hiệu suất cao**:
-    *   `GET /api/post`: Lấy toàn bộ danh sách bài viết mới nhất (sắp xếp ID giảm dần), sử dụng LINQ `.Select()` gọt tỉa trường tối ưu băng thông (chỉ truyền `Id`, `Title`, `ImageUrl`, `CreatedDate`, `CategoryName`).
-    *   `GET /api/post/category/{categoryId}`: Lọc danh sách bài viết theo chuyên mục tương ứng.
-    *   `GET /api/post/{id}`: Xem chi tiết bài viết đầy đủ (bao gồm cả trường `Content` chứa mã HTML từ CKEditor). Tích hợp xử lý **404 Not Found** chuẩn RESTful nếu tìm ID không tồn tại.
-*   **Cấu hình CORS toàn diện**: Kích hoạt Middleware CORS với chính sách `"AllowAll"` tại `Program.cs` nhằm mở đường cho Frontend ReactJS gọi dữ liệu Backend một cách trơn tru, loại bỏ lỗi chặn chính sách gốc của trình duyệt.
-*   **Tích hợp Swagger UI hiện đại**: Tích hợp gói NuGet `Swashbuckle.AspNetCore` giúp tự động sinh trang kiểm thử API tương tác trực quan tại địa chỉ: `/swagger/index.html`.
+*   **Kiến trúc API & CORS**: Cấu hình CORS với chính sách `"AllowAll"` tại `Program.cs` hỗ trợ gọi API liên nguồn từ ứng dụng ReactJS. Tích hợp bộ sinh tài liệu tự động **Swagger UI** truy cập tại `/swagger/index.html`.
+*   **Mã nguồn 4 API Controller Restful độc lập & Chi tiết các Endpoint**:
+
+#### 📰 A. API Bài viết Tin tức (`ApiPostController.cs` - Route: `/api/post`)
+*   **`GET /api/post`**: Lấy toàn bộ danh sách bài viết mới nhất (ID giảm dần). Gọt dữ liệu (Select) chỉ truyền `Id`, `Title`, `ImageUrl`, `CreatedDate`, `CategoryName`.
+*   **`GET /api/post/category/{categoryId}`**: Lọc danh sách bài viết thuộc chuyên mục tin tức tương ứng.
+*   **`GET /api/post/{id}`**: Lấy chi tiết bài viết (gồm trường `Content` chứa mã HTML). Trả về lỗi `404 Not Found` nếu ID không tồn tại.
+
+#### 📦 B. API Danh mục & Sản phẩm (`ApiProductController.cs` - Route: `/api/product`)
+*   **`GET /api/product/categories`**: Lấy danh sách toàn bộ danh mục sản phẩm (`CategoryProducts` gồm `Id`, `Name`, `Description`).
+*   **`GET /api/product`**: Lấy toàn bộ danh sách sản phẩm mới nhất (gồm `Id`, `Name`, `Description`, `Price`, `StockQuantity`, `ImageUrl`, `CategoryName`).
+*   **`GET /api/product/category/{categoryId}`**: Lọc sản phẩm thuộc về một danh mục sản phẩm cụ thể.
+*   **`GET /api/product/{id}`**: Lấy thông tin chi tiết của một sản phẩm cụ thể. Trả về `404 Not Found` nếu không tìm thấy.
+
+#### 👥 C. API Đăng ký & Đăng nhập Khách hàng (`ApiCustomerController.cs` - Route: `/api/customer`)
+*   **`POST /api/customer/register`**: Đăng ký khách hàng mới.
+    *   *Tham số truyền vào*: Đối tượng JSON gồm `FullName`, `Email`, `Phone`, `Address`, `Password`.
+    *   *Nghiệp vụ*: Kiểm tra định dạng Regex Email và SĐT Việt Nam, chặn trùng email. Tự động **mã hóa băm mật khẩu bằng BCrypt** trước khi ghi xuống CSDL.
+*   **`POST /api/customer/login`**: Đăng nhập hệ thống.
+    *   *Tham số truyền vào*: Đối tượng JSON gồm `Email`, `Password`.
+    *   *Nghiệp vụ*: Tìm email và dùng `VerifyPassword` đối soát mật khẩu băm. Trả về mã trạng thái và thông tin khách hàng nếu thành công.
+
+#### 🛒 D. API Giỏ hàng & Đơn hàng (`ApiOrderController.cs` - Route: `/api/order`)
+*   **`POST /api/order/checkout`**: Đặt hàng (thực hiện thanh toán giỏ hàng).
+    *   *Tham số truyền vào*: JSON gồm `CustomerId`, `Notes` và danh sách sản phẩm `Items` (mỗi phần tử chứa `ProductId` và `Quantity`).
+    *   *Quy trình xử lý*:
+        1. Sử dụng **Database Transaction** bảo đảm tính toàn vẹn (tự động Rollback hoàn toàn nếu phát sinh lỗi).
+        2. Kiểm tra tồn tại khách hàng và sản phẩm.
+        3. Kiểm tra số lượng hàng trong kho. Nếu thiếu hàng, trả về lỗi `400 Bad Request` chỉ rõ tên sản phẩm và số lượng tồn còn lại.
+        4. Tự động **trừ trực tiếp số lượng tồn kho** (`StockQuantity`) của sản phẩm.
+        5. Tự động áp giá bán hiện thời của sản phẩm vào `UnitPrice` trong chi tiết đơn hàng (`OrderDetail`).
+*   **`GET /api/order/customer/{customerId}`**: Lịch sử đơn hàng của một khách hàng (sắp xếp đơn hàng mới nhất lên đầu, trả về tổng tiền đơn hàng `TotalAmount` và tổng số sản phẩm `TotalItems`).
+*   **`GET /api/order/{id}`**: Lấy chi tiết đơn hàng (bao gồm thông tin khách hàng và danh sách chi tiết các sản phẩm đã mua gồm ảnh, tên, giá, số lượng và thành tiền).
 
 ---
 
@@ -119,7 +145,7 @@ Mở file `CMS.Backend/appsettings.json` và điều chỉnh chuỗi kết nối
 | **Buổi 3** | Xây dựng chức năng CRUD Danh mục an toàn, lọc bài viết mới nhất lên Trang chủ. | **Đã hoàn thành** | Khóa xóa danh mục chứa bài viết, dùng LINQ lấy 3 bài viết mới nhất. |
 | **Buổi 4** | Thiết kế giao diện quản trị Admin Panel, tích hợp tải ảnh và trình soạn thảo CKEditor 5. | **Đã hoàn thành** | Hoàn thiện các trang quản lý: Danh mục, Bài viết, Đơn hàng, Thành viên (User CRUD). |
 | **Buổi 5** | Bảo mật Cookie nâng cao, Phân quyền chi tiết, Quản lý sản phẩm & Danh mục sản phẩm. | **Đã hoàn thành** | **Xác thực Cookie, mã hóa BCrypt, dọn rác ảnh cũ, cố định ổ khóa Data Protection, phân trang, ẩn nút Xóa nếu chứa sản phẩm.** |
-| **Buổi 6** | Phát triển Web API RESTful & cấu hình CORS, tích hợp bộ tạo tài liệu tự động Swagger UI. | **Đang làm** |**Xây dựng `ApiPostController` (`/api/post`), nạp danh sách, lọc danh mục, xem chi tiết bài viết, kích hoạt CORS, cài đặt Swashbuckle.** |
+| **Buổi 6** | Phát triển Web API RESTful & cấu hình CORS, tích hợp bộ tạo tài liệu tự động Swagger UI. | **Đã hoàn thành** | **Xây dựng hệ thống 4 API Controllers (Bài viết, Sản phẩm, Khách hàng, Đơn hàng), băm mật khẩu BCrypt, trừ kho, Transaction checkout, CORS & Swashbuckle.** |
 
 ---
 
