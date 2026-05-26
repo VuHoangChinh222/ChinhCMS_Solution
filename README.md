@@ -11,7 +11,7 @@ Hệ thống quản lý nội dung (CMS) và bán hàng được xây dựng tr�
 *   **Lớp học:** CCQ2211J
 *   **Môn học:** Chuyên đề ASP.NET
 *   **Giáo viên hướng dẫn:** Nguyễn Cao Thái
-*   **Phiên bản dự án:** 1.2 (Cập nhật Buổi 5)
+*   **Phiên bản dự án:** 1.0
 
 ---
 
@@ -75,6 +75,15 @@ Dự án `ChinhCMS_Solution` được chia làm 3 dự án nhỏ bên trong:
 ### 6. Quản lý thành viên (User CRUD)
 *   **Đổi mật khẩu tùy chọn**: Cho phép bỏ trống trường mật khẩu mới khi sửa tài khoản để hệ thống tự động giữ nguyên mật khẩu cũ trong database, loại bỏ hoàn toàn các thông báo lỗi xác thực khó chịu.
 
+### 7. Web API & RESTful Service (Buổi 6) - [MỚI]
+*   **API Controller độc lập (`ApiPostController.cs`)**: Xây dựng cầu nối dữ liệu Backend bằng API RESTful phục vụ dữ liệu thô định dạng **JSON** qua đường dẫn được rút gọn đẹp mắt: `/api/post`.
+*   **3 API Endpoint hiệu suất cao**:
+    *   `GET /api/post`: Lấy toàn bộ danh sách bài viết mới nhất (sắp xếp ID giảm dần), sử dụng LINQ `.Select()` gọt tỉa trường tối ưu băng thông (chỉ truyền `Id`, `Title`, `ImageUrl`, `CreatedDate`, `CategoryName`).
+    *   `GET /api/post/category/{categoryId}`: Lọc danh sách bài viết theo chuyên mục tương ứng.
+    *   `GET /api/post/{id}`: Xem chi tiết bài viết đầy đủ (bao gồm cả trường `Content` chứa mã HTML từ CKEditor). Tích hợp xử lý **404 Not Found** chuẩn RESTful nếu tìm ID không tồn tại.
+*   **Cấu hình CORS toàn diện**: Kích hoạt Middleware CORS với chính sách `"AllowAll"` tại `Program.cs` nhằm mở đường cho Frontend ReactJS gọi dữ liệu Backend một cách trơn tru, loại bỏ lỗi chặn chính sách gốc của trình duyệt.
+*   **Tích hợp Swagger UI hiện đại**: Tích hợp gói NuGet `Swashbuckle.AspNetCore` giúp tự động sinh trang kiểm thử API tương tác trực quan tại địa chỉ: `/swagger/index.html`.
+
 ---
 
 ## HƯỚNG DẪN CÀI ĐẶT VÀ KHỞI CHẠY
@@ -110,6 +119,7 @@ Mở file `CMS.Backend/appsettings.json` và điều chỉnh chuỗi kết nối
 | **Buổi 3** | Xây dựng chức năng CRUD Danh mục an toàn, lọc bài viết mới nhất lên Trang chủ. | **Đã hoàn thành** | Khóa xóa danh mục chứa bài viết, dùng LINQ lấy 3 bài viết mới nhất. |
 | **Buổi 4** | Thiết kế giao diện quản trị Admin Panel, tích hợp tải ảnh và trình soạn thảo CKEditor 5. | **Đã hoàn thành** | Hoàn thiện các trang quản lý: Danh mục, Bài viết, Đơn hàng, Thành viên (User CRUD). |
 | **Buổi 5** | Bảo mật Cookie nâng cao, Phân quyền chi tiết, Quản lý sản phẩm & Danh mục sản phẩm. | **Đã hoàn thành** | **Xác thực Cookie, mã hóa BCrypt, dọn rác ảnh cũ, cố định ổ khóa Data Protection, phân trang, ẩn nút Xóa nếu chứa sản phẩm.** |
+| **Buổi 6** | Phát triển Web API RESTful & cấu hình CORS, tích hợp bộ tạo tài liệu tự động Swagger UI. | **Xây dựng `ApiPostController` (`/api/post`), nạp danh sách, lọc danh mục, xem chi tiết bài viết, kích hoạt CORS, cài đặt Swashbuckle.** |
 
 ---
 
