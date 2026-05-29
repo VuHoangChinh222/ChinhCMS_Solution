@@ -113,7 +113,14 @@ namespace CMS.Backend.Controllers
                     return NotFound();
                 }
 
-                // 2. Xử lý mật khẩu: Nếu nhập mới thì băm và lưu cái mới, nếu trống thì lấy lại mật khẩu cũ
+                // 2. BẢO VỆ CHỐNG TỰ HẠ QUYỀN: Nếu Admin đang chỉnh sửa chính tài khoản của mình,
+                // ép giữ nguyên Role gốc từ CSDL để ngăn Admin tự hạ xuống Editor dẫn tới khóa hệ thống
+                if (existingUser.Username == User.Identity.Name)
+                {
+                    model.Role = existingUser.Role; // Giữ nguyên quyền cũ, bỏ qua giá trị form gửi lên
+                }
+
+                // 3. Xử lý mật khẩu: Nếu nhập mới thì băm và lưu cái mới, nếu trống thì lấy lại mật khẩu cũ
                 if (!string.IsNullOrEmpty(NewPassword))
                 {
                     model.PasswordHash = PasswordHelper.HashPassword(NewPassword);
@@ -123,7 +130,7 @@ namespace CMS.Backend.Controllers
                     model.PasswordHash = existingUser.PasswordHash;
                 }
 
-                // 3. Cập nhật vào Database
+                // 4. Cập nhật vào Database
                 _context.Users.Update(model);
                 _context.SaveChanges();
                 return RedirectToAction("Index");
@@ -142,11 +149,21 @@ namespace CMS.Backend.Controllers
         public IActionResult Delete(int id)
         {
             var user = _context.Users.Find(id);
-            if (user != null)
+            if (user == null)
             {
-                _context.Users.Remove(user);
-                _context.SaveChanges();
+                return NotFound();
             }
+
+            // BẢO VỆ CHỐNG TỰ XÓA: Ngăn Admin xóa chính tài khoản đang đăng nhập
+            // để tránh tình trạng phiên đăng nhập bị hỏng và không còn ai quản lý hệ thống
+            if (user.Username == User.Identity.Name)
+            {
+                TempData["ErrorMessage"] = "Bạn không thể xóa chính tài khoản đang đăng nhập của mình!";
+                return RedirectToAction("Index");
+            }
+
+            _context.Users.Remove(user);
+            _context.SaveChanges();
             return RedirectToAction("Index");
         }
     }

@@ -228,7 +228,7 @@ namespace CMS.Backend.Controllers
         }
 
         // ==========================================
-        // 4. XÓA SẢN PHẨM (DELETE)
+        // 4. XÓA SẢN PHẨM (DELETE) - CÓ KIỂM TRA ĐƠN HÀNG LIÊN KẾT
         // ==========================================
         [HttpGet]
         public IActionResult Delete(int id)
@@ -240,6 +240,20 @@ namespace CMS.Backend.Controllers
             {
                 return NotFound("Không tìm thấy sản phẩm này trong hệ thống.");
             }
+
+            // Kiểm tra xem sản phẩm này có nằm trong đơn hàng nào không
+            var associatedOrders = _context.OrderDetails
+                                           .Include(od => od.Order)
+                                               .ThenInclude(o => o.Customer)
+                                           .Where(od => od.ProductId == id)
+                                           .Select(od => od.Order)
+                                           .Distinct()
+                                           .ToList();
+
+            // Truyền thông tin đơn hàng liên kết sang View để hiển thị cảnh báo
+            ViewBag.AssociatedOrders = associatedOrders;
+            ViewBag.HasAssociatedOrders = associatedOrders.Any();
+
             return View(product);
         }
 
@@ -247,29 +261,40 @@ namespace CMS.Backend.Controllers
         public IActionResult DeleteConfirmed(int id)
         {
             var product = _context.Products.Find(id);
-            if (product != null)
+            if (product == null)
             {
-                // Xóa file ảnh vật lý nếu có
-                if (!string.IsNullOrEmpty(product.ImageUrl) && product.ImageUrl.StartsWith("/uploads/"))
+                return NotFound();
+            }
+
+            // BẢO VỆ: Kiểm tra lại phía Server xem sản phẩm có đang tồn tại trong đơn hàng nào không
+            // Ngăn chặn trường hợp gửi POST request trực tiếp vượt qua giao diện
+            var hasOrders = _context.OrderDetails.Any(od => od.ProductId == id);
+            if (hasOrders)
+            {
+                TempData["ErrorMessage"] = $"Không thể xóa sản phẩm '{product.Name}' vì đang có đơn hàng chứa sản phẩm này!";
+                return RedirectToAction("Index");
+            }
+
+            // Xóa file ảnh vật lý nếu có
+            if (!string.IsNullOrEmpty(product.ImageUrl) && product.ImageUrl.StartsWith("/uploads/"))
+            {
+                string relativePath = product.ImageUrl.TrimStart('/');
+                string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", relativePath);
+                if (System.IO.File.Exists(filePath))
                 {
-                    string relativePath = product.ImageUrl.TrimStart('/');
-                    string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", relativePath);
-                    if (System.IO.File.Exists(filePath))
+                    try
                     {
-                        try
-                        {
-                            System.IO.File.Delete(filePath);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine("Lỗi khi xóa tệp ảnh sản phẩm: " + ex.Message);
-                        }
+                        System.IO.File.Delete(filePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Lỗi khi xóa tệp ảnh sản phẩm: " + ex.Message);
                     }
                 }
-
-                _context.Products.Remove(product);
-                _context.SaveChanges();
             }
+
+            _context.Products.Remove(product);
+            _context.SaveChanges();
             return RedirectToAction("Index");
         }
     }

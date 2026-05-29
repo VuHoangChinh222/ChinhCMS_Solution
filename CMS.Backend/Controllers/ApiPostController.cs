@@ -3,21 +3,23 @@
  * Mã sinh viên: 2122110380
  * Lớp: CCQ2211J
  * Ngày tạo: 26/05/2026
- * Version: 1.0
+ * Version: 1.1 (Cập nhật phân trang cho Bài viết)
  */
 
 using Microsoft.AspNetCore.Mvc;
 using CMS.Data;
+using System;
+using System.Linq;
 
 namespace CMS.Backend.Controllers
 {
     // 1. Định nghĩa đường dẫn gọi API. Đã cấu hình cứng thành "api/post" theo yêu cầu của bạn
     // Địa chỉ gọi API thực tế: https://localhost:7291/api/post
     [Route("api/post")]
-    
+
     // 2. Đánh dấu đây là một API Controller để hệ thống hỗ trợ các tính năng RESTful và tự động kiểm tra dữ liệu
     [ApiController]
-    
+
     // 3. API Controller kế thừa từ ControllerBase để giảm tải các tính năng MVC HTML không cần thiết
     public class ApiPostController : ControllerBase
     {
@@ -29,19 +31,29 @@ namespace CMS.Backend.Controllers
             _context = context;
         }
 
-        // ==========================================
-        // PHẦN 2: LẤY DANH SÁCH BÀI VIẾT (GET METHOD)
-        // ==========================================
+        // ===================================================
+        // PHẦN 2: LẤY DANH SÁCH BÀI VIẾT CÓ PHÂN TRANG (GET)
+        // ===================================================
 
-        // 1. API lấy toàn bộ bài viết mới nhất
-        // GET: api/ApiPost
+        // 1. API lấy toàn bộ bài viết mới nhất (Có phân trang)
+        // GET: api/post?pageNumber=1&pageSize=10
         [HttpGet]
-        public IActionResult GetAll()
+        public IActionResult GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
+            // Ràng buộc dữ liệu đầu vào tối thiểu để tránh lỗi hệ thống
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 10;
+
             try
             {
+                // Bước 1: Đếm tổng số bài viết hiện có trong Database
+                var totalItems = _context.Posts.Count();
+
+                // Bước 2: Truy cập và phân trang dữ liệu
                 var posts = _context.Posts
                     .OrderByDescending(p => p.Id) // Sắp xếp bài mới nhất lên đầu (từ ID lớn đến bé)
+                    .Skip((pageNumber - 1) * pageSize) // Bỏ qua các bài viết của các trang trước đó
+                    .Take(pageSize) // Lấy số lượng bài viết đúng bằng kích thước trang hiện tại
                     .Select(p => new {
                         p.Id,
                         p.Title,
@@ -51,7 +63,18 @@ namespace CMS.Backend.Controllers
                     })
                     .ToList();
 
-                return Ok(posts); // Trả về mã trạng thái 200 OK kèm dữ liệu JSON
+                // Bước 3: Tính toán tổng số trang dựa trên tổng số bài viết
+                var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+                // Bước 4: Trả về cấu trúc JSON phân trang chuẩn gọn cho Frontend dễ xử lý
+                return Ok(new
+                {
+                    TotalItems = totalItems,
+                    TotalPages = totalPages,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    Data = posts
+                });
             }
             catch (System.Exception ex)
             {
@@ -59,16 +82,26 @@ namespace CMS.Backend.Controllers
             }
         }
 
-        // 2. API lấy danh sách bài viết theo chuyên mục (Category)
-        // GET: api/ApiPost/category/{categoryId}
+        // 2. API lấy danh sách bài viết theo chuyên mục có phân trang (Category)
+        // GET: api/post/category/{categoryId}?pageNumber=1&pageSize=10
         [HttpGet("category/{categoryId}")]
-        public IActionResult GetByCategory(int categoryId)
+        public IActionResult GetByCategory(int categoryId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
+            // Ràng buộc dữ liệu đầu vào tối thiểu
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 10;
+
             try
             {
+                // Bước 1: Đếm tổng số bài viết thuộc riêng chuyên mục này
+                var totalItems = _context.Posts.Count(p => p.CategoryId == categoryId);
+
+                // Bước 2: Lấy dữ liệu bài viết đã lọc theo chuyên mục và phân trang
                 var posts = _context.Posts
                     .Where(p => p.CategoryId == categoryId)
                     .OrderByDescending(p => p.Id) // Sắp xếp bài mới nhất lên đầu
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
                     .Select(p => new {
                         p.Id,
                         p.Title,
@@ -77,7 +110,18 @@ namespace CMS.Backend.Controllers
                     })
                     .ToList();
 
-                return Ok(posts); // Trả về danh sách bài viết thuộc chuyên mục
+                // Bước 3: Tính toán tổng số trang của chuyên mục này
+                var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+                // Bước 4: Trả về kết quả kèm Metadata phân trang
+                return Ok(new
+                {
+                    TotalItems = totalItems,
+                    TotalPages = totalPages,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    Data = posts
+                });
             }
             catch (System.Exception ex)
             {
@@ -89,8 +133,8 @@ namespace CMS.Backend.Controllers
         // PHẦN 3: CHI TIẾT BÀI VIẾT (GET BY ID)
         // ==========================================
 
-        // 3. API lấy chi tiết một bài viết cụ thể dựa trên ID
-        // GET: api/ApiPost/{id}
+        // 3. API lấy chi tiết một bài viết cụ thể dựa trên ID (Giữ nguyên không đổi)
+        // GET: api/post/{id}
         [HttpGet("{id}")]
         public IActionResult GetDetail(int id)
         {

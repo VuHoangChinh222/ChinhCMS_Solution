@@ -1,84 +1,379 @@
+@model IEnumerable<CMS.Data.Entities.Post>
+
 @{
-    // Thiết lập tiêu đề trang hiển thị trên thẻ trình duyệt
-    ViewData["Title"] = "Trang chủ";
+    // Thiết lập tiêu đề trang hiển thị trên thanh tiêu đề của trình duyệt
+    ViewData["Title"] = "Trang chủ - Bảng Điều Khiển";
+    Layout = "_LayoutAdmin"; // Sử dụng giao diện Admin chung (có chứa Sidebar và Navbar)
+
+    // Nhận các giá trị thống kê từ Controller truyền qua đối tượng động ViewBag
+    var totalCustomers = ViewBag.TotalCustomers ?? 0;
+    var totalOrders = ViewBag.TotalOrders ?? 0;
+    var totalRevenue = ViewBag.TotalRevenue ?? 0m;
+    
+    // Ép kiểu danh sách Top 4 sản phẩm bán chạy để sử dụng vòng lặp duyệt qua hiển thị
+    var topProducts = (List<CMS.Backend.Models.TopProductViewModel>)(ViewBag.TopProducts ?? new List<CMS.Backend.Models.TopProductViewModel>());
 }
 
 @* 
-   Thông tin sinh viên thực hiện dự án:
+   =========================================================================
+   DỰ ÁN XÂY DỰNG BỞI SINH VIÊN:
    Sinh viên : Vũ Hoàng Chính
    Mã sinh viên: 2122110380
    Lớp: CCQ2211J
-   Ngày tạo: 15/05/2026
-   Phiên bản: 1.0
+   Ngày tạo : 15/05/2026
+   Phiên bản: 1.0 (Giao diện Bảng điều khiển phân tích tài chính & kinh doanh)
+   =========================================================================
 *@
 
-@* Khai báo kiểu dữ liệu truyền từ controller sang giao diện là danh sách 3 bài viết mới nhất *@
-@model IEnumerable<CMS.Data.Entities.Post>
-
-<!-- Phần biểu ngữ chào mừng lớn đầu trang chủ -->
-<div class="p-5 mb-4 bg-light rounded-3 text-center border shadow-sm">
-    <div class="container-fluid py-3">
-        <h1 class="display-5 fw-bold text-primary">TRANG QUẢN TRỊ</h1>
-        <p class="col-md-12 fs-5 text-muted">Dự án được xây dựng bởi sinh viên Vũ Hoàng Chính - Lớp CCQ2211J</p>
-        @* <div class="d-flex justify-content-center gap-2 mt-3">
-            <a href="/Post" class="btn btn-primary btn-md px-4">Quản lý bài viết</a>
-            <a href="/Category" class="btn btn-outline-secondary btn-md px-4">Quản lý danh mục</a>
-        </div> *@
+<div class="container-fluid mt-4">
+    <!-- KHUNG CHÀO MỪNG QUẢN TRỊ VIÊN (WELCOME CARD VỚI HIỆU ỨNG GRADIENT SANG TRỌNG) -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4 text-white animate__animated animate__fadeIn" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">
+        <div class="card-body p-5">
+            <h1 class="display-6 fw-bold mb-2"><i class="bi bi-speedometer2 me-2"></i> BẢNG ĐIỀU KHIỂN HỆ THỐNG</h1>
+            <p class="fs-5 mb-0 opacity-75">Chào mừng trở lại trang quản trị. Chúc bạn một ngày làm việc hiệu quả và quản lý cửa hàng thành công!</p>
+        </div>
     </div>
-</div>
 
-<div class="container my-5">
-    <!-- Tiêu đề phần tin tức mới nhất -->
-    <h2 class="text-center mb-4 text-danger fw-bold">TIN TỨC MỚI NHẤT</h2>
-    
-    <!-- Lưới hiển thị các thẻ bài viết -->
-    <div class="row">
-        @if (Model != null && Model.Any())
-        {
-            // Duyệt qua danh sách bài viết mới nhất được truyền sang
-            foreach (var item in Model)
-            {
-                <div class="col-md-4 mb-4">
-                    <!-- Thẻ bài viết thiết lập chiều cao 100% để hiển thị đồng đều -->
-                    <div class="card shadow-sm h-100 border">
-                        <!-- Hình ảnh minh họa bài viết thiết lập kích thước hợp lý -->
-                        <img src="@item.ImageUrl" class="card-img-top" alt="Hình ảnh bài viết" style="height: 200px; object-fit: cover;">
-                        
-                        <div class="card-body d-flex flex-column">
-                            <!-- Nhãn tên danh mục của bài viết, hiển thị màu xanh lam nổi bật -->
-                            @if (item.Category != null)
-                            {
-                                <span class="badge bg-primary mb-2 align-self-start">@item.Category.Name</span>
-                            }
-                            
-                            <!-- Tiêu đề của bài viết -->
-                            <h5 class="card-title fw-bold text-dark">@item.Title</h5>
-                            
-                            <!-- Tóm tắt nội dung bài viết, tự động cắt ngắn nếu nội dung quá dài -->
-                            <p class="card-text text-truncate flex-grow-1 text-muted"> 
-                            @System.Text.RegularExpressions.Regex.Replace(item.Content ?? "", "<.*?>", string.Empty)
-                            </p>
-                            
-                            <!-- Nút chuyển tới trang xem chi tiết bài viết -->
-                            <a href="@Url.Action("Details", "Post", new { id = item.Id })" class="btn btn-outline-danger btn-sm w-100 mt-3">
-                                Đọc tiếp
-                            </a>
-                        </div>
-                        
-                        <!-- Chân của thẻ bài viết hiển thị ngày tháng năm đăng bài viết -->
-                        <div class="card-footer text-muted small bg-white border-0 py-3">
-                            Ngày đăng: @item.CreatedDate.ToString("dd/MM/yyyy")
-                        </div>
+    <!-- 1. BẢNG OVERVIEW CÁC SỐ LIỆU THỐNG KÊ RÀ SOÁT NHANH -->
+    <div class="row mb-4">
+        <!-- Thẻ thống kê Khách hàng -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm rounded-3 h-100 p-2 position-relative overflow-hidden" style="border-left: 5px solid #3b82f6 !important;">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="text-uppercase text-secondary small fw-bold mb-2">TỔNG KHÁCH HÀNG</h6>
+                        <h2 class="fw-extrabold text-dark mb-1">@totalCustomers.ToString("N0")</h2>
+                        <span class="text-success small fw-semibold"><i class="bi bi-people-fill me-1"></i> Người dùng mua sắm</span>
+                    </div>
+                    <div class="p-3 bg-primary bg-opacity-10 text-primary rounded-circle">
+                        <i class="bi bi-people fs-2"></i>
                     </div>
                 </div>
-            }
-        }
-        else
-        {
-            <!-- Thông báo hiển thị nếu cơ sở dữ liệu chưa có bài viết nào -->
-            <div class="col-12 text-center text-muted py-5 border rounded bg-white shadow-sm">
-                Hiện tại chưa có bài viết tin tức nào được đăng tải trên hệ thống.
             </div>
-        }
+        </div>
+
+        <!-- Thẻ thống kê Đơn hàng -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm rounded-3 h-100 p-2 position-relative overflow-hidden" style="border-left: 5px solid #f97316 !important;">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="text-uppercase text-secondary small fw-bold mb-2">TỔNG ĐƠN HÀNG</h6>
+                        <h2 class="fw-extrabold text-dark mb-1">@totalOrders.ToString("N0")</h2>
+                        <span class="text-warning small fw-semibold"><i class="bi bi-cart-check-fill me-1"></i> Đơn hàng phát sinh</span>
+                    </div>
+                    <div class="p-3 bg-warning bg-opacity-10 text-warning rounded-circle">
+                        <i class="bi bi-cart4 fs-2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thẻ thống kê Doanh thu tài chính -->
+        <div class="col-xl-4 col-md-12 mb-4">
+            <div class="card border-0 shadow-sm rounded-3 h-100 p-2 position-relative overflow-hidden" style="border-left: 5px solid #10b981 !important;">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="text-uppercase text-secondary small fw-bold mb-2">TỔNG DOANH THU</h6>
+                        <h2 class="fw-extrabold text-success mb-1">@totalRevenue.ToString("N0") đ</h2>
+                        <span class="text-success small fw-semibold"><i class="bi bi-wallet2 me-1"></i> Doanh số bán hàng thực tế</span>
+                    </div>
+                    <div class="p-3 bg-success bg-opacity-10 text-success rounded-circle">
+                        <i class="bi bi-cash-coin fs-2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. BIỂU ĐỒ DOANH THU TƯƠNG TÁC (TÍCH HỢP TÌM KIẾM THEO NGÀY, TUẦN, THÁNG) & TOP SẢN PHẨM -->
+    <div class="row mb-4">
+        <!-- Khu vực vẽ biểu đồ doanh thu sử dụng thư viện Chart.js -->
+        <div class="col-xl-8 mb-4">
+            <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+                    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-graph-up text-primary me-2"></i> Phân Tích Đồ Thị Doanh Thu</h5>
+                    
+                    <!-- Nút lọc tương tác cho phép người dùng bấm chuyển đổi chế độ xem tức thì -->
+                    <div class="btn-group btn-group-sm rounded-pill p-1 bg-light border" role="group">
+                        <button type="button" class="btn btn-primary rounded-pill px-3 py-1 fw-bold" id="btnDaily" onclick="changeChartType('daily')">Theo Ngày</button>
+                        <button type="button" class="btn text-secondary rounded-pill px-3 py-1 fw-bold" id="btnWeekly" onclick="changeChartType('weekly')">Theo Tuần</button>
+                        <button type="button" class="btn text-secondary rounded-pill px-3 py-1 fw-bold" id="btnMonthly" onclick="changeChartType('monthly')">Theo Tháng</button>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Nơi hiển thị biểu đồ. Canvas phải nằm trong thẻ div có chiều cao cố định để responsive tốt -->
+                    <div style="position: relative; height: 350px;">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Danh sách 4 sản phẩm bán chạy nhất hệ thống -->
+        <div class="col-xl-4 mb-4">
+            <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-award-fill text-warning me-2"></i> 4 Sản Phẩm Bán Chạy Nhất</h5>
+                    <hr class="mt-3 mb-0 border-light" />
+                </div>
+                <div class="card-body p-4">
+                    @if (topProducts != null && topProducts.Any())
+                    {
+                        <div class="d-flex flex-column gap-3">
+                            @foreach (var prod in topProducts)
+                            {
+                                <div class="d-flex align-items-center justify-content-between p-2 border border-light rounded-3 bg-light bg-opacity-40 hover-shadow transition">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <!-- Khung ảnh sản phẩm nhỏ -->
+                                        <div class="rounded-3 border overflow-hidden bg-white d-flex align-items-center justify-content-center p-1" style="width: 50px; height: 50px; min-width: 50px;">
+                                            @if (!string.IsNullOrEmpty(prod.ImageUrl))
+                                            {
+                                                <img src="@prod.ImageUrl" alt="@prod.Name" style="width: 100%; height: 100%; object-fit: cover;" />
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-box-seam text-secondary fs-4"></i>
+                                            }
+                                        </div>
+                                        <div>
+                                            <!-- Tên sản phẩm cắt ngắn dấu ba chấm nếu quá dài -->
+                                            <h6 class="fw-bold text-dark mb-1 text-truncate" style="max-width: 160px;" title="@prod.Name">@prod.Name</h6>
+                                            <span class="text-danger small fw-bold">@prod.Price.ToString("N0") đ</span>
+                                        </div>
+                                    </div>
+                                    <!-- Số lượng đã tiêu thụ -->
+                                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 fw-bold small">
+                                        Đã bán: @prod.TotalSold
+                                    </span>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Hiển thị mặc định nếu chưa bán được đơn nào -->
+                        <div class="text-center text-muted py-5">
+                            <i class="bi bi-bag-x fs-1 d-block mb-2 text-secondary opacity-50"></i>
+                            Hệ thống chưa ghi nhận đơn hàng hoàn tất nào.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. TIN TỨC MỚI NHẤT TRÊN HỆ THỐNG (GIỮ NGUYÊN NỘI DUNG GỐC CÓ BÀI VIẾT) -->
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden mb-4">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+            <h4 class="fw-bold text-danger mb-0"><i class="bi bi-newspaper me-2"></i> BÀI VIẾT TIN TỨC MỚI NHẤT</h4>
+            <hr class="mt-3 mb-0 border-light" />
+        </div>
+        <div class="card-body p-4">
+            <div class="row">
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <div class="col-md-4 mb-4">
+                            <div class="card shadow-sm h-100 border border-light rounded-3 overflow-hidden">
+                                <img src="@item.ImageUrl" class="card-img-top" alt="Hình ảnh bài viết" style="height: 200px; object-fit: cover;">
+                                <div class="card-body d-flex flex-column p-4">
+                                    @if (item.Category != null)
+                                    {
+                                        <span class="badge bg-primary bg-opacity-10 text-primary mb-3 align-self-start px-3 py-2 rounded-pill fw-bold">@item.Category.Name</span>
+                                    }
+                                    <h5 class="card-title fw-bold text-dark mb-3">@item.Title</h5>
+                                    <p class="card-text text-truncate flex-grow-1 text-muted small mb-4"> 
+                                        @System.Text.RegularExpressions.Regex.Replace(item.Content ?? "", "<.*?>", string.Empty)
+                                    </p>
+                                    <a href="@Url.Action("Details", "Post", new { id = item.Id })" class="btn btn-outline-danger btn-sm w-100 rounded-pill py-2">
+                                        Đọc tiếp <i class="bi bi-arrow-right-short"></i>
+                                    </a>
+                                </div>
+                                <div class="card-footer text-muted small bg-white border-0 py-3 px-4 border-top border-light">
+                                    <i class="bi bi-calendar-event"></i> Ngày đăng: @item.CreatedDate.ToString("dd/MM/yyyy")
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12 text-center text-muted py-5 bg-light rounded border">
+                        <i class="bi bi-newspaper fs-1 d-block mb-3 text-secondary"></i>
+                        Hiện tại chưa có bài viết tin tức nào được đăng tải trên hệ thống.
+                    </div>
+                }
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- THÔNG TIN TÁC GIẢ BẢN QUYỀN SINH VIÊN -->
+<div class="text-center text-muted small py-4 border-top border-light mt-4">
+    Bản quyền thuộc về sinh viên: <strong>Vũ Hoàng Chính - MSSV: 2122110380</strong> | Lớp: CCQ2211J
+</div>
+
+<!-- =========================================================================
+     PHẦN JAVASCRIPT HỖ TRỢ BẢN ĐỒ VÀ BỘ LỌC TƯƠNG TÁC DOANH THU (CHART.JS)
+     ========================================================================= -->
+@section Scripts {
+    <!-- Tải tệp thư viện JavaScript Chart.js từ CDN công cộng của Cloudflare -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        // 1. TẢI DỮ LIỆU TỪ C# TRUYỀN VÀO MÃ JAVASCRIPT
+        // Sử dụng cú pháp Html.Raw để giữ nguyên định dạng nhãn dạng chữ (không bị escape ký tự đặc biệt)
+        
+        // Thống kê Doanh thu Theo Ngày
+        const rawDailyLabels = [@Html.Raw(ViewBag.DailyLabels)]; // Trục X: ["23/05", "24/05", ...]
+        const rawDailyValues = [@ViewBag.DailyValues];           // Trục Y: [500000, 1200000, ...]
+
+        // Thống kê Doanh thu Theo Tuần
+        const rawWeeklyLabels = [@Html.Raw(ViewBag.WeeklyLabels)]; // Trục X: ["Tuần 1", "Tuần 2", ...]
+        const rawWeeklyValues = [@ViewBag.WeeklyValues];           // Trục Y: [14000000, 18000000, ...]
+
+        // Thống kê Doanh thu Theo Tháng
+        const rawMonthlyLabels = [@Html.Raw(ViewBag.MonthlyLabels)]; // Trục X: ["01/2026", "02/2026", ...]
+        const rawMonthlyValues = [@ViewBag.MonthlyValues];           // Trục Y: [85000000, 110000000, ...]
+
+        // Khai báo thực thể biểu đồ để dễ kiểm soát và xóa vẽ lại
+        let revenueChart = null;
+
+        // 2. PHƯƠNG THỨC KHỞI TẠO BIỂU ĐỒ (initChart)
+        function initChart(labels, data, labelText) {
+            // Lấy ngữ cảnh vẽ 2D từ thẻ canvas
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            
+            // Dựng hiệu ứng dải màu Gradient chuyển động tuyến tính mờ dần cực kỳ xịn mịn cho biểu đồ
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(79, 70, 229, 0.45)'); // Đỉnh biểu đồ màu tím Indigo
+            gradient.addColorStop(1, 'rgba(79, 70, 229, 0.00)'); // Đáy biểu đồ trong suốt
+
+            // Khởi tạo thư viện Chart
+            revenueChart = new Chart(ctx, {
+                type: 'line', // Kiểu biểu đồ đường vẽ nối các điểm
+                data: {
+                    labels: labels, // Nhãn hiển thị trục X
+                    datasets: [{
+                        label: labelText, // Nhãn của đường
+                        data: data,       // Mảng dữ liệu doanh thu tương ứng
+                        borderColor: '#4f46e5', // Đường viền màu tím Indigo thương hiệu
+                        borderWidth: 3,         // Độ dày nét vẽ là 3px
+                        backgroundColor: gradient, // Màu dải dốc Gradient đổ bóng bên dưới
+                        fill: true,             // Cho phép đổ bóng phủ đầy phần dưới
+                        tension: 0.35,          // Độ bo góc cong mềm mại tự nhiên cho đường nối đồ thị
+                        pointBackgroundColor: '#ffffff', // Chấm tròn điểm mốc màu trắng
+                        pointBorderColor: '#4f46e5',     // Viền chấm tròn màu tím
+                        pointBorderWidth: 2,
+                        pointRadius: 6,                 // Bán kính chấm tròn
+                        pointHoverRadius: 8,            // Phóng to khi di chuột vào chấm tròn
+                        pointHoverBackgroundColor: '#4f46e5',
+                        pointHoverBorderColor: '#ffffff',
+                        pointHoverBorderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Không cố định tỉ lệ giúp tương thích chiều cao thiết bị tốt hơn
+                    plugins: {
+                        legend: {
+                            display: false // Ẩn nhãn mô tả thừa thãi bên trên để giao diện rộng thoáng
+                        },
+                        tooltip: {
+                            // Tùy biến hộp ghi nhớ thông tin khi di chuột vào điểm số liệu
+                            backgroundColor: '#1e1b4b', // Nền xanh bóng tối huyền bí sang trọng
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                // Định dạng số tiền có dấu chấm ngăn cách hàng nghìn và thêm chữ "đ"
+                                label: function(context) {
+                                    return ' Doanh thu: ' + context.raw.toLocaleString('vi-VN') + ' đ';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true, // Trục tung luôn bắt đầu từ giá trị 0
+                            grid: {
+                                color: 'rgba(243, 244, 246, 1)' // Đường lưới nét đứt nằm ngang mờ nhẹ
+                            },
+                            ticks: {
+                                // Rút gọn các con số doanh thu quá lớn để tránh tràn màn hình (Ví dụ: 10,000,000 đ hiển thị 10M đ)
+                                callback: function(value) {
+                                    if (value >= 1000000) {
+                                        return (value / 1000000) + 'M đ';
+                                    }
+                                    return value.toLocaleString('vi-VN') + ' đ';
+                                },
+                                font: {
+                                    size: 11
+                                },
+                                color: '#6b7280'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false // Ẩn đường lưới sọc dọc để đồ thị trông thoáng đãng hơn
+                            },
+                            ticks: {
+                                font: {
+                                    size: 11
+                                },
+                                color: '#6b7280'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 3. ĐỢI TRANG NẠP XONG VÀ KHỞI TẠO BIỂU ĐỒ MẶC ĐỊNH
+        // Vừa tải trang xong sẽ hiển thị biểu đồ Theo Ngày làm mặc định đầu tiên
+        document.addEventListener("DOMContentLoaded", function() {
+            initChart(rawDailyLabels, rawDailyValues, 'Doanh thu hàng ngày');
+        });
+
+        // 4. PHƯƠNG THỨC CHUYỂN ĐỔI CHẾ ĐỘ XEM BIỂU ĐỒ (changeChartType)
+        // Kích hoạt khi quản trị viên bấm vào các nút: "Theo Ngày", "Theo Tuần", "Theo Tháng"
+        function changeChartType(type) {
+            // Đưa màu nền 3 nút lọc về dạng mặc định màu xám không được chọn
+            document.getElementById('btnDaily').className = "btn text-secondary rounded-pill px-3 py-1 fw-bold";
+            document.getElementById('btnWeekly').className = "btn text-secondary rounded-pill px-3 py-1 fw-bold";
+            document.getElementById('btnMonthly').className = "btn text-secondary rounded-pill px-3 py-1 fw-bold";
+
+            let labels = [];
+            let data = [];
+            let labelText = '';
+
+            // Bôi màu tím đậm cho duy nhất nút đang được bấm chọn và nạp mảng dữ liệu tương ứng
+            if (type === 'daily') {
+                document.getElementById('btnDaily').className = "btn btn-primary rounded-pill px-3 py-1 fw-bold";
+                labels = rawDailyLabels;
+                data = rawDailyValues;
+                labelText = 'Doanh thu hàng ngày';
+            } else if (type === 'weekly') {
+                document.getElementById('btnWeekly').className = "btn btn-primary rounded-pill px-3 py-1 fw-bold";
+                labels = rawWeeklyLabels;
+                data = rawWeeklyValues;
+                labelText = 'Doanh thu hàng tuần';
+            } else if (type === 'monthly') {
+                document.getElementById('btnMonthly').className = "btn btn-primary rounded-pill px-3 py-1 fw-bold";
+                labels = rawMonthlyLabels;
+                data = rawMonthlyValues;
+                labelText = 'Doanh thu hàng tháng';
+            }
+
+            // Hủy cấu hình vẽ biểu đồ cũ để giải phóng RAM trình duyệt tránh xung đột đồ họa chồng lên nhau
+            if (revenueChart) {
+                revenueChart.destroy();
+            }
+            
+            // Vẽ biểu đồ mới cực kỳ mượt mà
+            initChart(labels, data, labelText);
+        }
+    </script>
+}

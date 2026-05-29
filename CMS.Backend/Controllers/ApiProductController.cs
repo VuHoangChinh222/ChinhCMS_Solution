@@ -3,12 +3,14 @@
  * Mã sinh viên: 2122110380
  * Lớp: CCQ2211J
  * Ngày tạo: 26/05/2026
- * Version: 1.0
+ * Version: 1.1 (Cập nhật phân trang)
  */
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CMS.Data;
+using System;
+using System.Linq;
 
 namespace CMS.Backend.Controllers
 {
@@ -53,16 +55,26 @@ namespace CMS.Backend.Controllers
         }
 
         // ==========================================
-        // 2. API LẤY TOÀN BỘ DANH SÁCH SẢN PHẨM
+        // 2. API LẤY TOÀN BỘ DANH SÁCH SẢN PHẨM (CÓ PHÂN TRANG)
         // ==========================================
-        // GET: api/product
+        // GET: api/product?pageNumber=1&pageSize=10
         [HttpGet]
-        public IActionResult GetAll()
+        public IActionResult GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
+            // Ràng buộc dữ liệu đầu vào tối thiểu
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 10;
+
             try
             {
+                // 1. Tính tổng số sản phẩm hiện có
+                var totalItems = _context.Products.Count();
+
+                // 2. Lấy dữ liệu đã phân trang
                 var products = _context.Products
-                    .OrderByDescending(p => p.Id) // Sắp xếp sản phẩm mới nhất lên hàng đầu
+                    .OrderByDescending(p => p.Id) // Sản phẩm mới nhất lên đầu
+                    .Skip((pageNumber - 1) * pageSize) // Bỏ qua các bản ghi của các trang trước
+                    .Take(pageSize) // Lấy số lượng bản ghi tương ứng kích thước trang
                     .Select(p => new {
                         p.Id,
                         p.Name,
@@ -75,7 +87,18 @@ namespace CMS.Backend.Controllers
                     })
                     .ToList();
 
-                return Ok(products);
+                // 3. Tính toán số trang
+                var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+                // 4. Trả về cấu trúc phân trang chuẩn
+                return Ok(new
+                {
+                    TotalItems = totalItems,
+                    TotalPages = totalPages,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    Data = products
+                });
             }
             catch (System.Exception ex)
             {
@@ -84,17 +107,26 @@ namespace CMS.Backend.Controllers
         }
 
         // ==========================================
-        // 3. API LỌC SẢN PHẨM THEO DANH MỤC
+        // 3. API LỌC SẢN PHẨM THEO DANH MỤC (CÓ PHÂN TRANG)
         // ==========================================
-        // GET: api/product/category/{categoryId}
+        // GET: api/product/category/{categoryId}?pageNumber=1&pageSize=10
         [HttpGet("category/{categoryId}")]
-        public IActionResult GetByCategory(int categoryId)
+        public IActionResult GetByCategory(int categoryId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 10;
+
             try
             {
+                // 1. Đếm tổng số sản phẩm thuộc danh mục này
+                var totalItems = _context.Products.Count(p => p.CategoryProductId == categoryId);
+
+                // 2. Lấy dữ liệu phân trang theo danh mục
                 var products = _context.Products
                     .Where(p => p.CategoryProductId == categoryId)
                     .OrderByDescending(p => p.Id)
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
                     .Select(p => new {
                         p.Id,
                         p.Name,
@@ -107,7 +139,16 @@ namespace CMS.Backend.Controllers
                     })
                     .ToList();
 
-                return Ok(products);
+                var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+                return Ok(new
+                {
+                    TotalItems = totalItems,
+                    TotalPages = totalPages,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    Data = products
+                });
             }
             catch (System.Exception ex)
             {

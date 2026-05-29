@@ -56,11 +56,26 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Vai trò (Role):</label>
-                        <select asp-for="Role" class="form-select" required>
-                            <option value="Admin">Quản trị viên (Admin)</option>
-                            <option value="Editor">Biên tập viên (Editor)</option>
-                        </select>
-                        <span asp-validation-for="Role" class="text-danger"></span>
+                        @if (Model.Username == User.Identity.Name)
+                        {
+                            <!-- ẨN DROPDOWN ROLE: Admin đang chỉnh sửa chính tài khoản mình -->
+                            <!-- Hiển thị ô chỉ-đọc thay thế để ngăn tự hạ quyền -->
+                            <input type="text" class="form-control bg-light" 
+                                   value="Quản trị viên (Admin) - Tài khoản của bạn" readonly />
+                            <input type="hidden" asp-for="Role" />
+                            <div class="alert alert-warning small mt-2 mb-0 py-2 px-3 d-flex align-items-center gap-2 rounded">
+                                <i class="bi bi-shield-exclamation text-warning"></i>
+                                <span>Bạn không thể thay đổi quyền của chính tài khoản đang đăng nhập để tránh khóa hệ thống.</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <select asp-for="Role" class="form-select" required>
+                                <option value="Admin">Quản trị viên (Admin)</option>
+                                <option value="Editor">Biên tập viên (Editor)</option>
+                            </select>
+                            <span asp-validation-for="Role" class="text-danger"></span>
+                        }
                     </div>
                 </div>
 
