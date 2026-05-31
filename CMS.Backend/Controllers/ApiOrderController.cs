@@ -179,10 +179,47 @@ namespace CMS.Backend.Controllers
         }
 
         // ==========================================
-        // 3. API XEM CHI TIẾT MỘT ĐƠN HÀNG
+        // 3. API XEM MỘT ĐƠN HÀNG
         // ==========================================
         // GET: api/order/{id}
         [HttpGet("{id}")]
+        public IActionResult GetOrderById(int id)
+        {
+            try
+            {
+                var order = _context.Orders
+                    .Include(o => o.Customer)
+                    .FirstOrDefault(o => o.Id == id);
+                if (order == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy thông tin đơn hàng này trong hệ thống" });
+                }
+                return Ok(new {
+                    order.Id,
+                    order.OrderDate,
+                    order.Status,
+                    StatusText = order.Status == 0 ? "Chờ duyệt" : (order.Status == 1 ? "Đang vận chuyển" : (order.Status == 2 ? "Đã hoàn thành" : "Đã hủy")),
+                    order.Notes,
+                    Customer = new {
+                        order.Customer?.Id,
+                        order.Customer?.FullName,
+                        order.Customer?.Email,
+                        order.Customer?.Phone,
+                        order.Customer?.Address 
+                    }
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi hệ thống khi tải thông tin đơn hàng", error = ex.Message });
+            }
+        }
+
+        // ==========================================
+        // 4. API XEM CHI TIẾT MỘT ĐƠN HÀNG
+        // ==========================================
+        // GET: api/order/orderDetail/{id}
+        [HttpGet("orderDetail/{id}")]
         public IActionResult GetOrderDetail(int id)
         {
             try
@@ -213,7 +250,7 @@ namespace CMS.Backend.Controllers
                     order.Id,
                     order.OrderDate,
                     order.Status,
-                    StatusText = order.Status == 0 ? "Chờ duyệt" : (order.Status == 1 ? "Đang giao" : "Đã xong"),
+                    StatusText = order.Status == 0 ? "Chờ duyệt" : (order.Status == 1 ? "Đang vận chuyển" : (order.Status == 2 ? "Đã hoàn thành" : "Đã hủy")),
                     order.Notes,
                     Customer = new {
                         order.Customer?.Id,

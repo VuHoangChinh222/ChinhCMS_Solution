@@ -82,7 +82,28 @@ namespace CMS.Backend.Controllers
             }
         }
 
-        // 2. API lấy danh sách bài viết theo chuyên mục có phân trang (Category)
+        //2. API lấy tất cả danh sách danh mục bài viết 
+        // GET: api/post/categories
+        [HttpGet("categories")]
+        public IActionResult GetCategories()
+        {
+            try
+            {
+                var categories = _context.Categories
+                    .OrderByDescending(c => c.Id)
+                    .Select(c => new {
+                        c.Id,
+                        c.Name
+                    })
+                    .ToList();
+                return Ok(categories);
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi hệ thống khi tải danh sách chuyên mục", error = ex.Message });
+            }
+        }
+        // 3. API lấy danh sách bài viết theo chuyên mục có phân trang (Category)
         // GET: api/post/category/{categoryId}?pageNumber=1&pageSize=10
         [HttpGet("category/{categoryId}")]
         public IActionResult GetByCategory(int categoryId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
@@ -130,10 +151,10 @@ namespace CMS.Backend.Controllers
         }
 
         // ==========================================
-        // PHẦN 3: CHI TIẾT BÀI VIẾT (GET BY ID)
+        // PHẦN 4: CHI TIẾT BÀI VIẾT (GET BY ID)
         // ==========================================
 
-        // 3. API lấy chi tiết một bài viết cụ thể dựa trên ID (Giữ nguyên không đổi)
+        // 4. API lấy chi tiết một bài viết cụ thể dựa trên ID (Giữ nguyên không đổi)
         // GET: api/post/{id}
         [HttpGet("{id}")]
         public IActionResult GetDetail(int id)
