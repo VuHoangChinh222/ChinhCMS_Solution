@@ -54,7 +54,7 @@ namespace CMS.Backend.Controllers
                 return BadRequest(new { message = "Giỏ hàng trống hoặc thông tin đặt hàng không hợp lệ" });
             }
 
-            // Kiểm tra khách hàng có tồn tại không!
+            // Kiểm tra khách hàng có tồn tại không
             var customerExists = _context.Customers.Any(c => c.Id == request.CustomerId);
             if (!customerExists)
             {
