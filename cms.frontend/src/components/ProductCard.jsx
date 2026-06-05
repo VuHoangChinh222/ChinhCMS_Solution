@@ -19,11 +19,13 @@ const ProductCard = ({ product, navigate }) => {
     }
   };
 
+  const imageSrc = product.image || (product.imageUrl ? (product.imageUrl.startsWith('http') ? product.imageUrl : `https://localhost:7291${product.imageUrl}`) : 'src/assets/images/default_product.png');
+
   return (
     <div className="product-card" onClick={handleDetail}>
       {product.badge && <div className="product-badge">{product.badge}</div>}
       <div className="product-img">
-        <img src={product.image} alt={product.name} />
+        <img src={imageSrc} alt={product.name} />
         <div className="product-action">
           <button onClick={(e) => { e.stopPropagation(); navigate('detail', { id: product.id }); }}>
             <i className="fa-solid fa-eye"></i> Xem chi tiết

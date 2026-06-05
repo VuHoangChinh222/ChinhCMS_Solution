@@ -1,4 +1,4 @@
-// import { formatPrice } from '../../data/products';
+import { getCookie } from '../utils/cookieHelper';
 
 export const productsData = [
   { id: 1, name: 'Ignite Red X', category: 'Giày bóng rổ', price: 3500000, image: 'src/assets/images/shoe_product_1_1778727884422.png', badge: 'Mới', desc: 'Đôi giày bứt phá mọi giới hạn tốc độ. Thiết kế ôm sát cổ chân, đế đệm bật nảy cực cao, giúp bạn thực hiện những pha lên rổ hoàn hảo.' },
@@ -58,7 +58,20 @@ const CartView = ({ cart, updateQty, removeFromCart, navigate }) => {
           <div className="summary-row"><span>Tạm tính</span><span>{formatPrice(total)}</span></div>
           <div className="summary-row"><span>Phí vận chuyển</span><span>Miễn phí</span></div>
           <div className="summary-total"><span>Tổng cộng</span><span style={{color: 'var(--accent)'}}>{formatPrice(total)}</span></div>
-          <button className="btn btn-primary btn-block" onClick={() => navigate('checkout')}>Tiến hành đặt hàng</button>
+          <button 
+            className="btn btn-primary btn-block" 
+            onClick={() => {
+              const customer = getCookie('customer');
+              if (!customer) {
+                alert("Hệ thống bảo mật: Bạn phải đăng nhập để tiến hành đặt hàng!");
+                navigate('login');
+              } else {
+                navigate('checkout');
+              }
+            }}
+          >
+            Tiến hành đặt hàng
+          </button>
         </div>
       </div>
     </div>

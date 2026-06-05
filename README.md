@@ -121,6 +121,24 @@ Dự án `ChinhCMS_Solution` được chia làm 3 dự án nhỏ bên trong:
 - **`GET /api/order/customer/{customerId}`**: Lịch sử đơn hàng của một khách hàng (sắp xếp đơn hàng mới nhất lên đầu, trả về tổng tiền đơn hàng `TotalAmount` và tổng số sản phẩm `TotalItems`).
 - **`GET /api/order/{id}`**: Lấy chi tiết đơn hàng (bao gồm thông tin khách hàng và danh sách chi tiết các sản phẩm đã mua gồm ảnh, tên, giá, số lượng và thành tiền).
 
+### 8. Kết nối Frontend ReactJS & Web API (Buổi 7) - [ĐÃ HOÀN THÀNH]
+
+- **Cấu hình CORS ở Backend**: Thiết lập chính sách `AllowReactApp` trong `Program.cs` cho phép cổng giao diện ReactJS (`http://localhost:3000`) thực hiện các truy vấn API.
+- **Trục gọi API tập trung (Axios Client)**: Khởi tạo và cấu hình `axiosClient.js` trong ReactJS hỗ trợ tự động bóc tách dữ liệu JSON và quản lý lỗi tập trung.
+- **Hiển thị danh mục sản phẩm thời trang (CategoryProductList)**: Thiết kế component gọi API `/api/categoriesproducts` real-time từ SQL Server để hiển thị bộ lọc danh mục.
+- **Hiển thị danh sách sản phẩm thời trang (ProductList) - [Mở rộng]**: Tự xây dựng component kết nối endpoint `/api/Products`, trình bày dạng lưới Grid Card Bootstrap kèm định dạng tiền tệ VND (`Intl.NumberFormat`).
+- **Hiển thị danh mục & bài viết tin tức (PostList) - [Mở rộng]**: Thiết lập kết nối endpoint `/api/Posts`, hiển thị các bài viết chia sẻ xu hướng phối đồ công sở, dạ hội kèm định dạng ngày đăng vi-VN (`toLocaleDateString`).
+
+### 9. Hoàn thiện Trang cá nhân, Hạng VIP động, Luồng Đặt hàng & Tách CSS (Buổi 8) - [ĐÃ HOÀN THÀNH]
+
+- **Trang Danh mục sản phẩm độc lập (`ProductView.jsx`)**: Tách biệt hoàn toàn phần lưới sản phẩm chính, bộ lọc danh mục và phân trang từ trang chủ sang một trang riêng, trỏ menu "Sản phẩm" ở Header đến đúng định tuyến mới.
+- **Trang chi tiết sản phẩm (`ProductDetailView.jsx`)**: Tải chi tiết sản phẩm thực tế từ API, tự động hiển thị size dựa trên danh mục, giới hạn số lượng mua theo tồn kho thực tế, kiểm tra trạng thái đăng nhập trước khi thêm sản phẩm vào giỏ hàng.
+- **Trang Cá Nhân & Hạng VIP Động (`UserInfoView.jsx`)**: Tải thông tin tài khoản khách hàng từ Cookie `customer` (hạn 2 ngày). Gọi API tải lịch sử mua hàng, hiển thị nhãn trạng thái hóa đơn có màu sắc trực quan. Tự động cộng dồn tổng tiền các hóa đơn để phân cấp VIP động.
+- **Luồng Thanh toán & Ràng buộc kho (`CheckoutView.jsx` & `PaymentView.jsx`)**: Ràng buộc bảo mật yêu cầu đăng nhập trước khi thanh toán. Gom toàn bộ giỏ hàng và thông tin khách hàng gửi lên Backend API. Nếu thành công, chuyển hướng đến trang chọn phương thức thanh toán và xóa sạch giỏ hàng.
+- **Trang Bài viết chuyên biệt (`BlogView.jsx`)**: Tách biệt hoàn toàn bộ lọc chuyên mục bài viết khỏi trang chủ. Khi bấm vào mục "Bài viết" ở Header, người dùng sẽ được chuyển tới giao diện tin tức độc lập có 2 cột (Trái: Danh sách chuyên mục `BlogCategoryList.jsx` tải real-time từ API `/post/categories`; Phải: Lưới các bài viết tương ứng có tích hợp bộ phân trang động `currentPage`/`totalPages`).
+- **Thống nhất mã nguồn Services**: Hợp nhất các cuộc gọi API bài viết và chuyên mục bài viết vào tệp `postService.js` thay vì tạo file dịch vụ trùng lặp, giúp tối ưu hóa cấu trúc dự án ReactJS.
+- **Tách mã CSS sạch**: Tách toàn bộ CSS nhúng (inline styles) trong các file JSX sang các file `.css` chuyên biệt như `AboutView.css`, `SearchView.css`, `ProductDetailView.css`, `CheckoutView.css`, `BlogView.css`, `BlogCategoryList.css` và `UserInfoView.css` trong thư mục `src/assets/css`.
+
 ---
 
 ## HƯỚNG DẪN CÀI ĐẶT VÀ KHỞI CHẠY
@@ -162,7 +180,8 @@ Mở file `CMS.Backend/appsettings.json` và điều chỉnh chuỗi kết nối
 | **Buổi 4** | Thiết kế giao diện quản trị Admin Panel, tích hợp tải ảnh và trình soạn thảo CKEditor 5. | **Đã hoàn thành** | Hoàn thiện các trang quản lý: Danh mục, Bài viết, Đơn hàng, Thành viên (User CRUD).                                                                         |
 | **Buổi 5** | Bảo mật Cookie nâng cao, Phân quyền chi tiết, Quản lý sản phẩm & Danh mục sản phẩm.      | **Đã hoàn thành** | **Xác thực Cookie, mã hóa BCrypt, dọn rác ảnh cũ, cố định ổ khóa Data Protection, phân trang, ẩn nút Xóa nếu chứa sản phẩm.**                               |
 | **Buổi 6** | Phát triển Web API RESTful & cấu hình CORS, tích hợp bộ tạo tài liệu tự động Swagger UI. | **Đã hoàn thành** | **Xây dựng hệ thống 4 API Controllers (Bài viết, Sản phẩm, Khách hàng, Đơn hàng), băm mật khẩu BCrypt, trừ kho, Transaction checkout, CORS & Swashbuckle.** |
-| **Buổi 7** | Tích hợp Web API với Frontend ReactJS, quản lý Cookie bảo mật và tính toán phân hạng thành viên động. | **Đã hoàn thành** | **Kết nối API lấy Sản phẩm/Tin tức (xử lý phân trang 20 món/trang, top 5 bán chạy/mới nhất), trang Chi tiết động (kiểm tra Stock tồn kho), tích hợp Đăng ký/Đăng nhập bằng Axios lưu Cookie xác thực thời hạn 2 ngày, hiển thị Lịch sử đơn hàng từ database , chức năng tính toán Hạng thành viên động (Chưa phân hạng, Đồng, Bạc, Vàng, Kim cương) (hiện chỉ mới phân hạng ở frontend chưa thực sự phân hạng ở backend).** |
+| **Buổi 7** | Kết nối Frontend ReactJS với Backend ASP.NET Core Web API. | **Đã hoàn thành** | **Cấu hình CORS trên Backend, thiết lập Axios Client tập trung (`axiosClient.js`), xây dựng component hiển thị danh mục sản phẩm (`CategoryProductList.jsx`). Tự thực hiện bài tập mở rộng kết nối API danh sách sản phẩm (`ProductList.jsx` hiển thị Grid Card, định dạng VND) và tin tức (`PostList.jsx` hiển thị bài viết, định dạng ngày vi-VN).** |
+| **Buổi 8** | Hoàn thiện trang cá nhân, xếp hạng VIP động (chỉ mới làm ở frontend), luồng đặt hàng thật, tách CSS và tối ưu hóa UI/UX. | **Đã hoàn thành** | **Tách biệt trang danh sách sản phẩm độc lập (ProductView.jsx) và trang Bài viết chuyên biệt (BlogView.jsx) kèm bộ lọc chuyên mục bài viết (BlogCategoryList.jsx) có phân trang. Tải thông tin tài khoản và tính hạng VIP động từ database. Ràng buộc bảo mật đăng nhập giỏ hàng/thanh toán. Gửi hóa đơn lên Backend thực hiện Database Transaction trừ tồn kho. Tách toàn bộ CSS nhúng sang thư mục `src/assets/css`.** |
 ---
 
 _Dự án được thực hiện bởi sinh viên Vũ Hoàng Chính - CCQ2211J._

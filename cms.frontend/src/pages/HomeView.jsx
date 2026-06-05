@@ -1,57 +1,142 @@
-import { useState } from 'react';
+/* 
+ * HOMEVIEW COMPONENT - AUTOMATED DATABASE & API INTEGRATION (HOMEPAGE VIEW)
+ * Sinh viên: Vũ Hoàng Chính
+ * Môn học: Chuyên đề ASP.NET Core & ReactJS
+ */
+
+import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
-// import { productsData, categories } from '../../data/products';
+import PostCard from '../components/PostCard';
+import productService from '../services/productService';
+import postService from '../services/postService';
 
-
-export const productsData = [
-  { id: 1, name: 'Ignite Red X', category: 'Giày bóng rổ', price: 3500000, image: 'src/assets/images/shoe_product_1_1778727884422.png', badge: 'Mới', desc: 'Đôi giày bứt phá mọi giới hạn tốc độ. Thiết kế ôm sát cổ chân, đế đệm bật nảy cực cao, giúp bạn thực hiện những pha lên rổ hoàn hảo.' },
-  { id: 2, name: 'Velocity HX-1 Neo', category: 'Giày bóng rổ', price: 4200000, image: 'src/assets/images/shoe_product_2_1778727899404.png', badge: 'Bán chạy', desc: 'Trang bị công nghệ viền đèn Neon ẩn, Velocity HX-1 mang đến vẻ ngoài đến từ tương lai cùng hiệu năng đỉnh cao. Chất liệu siêu nhẹ hỗ trợ bứt tốc.' },
-  { id: 3, name: 'Nights Owl Jersey', category: 'Áo', price: 1200000, image: 'src/assets/images/shirt_product_1778727913549.png', badge: 'Limited', desc: 'Áo đấu phiên bản giới hạn "Nights Owl" với chất liệu siêu thoáng khí, công nghệ dệt 3D giúp thấm hút mồ hôi cực tốt trong các trận đấu căng thẳng.' },
-  { id: 4, name: 'Elite Performance Shorts', category: 'Quần', price: 850000, image: 'src/assets/images/pants_product_1778727928285.png', badge: 'Hot', desc: 'Quần short siêu nhẹ, viền sọc cam đặc trưng. Form chuẩn dành cho những pha di chuyển mượt mà trên sân.' },
-  { id: 5, name: 'Nike Classic Elite Socks', category: 'Vớ', price: 350000, image: 'src/assets/images/socks_product_1778727946646.png', desc: 'Vớ bóng rổ dày dặn, đệm lót ở gót và mũi chân hỗ trợ giảm chấn thương vùng mắt cá và bàn chân tối đa.' }
-];
-
-export const categories = ['Tất cả', 'Giày bóng rổ', 'Áo', 'Quần', 'Vớ'];
-
-export const formatPrice = (price) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+// Import các file CSS cần thiết
+import '../assets/css/HomeView.css';
 
 const HomeView = ({ navigate }) => {
-  const [activeCategory, setActiveCategory] = useState('Tất cả');
-  
-  const filteredProducts = activeCategory === 'Tất cả' 
-    ? productsData 
-    : productsData.filter(p => p.category === activeCategory);
+  const [newestProducts, setNewestProducts] = useState([]);
+  const [bestSellers, setBestSellers] = useState([]);
+  const [latestPosts, setLatestPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // 1. Tải dữ liệu Trang chủ (Top 5 sản phẩm mới, top 5 bán chạy, top 5 tin tức)
+  useEffect(() => {
+    const loadHomeData = async () => {
+      try {
+        setLoading(true);
+        
+        // Tải top 5 sản phẩm mới nhất
+        const newestRes = await productService.getNewestProducts();
+        if (newestRes && Array.isArray(newestRes)) {
+          setNewestProducts(newestRes.slice(0, 5));
+        }
+
+        // Tải top 5 sản phẩm bán chạy nhất
+        const bestRes = await productService.getBestSellers();
+        if (bestRes && Array.isArray(bestRes)) {
+          setBestSellers(bestRes.slice(0, 5));
+        }
+
+        // Tải top 5 bài viết mới nhất
+        const postsRes = await postService.getLatestPosts(1, 5);
+        const postsArray = postsRes.data || postsRes;
+        if (postsArray && Array.isArray(postsArray)) {
+          setLatestPosts(postsArray.slice(0, 5));
+        }
+      } catch (err) {
+        console.error("Lỗi khi tải dữ liệu trang chủ:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadHomeData();
+  }, []);
 
   return (
     <div className="page-transition">
+      {/* SECTION 1: HERO BANNER */}
       <section className="hero">
-        <div className="hero-bg"><img src="src/assets/images/hero_basketball_1778727871576.png" alt="Hero" /></div>
+        <div className="hero-bg">
+          <img src="src/assets/images/hero_basketball_1778727871576.png" alt="Astra Hoops Hero" />
+        </div>
         <div className="hero-content">
           <span className="hero-tag">Bộ sưu tập mới 2026</span>
           <h1 className="hero-title">ELEVATE YOUR <span>GAME</span></h1>
-          <p className="hero-desc">Trang bị những sản phẩm bóng rổ đỉnh cao nhất. Từ đôi giày hiệu năng cao đến trang phục chuyên nghiệp, Astra Hoops đồng hành cùng bạn trên mọi mặt sân.</p>
-          <button className="btn btn-primary" onClick={() => document.getElementById('products-sec').scrollIntoView({behavior: 'smooth'})}>Mua Sắm Ngay</button>
+          <p className="hero-desc">
+            Trang bị những sản phẩm bóng rổ đỉnh cao nhất. Từ đôi giày hiệu năng cao đến trang phục chuyên nghiệp, Astra Hoops đồng hành cùng bạn trên mọi mặt sân.
+          </p>
+          <button className="btn btn-primary" onClick={() => navigate('products')}>
+            Mua Sắm Ngay
+          </button>
         </div>
       </section>
-      
-      <section id="products-sec" className="products-section">
-        <div className="section-header">
-          <div>
-            <h2 className="section-title">Trang bị của bạn</h2>
-            <p style={{color: 'var(--text-muted)', marginTop: '0.5rem'}}>Lựa chọn những trang bị tốt nhất để tỏa sáng</p>
+
+      {/* SECTION 2: GỢI Ý MUA SẮM THÔNG MINH (TOP 5 MỚI & BÁN CHẠY) */}
+      <section className="featured-sections" style={{ padding: '3rem 4%', display: 'flex', flexDirection: 'column', gap: '4rem' }}>
+
+        {loading ? (
+          <div className="loading-text">
+            <i className="fa-solid fa-spinner fa-spin" style={{ marginRight: '8px' }}></i> Đang tải dữ liệu trang chủ...
           </div>
-          <div className="categories">
-            {categories.map(cat => (
-              <button key={cat} className={`category-btn ${activeCategory === cat ? 'active' : ''}`} onClick={() => setActiveCategory(cat)}>
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="products-grid">
-          {filteredProducts.map(product => <ProductCard key={product.id} product={product} navigate={navigate} />)}
-        </div>
+        ) : (
+          <>
+            {/* Khối 1: Top 5 sản phẩm mới nhất */}
+            {newestProducts.length > 0 && (
+              <div>
+                <div className="section-header">
+                  <h2 className="section-title">⭐ SẢN PHẨM MỚI NHẤT</h2>
+                  <p className="section-desc">Top 5 sản phẩm cực hot vừa cập bến cửa hàng</p>
+                </div>
+                <div className="products-grid-5-columns">
+                  {newestProducts.map(product => (
+                    <ProductCard key={product.id} product={{ ...product, badge: 'MỚI' }} navigate={navigate} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Khối 2: Top 5 sản phẩm bán chạy nhất */}
+            {bestSellers.length > 0 && (
+              <div>
+                <div className="section-header">
+                  <h2 className="section-title">🔥 BÁN CHẠY NHẤT</h2>
+                  <p className="section-desc">Những sản phẩm được đông đảo cầu thủ tin dùng dựa trên số lượng đã bán</p>
+                </div>
+                <div className="products-grid-5-columns">
+                  {bestSellers.map(product => (
+                    <ProductCard key={product.id} product={{ ...product, badge: 'HOT' }} navigate={navigate} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
       </section>
+
+      {/* SECTION 3: BẢNG TIN XU HƯỚNG THỜI TRANG (TOP 5 LATEST BLOGS) */}
+      {!loading && latestPosts.length > 0 && (
+        <section id="posts-sec" style={{ padding: '3rem 4%', background: 'var(--bg-card-dark, rgba(0,0,0,0.2))', borderTop: '1px solid var(--border-color)' }}>
+          <div className="section-header">
+            <h2 className="section-title">📰 BẢNG TIN XU HƯỚNG</h2>
+            <p className="section-desc">Khám phá các mẹo bổ ích, xu hướng thời trang & kiến thức thể thao mới nhất</p>
+          </div>
+          <div className="products-grid-5-columns">
+            {latestPosts.map(post => {
+              const displayTitle = post.title.length > 50
+                ? post.title.substring(0, 47) + '...'
+                : post.title;
+              return (
+                <PostCard
+                  key={post.id}
+                  post={{ ...post, title: displayTitle }}
+                  navigate={navigate}
+                />
+              );
+            })}
+          </div>
+        </section>
+      )}
     </div>
   );
 };

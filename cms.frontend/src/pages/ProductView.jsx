@@ -110,7 +110,11 @@ const ProductView = ({ navigate }) => {
             <section id="products-sec" className="products-section">
                 <div className="section-header">
                     <div>
-                        <h2 className="section-title">Sản phẩm</h2>
+                        <h2 className="section-title">
+                            {categories.find(c => c.id === activeCategoryId)?.name === 'Tất cả' 
+                                ? 'Tất cả sản phẩm' 
+                                : (categories.find(c => c.id === activeCategoryId)?.name || 'Sản phẩm')}
+                        </h2>
                     </div>
 
                     {/* Menu danh mục nút lọc */}
@@ -140,7 +144,9 @@ const ProductView = ({ navigate }) => {
                                 // Xử lý gắn link domain Backend (https://localhost:7291) vào đường dẫn ảnh cục bộ (/uploads/xxx.png)
                                 const processedProduct = {
                                     ...product,
-                                    image: product.imageUrl.startsWith('http') ? product.imageUrl : `${BASE_URL}${product.imageUrl}`
+                                    image: product.imageUrl 
+                                        ? (product.imageUrl.startsWith('http') ? product.imageUrl : `${BASE_URL}${product.imageUrl}`) 
+                                        : 'src/assets/images/default_product.png'
                                 };
 
                                 return (

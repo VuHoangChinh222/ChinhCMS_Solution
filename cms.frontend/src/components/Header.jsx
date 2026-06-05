@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 const Header = ({ currentView, navigate, cartCount }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
+
   const handleNav = (view) => {
     navigate(view);
     setIsMobileMenuOpen(false);
@@ -15,7 +15,8 @@ const Header = ({ currentView, navigate, cartCount }) => {
       </div>
       <ul className={`nav-links ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
         <li><button className={currentView.name === 'home' ? 'active' : ''} onClick={() => handleNav('home')}>Trang chủ</button></li>
-        <li><button className={currentView.name === 'products' ? 'active' : ''} onClick={() => handleNav('home')}>Sản phẩm</button></li>
+        <li><button className={currentView.name === 'products' ? 'active' : ''} onClick={() => handleNav('products')}>Sản phẩm</button></li>
+        <li><button className={currentView.name === 'blog' ? 'active' : ''} onClick={() => handleNav('blog')}>Bài viết</button></li>
         <li><button className={currentView.name === 'about' ? 'active' : ''} onClick={() => handleNav('about')}>Về chúng tôi</button></li>
       </ul>
       <div className="header-actions">

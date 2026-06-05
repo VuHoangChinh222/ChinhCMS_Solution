@@ -9,11 +9,13 @@ const PostCard = ({ post, navigate }) => {
         }
     };
 
+    const imageSrc = post.image || (post.imageUrl ? (post.imageUrl.startsWith('http') ? post.imageUrl : `https://localhost:7291${post.imageUrl}`) : 'src/assets/images/default_post.png');
+
     return (
         <div className="product-card post-card-sync" onClick={handleDetail}>
             {/* Phần hình ảnh bài viết */}
             <div className="product-img">
-                <img src={post.image} alt={post.title} />
+                <img src={imageSrc} alt={post.title} />
                 <div className="product-action">
                     {/* CHỈNH SỬA TẠI ĐÂY: Sửa nút bấm Xem chi tiết cho đồng bộ */}
                     <button onClick={(e) => { e.stopPropagation(); navigate('postDetail', { id: post.id }); }}>
