@@ -157,7 +157,76 @@ namespace CMS.Backend.Controllers
         }
 
         // ==========================================
-        // 4. API LẤY CHI TIẾT SẢN PHẨM
+        // 4. API LẤY 5 SẢN PHẨM MỚI NHẤT (NEWEST)
+        // ==========================================
+        // GET: api/product/newest
+        [HttpGet("newest")]
+        public IActionResult GetNewest()
+        {
+            try
+            {
+                var products = _context.Products
+                    .OrderByDescending(p => p.Id) // Sắp xếp ID lớn nhất (mới nhất) lên đầu
+                    .Take(5) // Chỉ lấy đúng 5 sản phẩm
+                    .Select(p => new {
+                        p.Id,
+                        p.Name,
+                        p.Description,
+                        p.Price,
+                        p.StockQuantity,
+                        p.ImageUrl,
+                        p.CategoryProductId,
+                        CategoryName = p.CategoryProduct != null ? p.CategoryProduct.Name : "Chưa phân loại"
+                    })
+                    .ToList();
+
+                return Ok(products);
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi hệ thống khi tải top sản phẩm mới nhất", error = ex.Message });
+            }
+        }
+
+        // ==========================================
+        // 5. API LẤY 5 SẢN PHẨM BÁN CHẠY NHẤT (BEST SELLERS)
+        // ==========================================
+        // GET: api/product/best-sellers
+        [HttpGet("best-sellers")]
+        public IActionResult GetBestSellers()
+        {
+            try
+            {
+                // Truy vấn tính tổng số lượng bán dựa trên bảng OrderDetails
+                var products = _context.Products
+                    .Select(p => new {
+                        p.Id,
+                        p.Name,
+                        p.Description,
+                        p.Price,
+                        p.StockQuantity,
+                        p.ImageUrl,
+                        p.CategoryProductId,
+                        CategoryName = p.CategoryProduct != null ? p.CategoryProduct.Name : "Chưa phân loại",
+                        // Tính tổng số lượng Quantity trong bảng OrderDetails tương ứng với ProductId này
+                        TotalSold = _context.OrderDetails.Where(od => od.ProductId == p.Id).Sum(od => od.Quantity)
+                    })
+                    .OrderByDescending(p => p.TotalSold) // Ưu tiên số lượng bán nhiều nhất xếp lên đầu
+                    .ThenByDescending(p => p.Id) // Nếu lượt bán bằng nhau (ví dụ đều bằng 0), ưu tiên sản phẩm mới hơn
+                    .Take(5) // Lấy ra top 5 sản phẩm
+                    .ToList();
+
+                return Ok(products);
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi hệ thống khi tải top sản phẩm bán chạy", error = ex.Message });
+            }
+        }
+
+
+        // ==========================================
+        // 6. API LẤY CHI TIẾT SẢN PHẨM
         // ==========================================
         // GET: api/product/{id}
         [HttpGet("{id}")]

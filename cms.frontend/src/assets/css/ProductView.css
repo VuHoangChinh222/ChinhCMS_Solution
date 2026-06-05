@@ -1,0 +1,78 @@
+/* Lưới hiển thị 5 sản phẩm trên một hàng */
+.products-grid-5-columns {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    /* Chia thành 5 cột bằng nhau */
+    gap: 20px;
+    /* Khoảng cách giữa các sản phẩm */
+    margin-top: 2rem;
+    width: 100%;
+}
+
+/* Khu vực thanh phân trang */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 3.5rem;
+    margin-bottom: 2rem;
+}
+
+.page-btn {
+    background-color: #f4f4f5;
+    border: 1px solid #e4e4e7;
+    color: #18181b;
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.page-btn:hover:not(:disabled) {
+    background-color: #e4e4e7;
+}
+
+.page-btn.active {
+    background-color: #f97316;
+    /* Màu cam thương hiệu của dự án */
+    color: white;
+    border-color: #f97316;
+}
+
+.page-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.loading-text {
+    text-align: center;
+    padding: 4rem;
+    font-size: 16px;
+    color: #71717a;
+}
+
+/* === RESPONSIVE (Tự động co giãn theo kích thước màn hình) === */
+@media (max-width: 1200px) {
+    .products-grid-5-columns {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        /* Màn hình máy tính nhỏ: 4 sản phẩm/hàng */
+    }
+}
+
+@media (max-width: 992px) {
+    .products-grid-5-columns {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        /* Màn hình máy tính bảng lớn: 3 sản phẩm/hàng */
+    }
+}
+
+@media (max-width: 640px) {
+    .products-grid-5-columns {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        /* Màn hình điện thoại di động: 2 sản phẩm/hàng */
+        gap: 12px;
+    }
+}
