@@ -162,7 +162,7 @@ Mở file `CMS.Backend/appsettings.json` và điều chỉnh chuỗi kết nối
 | **Buổi 4** | Thiết kế giao diện quản trị Admin Panel, tích hợp tải ảnh và trình soạn thảo CKEditor 5. | **Đã hoàn thành** | Hoàn thiện các trang quản lý: Danh mục, Bài viết, Đơn hàng, Thành viên (User CRUD).                                                                         |
 | **Buổi 5** | Bảo mật Cookie nâng cao, Phân quyền chi tiết, Quản lý sản phẩm & Danh mục sản phẩm.      | **Đã hoàn thành** | **Xác thực Cookie, mã hóa BCrypt, dọn rác ảnh cũ, cố định ổ khóa Data Protection, phân trang, ẩn nút Xóa nếu chứa sản phẩm.**                               |
 | **Buổi 6** | Phát triển Web API RESTful & cấu hình CORS, tích hợp bộ tạo tài liệu tự động Swagger UI. | **Đã hoàn thành** | **Xây dựng hệ thống 4 API Controllers (Bài viết, Sản phẩm, Khách hàng, Đơn hàng), băm mật khẩu BCrypt, trừ kho, Transaction checkout, CORS & Swashbuckle.** |
-
+| **Buổi 7** | Tích hợp Web API với Frontend ReactJS, quản lý Cookie bảo mật và tính toán phân hạng thành viên động. | **Đã hoàn thành** | **Kết nối API lấy Sản phẩm/Tin tức (xử lý phân trang 20 món/trang, top 5 bán chạy/mới nhất), trang Chi tiết động (kiểm tra Stock tồn kho), tích hợp Đăng ký/Đăng nhập bằng Axios lưu Cookie xác thực thời hạn 2 ngày, hiển thị Lịch sử đơn hàng từ DB , chức năng tính toán Hạng thành viên động (Chưa phân hạng, Đồng, Bạc, Vàng, Kim cương) (hiện chỉ mới phân hạng ở frontend chưa thực sự phân hạng ở backend).** |
 ---
 
 _Dự án được thực hiện bởi sinh viên Vũ Hoàng Chính - CCQ2211J._
