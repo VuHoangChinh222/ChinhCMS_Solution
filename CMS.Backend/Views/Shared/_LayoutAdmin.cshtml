@@ -176,13 +176,13 @@
                 <i class="bi bi-tags"></i> Danh mục sản phẩm
             </a>
             <a href="@Url.Action("Index", "Products")" class="nav-link-item d-flex align-items-center gap-2 px-3 py-2 text-decoration-none @(currentController == "Products" ? "active bg-primary text-white fw-bold" : "text-light")">
-                <i class="bi bi-box-seam"></i> Sản phẩm kho hàng
+                <i class="bi bi-box-seam"></i> Sản phẩm
             </a>
             <a href="@Url.Action("Index", "Customers")" class="nav-link-item d-flex align-items-center gap-2 px-3 py-2 text-decoration-none @(currentController == "Customers" ? "active bg-primary text-white fw-bold" : "text-light")">
-                <i class="bi bi-person-heart"></i> Khách hàng mua sắm
+                <i class="bi bi-person-heart"></i> Khách hàng
             </a>
             <a href="@Url.Action("Index", "Orders")" class="nav-link-item d-flex align-items-center gap-2 px-3 py-2 text-decoration-none @(currentController == "Orders" ? "active bg-primary text-white fw-bold" : "text-light")">
-                <i class="bi bi-receipt"></i> Đơn hàng tổng hợp
+                <i class="bi bi-receipt"></i> Đơn hàng
             </a>
             <a href="@Url.Action("Index", "OrderDetails")" class="nav-link-item d-flex align-items-center gap-2 px-3 py-2 text-decoration-none @(currentController == "OrderDetails" ? "active bg-primary text-white fw-bold" : "text-light")">
                 <i class="bi bi-list-check"></i> Đơn hàng chi tiết
@@ -242,13 +242,13 @@
                 <i class="bi bi-tags"></i> Danh mục sản phẩm
             </a>
             <a asp-controller="Products" asp-action="Index" class="nav-link-item @(currentController == "Products" ? "active" : "")">
-                <i class="bi bi-box-seam"></i> Sản phẩm kho hàng
+                <i class="bi bi-box-seam"></i> Sản phẩm
             </a>
             <a asp-controller="Customers" asp-action="Index" class="nav-link-item @(currentController == "Customers" ? "active" : "")">
-                <i class="bi bi-person-heart"></i> Khách hàng mua sắm
+                <i class="bi bi-person-heart"></i> Khách hàng
             </a>
             <a asp-controller="Orders" asp-action="Index" class="nav-link-item @(currentController == "Orders" ? "active" : "")">
-                <i class="bi bi-receipt"></i> Đơn hàng tổng hợp
+                <i class="bi bi-receipt"></i> Đơn hàng
             </a>
             @* <a asp-controller="OrderDetails" asp-action="Index" class="nav-link-item @(currentController == "OrderDetails" ? "active" : "")">
                 <i class="bi bi-list-check"></i> Đơn hàng chi tiết

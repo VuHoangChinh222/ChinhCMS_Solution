@@ -39,7 +39,7 @@
 
                 <div class="card-body p-4">
                     <!-- Biểu mẫu gửi dữ liệu lên phương thức Edit sử dụng giao thức POST -->
-                    <form asp-action="Edit" method="post">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
                         <!-- Khu vực hiển thị thông báo lỗi tổng hợp -->
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
@@ -63,6 +63,27 @@
                             <textarea asp-for="Description" class="form-control" rows="4" placeholder="Nhập mô tả ngắn gọn về đặc điểm của danh mục sản phẩm này..."></textarea>
                             <span asp-validation-for="Description" class="text-danger small mt-1 d-block"></span>
                         </div>
+
+                        <!-- Hiển thị hình ảnh hiện tại (nếu có) -->
+                        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                        {
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-dark d-block">Hình ảnh hiện tại</label>
+                                <img src="@Model.ImageUrl" alt="@Model.Name" class="img-thumbnail rounded shadow-sm" style="max-height: 120px; object-fit: cover;" />
+                            </div>
+                        }
+
+                        <!-- Trường tải lên hình ảnh đại diện mới -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark">Tải lên hình ảnh mới</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-image-fill"></i></span>
+                                <input type="file" name="uploadImage" class="form-control" accept="image/*" />
+                            </div>
+                            <span class="text-muted small mt-1 d-block">Hãy chọn hình ảnh mới nếu muốn thay đổi hình ảnh đại diện hiện tại.</span>
+                        </div>
+                        <!-- Lưu giữ đường dẫn hình ảnh cũ nếu không thay đổi -->
+                        <input type="hidden" asp-for="ImageUrl" />
 
                         <!-- Khu vực chứa các nút chức năng của biểu mẫu -->
                         <div class="d-flex gap-2 justify-content-end">

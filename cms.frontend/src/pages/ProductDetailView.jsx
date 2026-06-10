@@ -15,6 +15,7 @@ const BASE_URL = "https://localhost:7291";
 export const formatPrice = (price) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
 
 const ProductDetailView = ({ params, addToCart, navigate }) => {
+  const productSlug = params.slug;
   const productId = params.id;
   const [product, setProduct] = useState(null);
   const [size, setSize] = useState('');
@@ -22,11 +23,16 @@ const ProductDetailView = ({ params, addToCart, navigate }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // 1. Tải chi tiết sản phẩm từ API
+  // 1. Tải chi tiết sản phẩm từ API (ưu tiên gọi theo Slug, fallback ID)
   useEffect(() => {
-    if (!productId) return;
+    if (!productSlug && !productId) return;
     setLoading(true);
-    productService.getProductById(productId)
+
+    const fetchPromise = productSlug 
+      ? productService.getProductBySlug(productSlug)
+      : productService.getProductById(productId);
+
+    fetchPromise
       .then(data => {
         setProduct(data);
         setLoading(false);
@@ -45,7 +51,7 @@ const ProductDetailView = ({ params, addToCart, navigate }) => {
         setError("Không thể tải chi tiết sản phẩm này.");
         setLoading(false);
       });
-  }, [productId]);
+  }, [productSlug, productId]);
 
   if (loading) {
     return (

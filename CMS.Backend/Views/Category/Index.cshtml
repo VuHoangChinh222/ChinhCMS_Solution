@@ -39,6 +39,7 @@
                     <thead class="table-light text-uppercase text-secondary" style="font-size: 12px; letter-spacing: 0.5px;">
                         <tr>
                             <th class="ps-4 py-3" style="width: 100px;">ID</th>
+                            <th class="py-3" style="width: 120px;">Hình ảnh</th>
                             <th class="py-3" style="width: 250px;">Tên danh mục</th>
                             <th class="py-3">Mô tả chi tiết</th>
                             <th class="pe-4 py-3 text-end" style="width: 200px;">Thao tác</th>
@@ -48,7 +49,7 @@
                         @if (!Model.Any())
                         {
                             <tr>
-                                <td colspan="4" class="text-center py-5 text-muted">
+                                <td colspan="5" class="text-center py-5 text-muted">
                                     <i class="bi bi-folder fs-1 d-block mb-3 text-secondary"></i>
                                     Chưa có danh mục bài viết nào trong hệ thống.
                                 </td>
@@ -60,6 +61,18 @@
                             {
                                 <tr>
                                     <td class="ps-4 fw-semibold text-secondary">#@item.Id</td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                        {
+                                            <img src="@item.ImageUrl" alt="@item.Name" class="rounded shadow-sm border border-light" style="width: 50px; height: 50px; object-fit: cover;" />
+                                        }
+                                        else
+                                        {
+                                            <div class="rounded bg-light text-muted d-flex align-items-center justify-content-center shadow-sm border border-light" style="width: 50px; height: 50px;">
+                                                <i class="bi bi-image" style="font-size: 20px;"></i>
+                                            </div>
+                                        }
+                                    </td>
                                     <td>
                                         <div class="d-flex align-items-center gap-2">
                                             <span class="p-2 rounded bg-indigo bg-opacity-10 text-indigo" style="color: #4f46e5; background-color: rgba(79, 70, 229, 0.1);">

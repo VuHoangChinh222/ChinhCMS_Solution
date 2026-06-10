@@ -60,7 +60,7 @@ Dự án `ChinhCMS_Solution` được chia làm 3 dự án nhỏ bên trong:
   - Nếu số lượng sản phẩm thuộc danh mục đang lớn hơn 0 (`Products.Count > 0`), hệ thống sẽ **ẩn hoàn toàn nút Xóa** ở trang danh sách để ngăn chặn hành động sơ suất của người dùng.
   - Tích hợp bộ bảo vệ 2 lớp ở server-side trong `DeleteConfirmed` để trả về thông báo lỗi dạng Toast/Alert và ngăn chặn hành vi cố tình gửi yêu cầu xóa danh mục không rỗng.
 
-### 4. Quản lý sản phẩm kho hàng (Product CRUD) - [MỚI]
+### 4. Quản lý Sản phẩm (Product CRUD) - [MỚI]
 
 - **Thông số kho chi tiết**: Hiển thị ảnh đại diện sản phẩm nhỏ gọn, tên sản phẩm, danh mục cha, giá bán định dạng tiền tệ VNĐ và số lượng tồn kho.
 - **Nhãn trạng thái tồn kho thông minh**:
@@ -182,6 +182,7 @@ Mở file `CMS.Backend/appsettings.json` và điều chỉnh chuỗi kết nối
 | **Buổi 6** | Phát triển Web API RESTful & cấu hình CORS, tích hợp bộ tạo tài liệu tự động Swagger UI. | **Đã hoàn thành** | **Xây dựng hệ thống 4 API Controllers (Bài viết, Sản phẩm, Khách hàng, Đơn hàng), băm mật khẩu BCrypt, trừ kho, Transaction checkout, CORS & Swashbuckle.** |
 | **Buổi 7** | Kết nối Frontend ReactJS với Backend ASP.NET Core Web API. | **Đã hoàn thành** | **Cấu hình CORS trên Backend, thiết lập Axios Client tập trung (`axiosClient.js`), xây dựng component hiển thị danh mục sản phẩm (`CategoryProductList.jsx`). Tự thực hiện bài tập mở rộng kết nối API danh sách sản phẩm (`ProductList.jsx` hiển thị Grid Card, định dạng VND) và tin tức (`PostList.jsx` hiển thị bài viết, định dạng ngày vi-VN).** |
 | **Buổi 8** | Hoàn thiện trang cá nhân, xếp hạng VIP động (chỉ mới làm ở frontend), luồng đặt hàng thật, tách CSS và tối ưu hóa UI/UX. | **Đã hoàn thành** | **Tách biệt trang danh sách sản phẩm độc lập (ProductView.jsx) và trang Bài viết chuyên biệt (BlogView.jsx) kèm bộ lọc chuyên mục bài viết (BlogCategoryList.jsx) có phân trang. Tải thông tin tài khoản và tính hạng VIP động ở Frontend. Ràng buộc bảo mật đăng nhập giỏ hàng/thanh toán. Gửi hóa đơn lên Backend thực hiện Database Transaction trừ tồn kho. Tách toàn bộ CSS nhúng sang thư mục `src/assets/css`.** |
+| **Buổi 9** | Nâng cấp hệ thống SEO Slug và cấu trúc dữ liệu cho thực thể sản phẩm (Product). | **Đã hoàn thành** | **Tích hợp SlugHelper tự sinh URL thân thiện tiếng Việt không dấu, ràng buộc Unique Index trên database SQL Server. Xây dựng API và client service tải sản phẩm theo Slug, nâng cấp ProductCard và ProductDetailView sang định tuyến SEO.** |
 ---
 
 _Dự án được thực hiện bởi sinh viên Vũ Hoàng Chính - CCQ2211J._

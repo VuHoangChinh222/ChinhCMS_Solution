@@ -62,12 +62,32 @@ namespace CMS.Backend.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(CategoryProduct model)
+        public IActionResult Create(CategoryProduct model, IFormFile? uploadImage)
         {
             if (string.IsNullOrEmpty(model.Name))
             {
                 ModelState.AddModelError("Name", "Vui lòng nhập tên danh mục sản phẩm.");
                 return View(model);
+            }
+
+            // Xử lý tải ảnh lên nếu có file được chọn
+            if (uploadImage != null && uploadImage.Length > 0)
+            {
+                string folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                if (!Directory.Exists(folder))
+                {
+                    Directory.CreateDirectory(folder);
+                }
+
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(uploadImage.FileName);
+                string filePath = Path.Combine(folder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    uploadImage.CopyTo(stream);
+                }
+
+                model.ImageUrl = "/uploads/" + fileName;
             }
 
             _context.CategoriesProducts.Add(model);
@@ -90,12 +110,51 @@ namespace CMS.Backend.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(CategoryProduct model)
+        public IActionResult Edit(CategoryProduct model, IFormFile? uploadImage)
         {
             if (string.IsNullOrEmpty(model.Name))
             {
                 ModelState.AddModelError("Name", "Vui lòng nhập tên danh mục sản phẩm.");
                 return View(model);
+            }
+
+            // Xử lý tải ảnh lên nếu có file được chọn
+            if (uploadImage != null && uploadImage.Length > 0)
+            {
+                // Dọn dẹp tệp tin ảnh vật lý cũ
+                var oldCategory = _context.CategoriesProducts.AsNoTracking().FirstOrDefault(c => c.Id == model.Id);
+                if (oldCategory != null && !string.IsNullOrEmpty(oldCategory.ImageUrl) && oldCategory.ImageUrl.StartsWith("/uploads/"))
+                {
+                    string oldRelativePath = oldCategory.ImageUrl.TrimStart('/');
+                    string oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", oldRelativePath);
+                    if (System.IO.File.Exists(oldFilePath))
+                    {
+                        try
+                        {
+                            System.IO.File.Delete(oldFilePath);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Lỗi khi xóa tệp ảnh cũ: " + ex.Message);
+                        }
+                    }
+                }
+
+                string folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                if (!Directory.Exists(folder))
+                {
+                    Directory.CreateDirectory(folder);
+                }
+
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(uploadImage.FileName);
+                string filePath = Path.Combine(folder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    uploadImage.CopyTo(stream);
+                }
+
+                model.ImageUrl = "/uploads/" + fileName;
             }
 
             _context.CategoriesProducts.Update(model);
@@ -143,6 +202,24 @@ namespace CMS.Backend.Controllers
                 {
                     TempData["ErrorMessage"] = "Không thể xóa danh mục vì đang chứa sản phẩm!";
                     return RedirectToAction("Index");
+                }
+
+                // Xóa ảnh vật lý nếu có
+                if (!string.IsNullOrEmpty(category.ImageUrl) && category.ImageUrl.StartsWith("/uploads/"))
+                {
+                    string relativePath = category.ImageUrl.TrimStart('/');
+                    string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", relativePath);
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        try
+                        {
+                            System.IO.File.Delete(filePath);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Lỗi khi xóa tệp ảnh cũ: " + ex.Message);
+                        }
+                    }
                 }
 
                 _context.CategoriesProducts.Remove(category);

@@ -8,6 +8,7 @@
 
 using CMS.Data;
 using CMS.Data.Entities;
+using CMS.Backend.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -66,10 +67,49 @@ namespace CMS.Backend.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Product model, IFormFile uploadImage)
+        public IActionResult Create(Product model, IFormFile? uploadImage)
         {
-            // Loại bỏ kiểm tra ModelState đối với thuộc tính liên kết ảo của EF Core
+            // 1. Loại bỏ các thuộc tính không cần xác thực trực tiếp khỏi ModelState.
+            // Điều này rất quan trọng khi sử dụng Non-Nullable Reference Types trong .NET Core,
+            // giúp tránh việc Form bị từ chối do các trường ảo (Navigation properties) hoặc các trường tùy chọn.
             ModelState.Remove("CategoryProduct");
+            ModelState.Remove("Slug");
+            ModelState.Remove("uploadImage");
+
+            // 2. Xác định phương thức điền Slug: Tự gõ thủ công (Manual) hay Tự động sinh (Auto).
+            bool isManuallyEntered = !string.IsNullOrEmpty(model.Slug);
+
+            if (string.IsNullOrEmpty(model.Slug))
+            {
+                // Nếu người dùng không nhập, tự động tạo slug thô từ tên sản phẩm.
+                model.Slug = SlugHelper.GenerateSlug(model.Name);
+            }
+            else
+            {
+                // Nếu tự nhập, chuyển đổi chuỗi thô của người dùng thành định dạng slug chuẩn SEO (không dấu, gạch ngang).
+                model.Slug = SlugHelper.GenerateSlug(model.Slug);
+            }
+
+            // 3. Xử lý kiểm tra trùng lặp và xung đột Slug:
+            if (isManuallyEntered)
+            {
+                // TRƯỜNG HỢP TỰ GÕ: Nếu slug tự nhập đã tồn tại trong DB, hiển thị cảnh báo lỗi (đúng nguyên tắc UX).
+                if (_context.Products.Any(p => p.Slug == model.Slug))
+                {
+                    ModelState.AddModelError("Slug", "Đường dẫn thân thiện (Slug) này đã tồn tại trong hệ thống. Vui lòng chọn đường dẫn khác.");
+                }
+            }
+            else
+            {
+                // TRƯỜNG HỢP TỰ ĐỘNG SINH: Tự động phát hiện trùng lặp và thêm số hậu tố để đảm bảo lưu thành công mà không gây lỗi (ví dụ: 'giay-nike-1', 'giay-nike-2').
+                string baseSlug = model.Slug;
+                int counter = 1;
+                while (_context.Products.Any(p => p.Slug == model.Slug))
+                {
+                    model.Slug = $"{baseSlug}-{counter}";
+                    counter++;
+                }
+            }
 
             // Xử lý tải ảnh lên nếu có file được chọn
             if (uploadImage != null && uploadImage.Length > 0)
@@ -142,9 +182,48 @@ namespace CMS.Backend.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(Product model, IFormFile uploadImage)
+        public IActionResult Edit(Product model, IFormFile? uploadImage)
         {
+            // 1. Loại bỏ các thuộc tính không cần xác thực trực tiếp khỏi ModelState.
+            // Loại bỏ 'uploadImage' để không bắt buộc tải lên hình ảnh mới khi cập nhật.
             ModelState.Remove("CategoryProduct");
+            ModelState.Remove("Slug");
+            ModelState.Remove("uploadImage");
+
+            // 2. Xác định phương thức điền Slug: Tự gõ thủ công (Manual) hay Tự động sinh (Auto).
+            bool isManuallyEntered = !string.IsNullOrEmpty(model.Slug);
+
+            if (string.IsNullOrEmpty(model.Slug))
+            {
+                // Nếu để trống, tự sinh slug thô từ tên sản phẩm.
+                model.Slug = SlugHelper.GenerateSlug(model.Name);
+            }
+            else
+            {
+                // Nếu tự gõ, chuẩn hóa về slug viết thường không dấu.
+                model.Slug = SlugHelper.GenerateSlug(model.Slug);
+            }
+
+            // 3. Xử lý kiểm tra trùng lặp và xung đột Slug cho hành động chỉnh sửa (loại trừ chính sản phẩm hiện tại thông qua Id):
+            if (isManuallyEntered)
+            {
+                // TRƯỜNG HỢP TỰ GÕ: Nếu trùng với bất kỳ sản phẩm nào khác trong DB, trả về thông báo lỗi.
+                if (_context.Products.Any(p => p.Slug == model.Slug && p.Id != model.Id))
+                {
+                    ModelState.AddModelError("Slug", "Đường dẫn thân thiện (Slug) này đã tồn tại trong hệ thống. Vui lòng chọn đường dẫn khác.");
+                }
+            }
+            else
+            {
+                // TRƯỜNG HỢP TỰ ĐỘNG SINH: Tự động thêm hậu tố số để tránh xung đột với các sản phẩm khác.
+                string baseSlug = model.Slug;
+                int counter = 1;
+                while (_context.Products.Any(p => p.Slug == model.Slug && p.Id != model.Id))
+                {
+                    model.Slug = $"{baseSlug}-{counter}";
+                    counter++;
+                }
+            }
 
             if (uploadImage != null && uploadImage.Length > 0)
             {

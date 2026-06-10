@@ -34,7 +34,7 @@
     <div class="row">
         <div class="col-md-8">
             <!-- Biểu mẫu gửi dữ liệu lên phương thức Create sử dụng giao thức POST -->
-            <form asp-action="Create" method="post" class="shadow-sm p-4 border rounded bg-white">
+            <form asp-action="Create" method="post" enctype="multipart/form-data" class="shadow-sm p-4 border rounded bg-white">
                 <!-- Khu vực hiển thị thông báo lỗi tổng hợp từ hệ thống kiểm tra dữ liệu -->
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
@@ -53,6 +53,15 @@
                     <!-- Hiển thị thông báo lỗi cụ thể cho trường Mô tả danh mục nếu kiểm tra thất bại -->
                     <span asp-validation-for="Description" class="text-danger small"></span>
                 </div>
+
+                <!-- Trường tải lên hình ảnh đại diện cho danh mục -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Hình ảnh đại diện:</label>
+                    <input type="file" name="uploadImage" class="form-control" accept="image/*" />
+                    <span class="text-muted small">Hãy chọn hình ảnh đại diện đẹp mắt cho danh mục tin tức này.</span>
+                </div>
+
+
 
                 <!-- Khu vực chứa các nút chức năng của biểu mẫu -->
                 <div class="d-flex gap-2">

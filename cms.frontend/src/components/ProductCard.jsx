@@ -15,7 +15,7 @@ export const formatPrice = (price) => new Intl.NumberFormat('vi-VN', { style: 'c
 const ProductCard = ({ product, navigate }) => {
   const handleDetail = (e) => {
     if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'I') {
-        navigate('detail', { id: product.id });
+        navigate('detail', { slug: product.slug || product.id });
     }
   };
 
@@ -27,7 +27,7 @@ const ProductCard = ({ product, navigate }) => {
       <div className="product-img">
         <img src={imageSrc} alt={product.name} />
         <div className="product-action">
-          <button onClick={(e) => { e.stopPropagation(); navigate('detail', { id: product.id }); }}>
+          <button onClick={(e) => { e.stopPropagation(); navigate('detail', { slug: product.slug || product.id }); }}>
             <i className="fa-solid fa-eye"></i> Xem chi tiết
           </button>
         </div>

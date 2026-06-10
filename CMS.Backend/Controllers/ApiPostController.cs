@@ -93,7 +93,9 @@ namespace CMS.Backend.Controllers
                     .OrderByDescending(c => c.Id)
                     .Select(c => new {
                         c.Id,
-                        c.Name
+                        c.Name,
+                        c.Description,
+                        c.ImageUrl
                     })
                     .ToList();
                 return Ok(categories);

@@ -42,7 +42,8 @@ namespace CMS.Backend.Controllers
                     .Select(c => new {
                         c.Id,
                         c.Name,
-                        c.Description
+                        c.Description,
+                        c.ImageUrl
                     })
                     .ToList();
 
@@ -78,6 +79,7 @@ namespace CMS.Backend.Controllers
                     .Select(p => new {
                         p.Id,
                         p.Name,
+                        p.Slug,
                         p.Description,
                         p.Price,
                         p.StockQuantity,
@@ -130,6 +132,7 @@ namespace CMS.Backend.Controllers
                     .Select(p => new {
                         p.Id,
                         p.Name,
+                        p.Slug,
                         p.Description,
                         p.Price,
                         p.StockQuantity,
@@ -171,6 +174,7 @@ namespace CMS.Backend.Controllers
                     .Select(p => new {
                         p.Id,
                         p.Name,
+                        p.Slug,
                         p.Description,
                         p.Price,
                         p.StockQuantity,
@@ -202,6 +206,7 @@ namespace CMS.Backend.Controllers
                     .Select(p => new {
                         p.Id,
                         p.Name,
+                        p.Slug,
                         p.Description,
                         p.Price,
                         p.StockQuantity,
@@ -224,12 +229,11 @@ namespace CMS.Backend.Controllers
             }
         }
 
-
         // ==========================================
-        // 6. API LẤY CHI TIẾT SẢN PHẨM
+        // 6. API LẤY CHI TIẾT SẢN PHẨM THEO ID
         // ==========================================
         // GET: api/product/{id}
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public IActionResult GetDetail(int id)
         {
             try
@@ -238,6 +242,7 @@ namespace CMS.Backend.Controllers
                     .Select(p => new {
                         p.Id,
                         p.Name,
+                        p.Slug,
                         p.Description,
                         p.Price,
                         p.StockQuantity,
@@ -258,6 +263,43 @@ namespace CMS.Backend.Controllers
             catch (System.Exception ex)
             {
                 return StatusCode(500, new { message = "Lỗi hệ thống khi tải chi tiết sản phẩm", error = ex.Message });
+            }
+        }
+
+        // ==========================================
+        // 7. API LẤY CHI TIẾT SẢN PHẨM THEO SLUG (SEO FRIENDLY)
+        // ==========================================
+        // GET: api/product/slug/{slug}
+        [HttpGet("slug/{slug}")]
+        public IActionResult GetDetailBySlug(string slug)
+        {
+            try
+            {
+                var product = _context.Products
+                    .Select(p => new {
+                        p.Id,
+                        p.Name,
+                        p.Slug,
+                        p.Description,
+                        p.Price,
+                        p.StockQuantity,
+                        p.ImageUrl,
+                        p.CategoryProductId,
+                        CategoryName = p.CategoryProduct != null ? p.CategoryProduct.Name : "Chưa phân loại"
+                    })
+                    .FirstOrDefault(p => p.Slug == slug);
+
+                // Xử lý kịch bản không tồn tại sản phẩm
+                if (product == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy sản phẩm này trong kho hàng dựa trên slug" });
+                }
+
+                return Ok(product);
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi hệ thống khi tải chi tiết sản phẩm theo slug", error = ex.Message });
             }
         }
     }

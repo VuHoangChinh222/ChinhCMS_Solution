@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Sinh viên : Vũ Hoàng Chính
  * Mã sinh viên: 2122110380
  * Lớp: CCQ2211J
@@ -32,6 +32,16 @@ namespace CMS.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Cấu hình chỉ mục duy nhất (Unique Index) cho cột Slug trong bảng Products.
+            // Đảm bảo không tồn tại hai sản phẩm trùng nhau về đường dẫn thân thiện (Slug).
+            modelBuilder.Entity<Product>()
+                .HasIndex(p => p.Slug)
+                .IsUnique();
+        }
     }
 }
 

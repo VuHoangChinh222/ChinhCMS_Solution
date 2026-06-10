@@ -19,6 +19,12 @@ const productService = {
         return axiosClient.get(url);
     },
 
+    // API lấy chi tiết sản phẩm theo slug (SEO)
+    getProductBySlug: (slug) => {
+        const url = `/product/slug/${slug}`;
+        return axiosClient.get(url);
+    },
+
     // API lấy 5 sản phẩm mới nhất
     getNewestProducts: () => {
         const url = '/product/newest';

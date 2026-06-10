@@ -34,7 +34,7 @@
     <div class="row">
         <div class="col-md-8">
             <!-- Biểu mẫu gửi dữ liệu cập nhật lên phương thức Edit sử dụng giao thức POST -->
-            <form asp-action="Edit" method="post" class="shadow-sm p-4 border rounded bg-white">
+            <form asp-action="Edit" method="post" enctype="multipart/form-data" class="shadow-sm p-4 border rounded bg-white">
                 <!-- Khu vực hiển thị thông báo lỗi tổng hợp từ hệ thống kiểm tra dữ liệu -->
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
@@ -56,6 +56,25 @@
                     <!-- Hiển thị lỗi nếu người dùng nhập mô tả không hợp lệ -->
                     <span asp-validation-for="Description" class="text-danger small"></span>
                 </div>
+
+                <!-- Hiển thị hình ảnh hiện tại (nếu có) -->
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <div class="mb-3">
+                        <label class="form-label fw-bold d-block">Hình ảnh hiện tại:</label>
+                        <img src="@Model.ImageUrl" alt="@Model.Name" class="img-thumbnail rounded shadow-sm" style="max-height: 120px; object-fit: cover;" />
+                    </div>
+                }
+
+                <!-- Trường tải lên hình ảnh đại diện mới -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tải lên hình ảnh mới:</label>
+                    <input type="file" name="uploadImage" class="form-control" accept="image/*" />
+                    <span class="text-muted small">Hãy chọn hình ảnh mới nếu muốn thay đổi hình ảnh hiện tại.</span>
+                </div>
+
+                <!-- Lưu giữ đường dẫn hình ảnh cũ nếu không thay đổi -->
+                <input type="hidden" asp-for="ImageUrl" />
 
                 <!-- Khu vực các nút bấm xác nhận cập nhật hoặc hủy bỏ -->
                 <div class="d-flex gap-2">

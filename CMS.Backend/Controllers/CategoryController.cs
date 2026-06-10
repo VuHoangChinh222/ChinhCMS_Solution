@@ -65,7 +65,7 @@ namespace CMS.Backend.Controllers
 
         // Hàm POST: Tiếp nhận thông tin danh mục mới được gửi lên từ trình duyệt và lưu vào cơ sở dữ liệu
         [HttpPost]
-        public IActionResult Create(Category model)
+        public IActionResult Create(Category model, IFormFile? uploadImage)
         {
             // Loại bỏ kiểm tra ModelState.IsValid tự động để tránh lỗi xác thực thuộc tính liên kết (Posts) bị null trong .NET 8.
             // Thay vào đó, chúng ta chủ động kiểm tra xem người dùng có nhập Tên danh mục hay không.
@@ -73,6 +73,26 @@ namespace CMS.Backend.Controllers
             {
                 ModelState.AddModelError("Name", "Vui lòng nhập tên danh mục bài viết.");
                 return View(model);
+            }
+
+            // Xử lý tải ảnh lên nếu có file được chọn
+            if (uploadImage != null && uploadImage.Length > 0)
+            {
+                string folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                if (!Directory.Exists(folder))
+                {
+                    Directory.CreateDirectory(folder);
+                }
+
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(uploadImage.FileName);
+                string filePath = Path.Combine(folder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    uploadImage.CopyTo(stream);
+                }
+
+                model.ImageUrl = "/uploads/" + fileName;
             }
 
             // Bước 1: Thêm đối tượng mới vào bộ nhớ tạm của hệ thống
@@ -109,13 +129,52 @@ namespace CMS.Backend.Controllers
 
         // Hàm POST: Tiếp nhận thông tin danh mục đã được thay đổi từ người dùng và cập nhật vào cơ sở dữ liệu
         [HttpPost]
-        public IActionResult Edit(Category model)
+        public IActionResult Edit(Category model, IFormFile? uploadImage)
         {
             // Tương tự, chỉ kiểm tra trường Tên danh mục bắt buộc nhập để tránh lỗi thuộc tính liên kết Posts bị null
             if (string.IsNullOrEmpty(model.Name))
             {
                 ModelState.AddModelError("Name", "Vui lòng nhập tên danh mục bài viết.");
                 return View(model);
+            }
+
+            // Xử lý tải ảnh lên nếu có file được chọn
+            if (uploadImage != null && uploadImage.Length > 0)
+            {
+                // Dọn dẹp tệp tin ảnh vật lý cũ
+                var oldCategory = _context.Categories.AsNoTracking().FirstOrDefault(c => c.Id == model.Id);
+                if (oldCategory != null && !string.IsNullOrEmpty(oldCategory.ImageUrl) && oldCategory.ImageUrl.StartsWith("/uploads/"))
+                {
+                    string oldRelativePath = oldCategory.ImageUrl.TrimStart('/');
+                    string oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", oldRelativePath);
+                    if (System.IO.File.Exists(oldFilePath))
+                    {
+                        try
+                        {
+                            System.IO.File.Delete(oldFilePath);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Lỗi khi xóa tệp ảnh cũ: " + ex.Message);
+                        }
+                    }
+                }
+
+                string folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                if (!Directory.Exists(folder))
+                {
+                    Directory.CreateDirectory(folder);
+                }
+
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(uploadImage.FileName);
+                string filePath = Path.Combine(folder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    uploadImage.CopyTo(stream);
+                }
+
+                model.ImageUrl = "/uploads/" + fileName;
             }
 
             // Cập nhật thông tin danh mục vào bộ nhớ tạm của hệ thống
@@ -161,6 +220,24 @@ namespace CMS.Backend.Controllers
             // Nếu đối tượng tồn tại trong hệ thống
             if (category != null)
             {
+                // Xóa ảnh vật lý nếu có
+                if (!string.IsNullOrEmpty(category.ImageUrl) && category.ImageUrl.StartsWith("/uploads/"))
+                {
+                    string relativePath = category.ImageUrl.TrimStart('/');
+                    string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", relativePath);
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        try
+                        {
+                            System.IO.File.Delete(filePath);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Lỗi khi xóa tệp ảnh cũ: " + ex.Message);
+                        }
+                    }
+                }
+
                 // Xóa đối tượng khỏi bộ nhớ tạm của hệ thống
                 _context.Categories.Remove(category);
 

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Sinh viên : Vũ Hoàng Chính
  * Mã sinh viên: 2122110380
  * Lớp: CCQ2211J
@@ -24,9 +24,12 @@ namespace CMS.Data.Entities
 
         [Required(ErrorMessage = "Tên danh mục không được để trống")]
         [StringLength(100)]
-        public string Name { get; set; } // Tên danh mục (vd: Điện tử, Thời trang)
+        public string Name { get; set; } = null!; // Tên danh mục (vd: Điện tử, Thời trang)
 
         public string? Description { get; set; } // Mô tả ngắn về danh mục (vd: Các sản phẩm điện tử như điện thoại, laptop)
+
+        // Đường dẫn hình ảnh đại diện cho danh mục sản phẩm (hỗ trợ hiển thị UI đẹp mắt)
+        public string? ImageUrl { get; set; }
 
         // Quan hệ: Một danh mục có nhiều sản phẩm
         public virtual ICollection<Product>? Products { get; set; }

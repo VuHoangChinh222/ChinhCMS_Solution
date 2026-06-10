@@ -47,6 +47,7 @@
                     <thead class="table-light text-uppercase text-secondary" style="font-size: 12px; letter-spacing: 0.5px;">
                         <tr>
                             <th class="ps-4 py-3" style="width: 80px;">ID</th>
+                            <th class="py-3" style="width: 120px;">Hình ảnh</th>
                             <th class="py-3">Tên danh mục</th>
                             <th class="py-3">Mô tả chi tiết</th>
                             <th class="py-3 text-center" style="width: 150px;">Số sản phẩm</th>
@@ -57,7 +58,7 @@
                         @if (!Model.Any())
                         {
                             <tr>
-                                <td colspan="5" class="text-center py-5 text-muted">
+                                <td colspan="6" class="text-center py-5 text-muted">
                                     <i class="bi bi-folder-x fs-1 d-block mb-3 text-secondary"></i>
                                     Chưa có danh mục sản phẩm nào được tạo.
                                 </td>
@@ -70,6 +71,18 @@
                                 int productCount = item.Products != null ? item.Products.Count : 0;
                                 <tr>
                                     <td class="ps-4 fw-semibold text-secondary">@item.Id</td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                        {
+                                            <img src="@item.ImageUrl" alt="@item.Name" class="rounded shadow-sm border border-light" style="width: 50px; height: 50px; object-fit: cover;" />
+                                        }
+                                        else
+                                        {
+                                            <div class="rounded bg-light text-muted d-flex align-items-center justify-content-center shadow-sm border border-light" style="width: 50px; height: 50px;">
+                                                <i class="bi bi-image" style="font-size: 20px;"></i>
+                                            </div>
+                                        }
+                                    </td>
                                     <td>
                                         <div class="d-flex align-items-center gap-2">
                                             <span class="fw-semibold text-dark">@item.Name</span>
