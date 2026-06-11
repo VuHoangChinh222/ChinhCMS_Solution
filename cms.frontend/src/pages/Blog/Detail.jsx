@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import postService from '../services/postService';
+import postService from '../../services/postService';
 
 // Import css
-import '../assets/css/PostDetailView.css';
+import '../../assets/css/PostDetailView.css';
 
 // Cấu hình URL Backend để lấy hình ảnh từ wwwroot/uploads
 const BASE_URL = "https://localhost:7291";

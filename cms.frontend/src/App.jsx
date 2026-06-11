@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import HomeView from './pages/HomeView';
-import ProductView from './pages/ProductView';
-import ProductDetailView from './pages/ProductDetailView';
-import CartView from './pages/CartView';
-import CheckoutView from './pages/CheckoutView';
-import PaymentView from './pages/PaymentView';
+import HomeView from './pages/Home/Index';
+import ProductView from './pages/Product/Index';
+import ProductDetailView from './pages/Product/Detail';
+import CartView from './pages/Cart/Index';
+import CheckoutView from './pages/Checkout/CheckoutView';
+import PaymentView from './pages/Checkout/PaymentView';
 import SearchView from './pages/SearchView';
-import LoginView from './pages/LoginView';
-import UserInfoView from './pages/UserInfoView';
-import AboutView from './pages/AboutView';
-import PostDetailView from './pages/PostDetailView';
-import BlogView from './pages/BlogView';
+import LoginView from './pages/Login/LoginView';
+import UserInfoView from './pages/User/Index';
+import AboutView from './pages/About/Index';
+import PostDetailView from './pages/Blog/Detail';
+import BlogView from './pages/Blog/Index';
 
 const App = () => {
   const [currentView, setCurrentView] = useState({ name: 'home', params: {} });
@@ -59,7 +59,7 @@ const App = () => {
 
   return (
     <div>
-      <Header currentView={currentView} navigate={navigate} cartCount={cart.reduce((sum, item)=>sum+item.qty, 0)} />
+      <Header currentView={currentView} navigate={navigate} cartCount={cart.reduce((sum, item) => sum + item.qty, 0)} />
       {renderView()}
       <Footer navigate={navigate} />
     </div>

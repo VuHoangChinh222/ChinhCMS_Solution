@@ -5,19 +5,19 @@
  */
 
 import { useState } from 'react';
-import customerService from '../services/customerService';
-import { setCookie } from '../utils/cookieHelper';
+import customerService from '../../services/customerService';
+import { setCookie } from '../../utils/cookieHelper';
 
 const LoginView = ({ navigate }) => {
   const [isLogin, setIsLogin] = useState(true);
-  
+
   // States cho Form
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [password, setPassword] = useState('');
-  
+
   // Trạng thái xử lý
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -67,7 +67,7 @@ const LoginView = ({ navigate }) => {
     <div className="page-container page-transition">
       <h2 className="page-title">{isLogin ? 'Đăng Nhập' : 'Đăng Ký Khách Hàng'}</h2>
       <div className="form-card" style={{ maxWidth: '480px', margin: '0 auto' }}>
-        
+
         {errorMessage && (
           <div className="error-alert" style={{ background: '#fef2f2', borderLeft: '4px solid #ef4444', color: '#b91c1c', padding: '10px 15px', borderRadius: '4px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
             <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: '8px' }}></i> {errorMessage}
@@ -78,11 +78,11 @@ const LoginView = ({ navigate }) => {
           {!isLogin && (
             <div className="form-group">
               <label>Họ và tên <span style={{ color: 'red' }}>*</span></label>
-              <input 
-                type="text" 
-                className="form-input" 
-                placeholder="Nhập họ và tên" 
-                required 
+              <input
+                type="text"
+                className="form-input"
+                placeholder="Nhập họ và tên"
+                required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
               />
@@ -91,11 +91,11 @@ const LoginView = ({ navigate }) => {
 
           <div className="form-group">
             <label>Địa chỉ Email <span style={{ color: 'red' }}>*</span></label>
-            <input 
-              type="email" 
-              className="form-input" 
-              placeholder="example@gmail.com" 
-              required 
+            <input
+              type="email"
+              className="form-input"
+              placeholder="example@gmail.com"
+              required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -105,20 +105,20 @@ const LoginView = ({ navigate }) => {
             <>
               <div className="form-group">
                 <label>Số điện thoại (SĐT VN)</label>
-                <input 
-                  type="tel" 
-                  className="form-input" 
-                  placeholder="09xx xxx xxx" 
+                <input
+                  type="tel"
+                  className="form-input"
+                  placeholder="09xx xxx xxx"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                 />
               </div>
               <div className="form-group">
                 <label>Địa chỉ nhận hàng</label>
-                <input 
-                  type="text" 
-                  className="form-input" 
-                  placeholder="Số nhà, tên đường, quận/huyện, tỉnh/thành" 
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Số nhà, tên đường, quận/huyện, tỉnh/thành"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                 />
@@ -128,11 +128,11 @@ const LoginView = ({ navigate }) => {
 
           <div className="form-group">
             <label>Mật khẩu <span style={{ color: 'red' }}>*</span></label>
-            <input 
-              type="password" 
-              className="form-input" 
-              placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)" 
-              required 
+            <input
+              type="password"
+              className="form-input"
+              placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
+              required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -148,9 +148,9 @@ const LoginView = ({ navigate }) => {
 
           <div style={{ textAlign: 'center', marginTop: '1.5rem', color: 'var(--text-muted)' }}>
             {isLogin ? 'Chưa có tài khoản khách hàng? ' : 'Đã đăng ký tài khoản? '}
-            <button 
-              type="button" 
-              style={{ background: 'transparent', color: 'var(--accent)', fontWeight: 'bold', border: 'none', cursor: 'pointer' }} 
+            <button
+              type="button"
+              style={{ background: 'transparent', color: 'var(--accent)', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}
               onClick={() => {
                 setIsLogin(!isLogin);
                 setErrorMessage('');

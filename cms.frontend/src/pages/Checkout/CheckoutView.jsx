@@ -5,19 +5,19 @@
  */
 
 import { useState, useEffect } from 'react';
-import { getCookie } from '../utils/cookieHelper';
-import orderService from '../services/orderService';
-import '../assets/css/CheckoutView.css';
+import { getCookie } from '../../utils/cookieHelper';
+import orderService from '../../services/orderService';
+import '../../assets/css/CheckoutView.css';
 
 const CheckoutView = ({ cart, clearCart, navigate }) => {
   const [customer, setCustomer] = useState(null);
-  
+
   // States cho Form
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [notes, setNotes] = useState('');
-  
+
   // Trạng thái xử lý
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -31,7 +31,7 @@ const CheckoutView = ({ cart, clearCart, navigate }) => {
       return;
     }
     setCustomer(loggedCustomer);
-    
+
     // Tự động điền (Pre-populate) thông tin khách hàng từ Cookie
     setFullName(loggedCustomer.fullName || '');
     setPhone(loggedCustomer.phone || '');
@@ -42,7 +42,7 @@ const CheckoutView = ({ cart, clearCart, navigate }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
-    
+
     if (cart.length === 0) {
       setErrorMessage("Giỏ hàng của bạn đang trống!");
       return;
@@ -84,7 +84,7 @@ const CheckoutView = ({ cart, clearCart, navigate }) => {
     <div className="page-container page-transition">
       <h2 className="page-title">Thông tin <span>Giao hàng</span></h2>
       <div className="form-card checkout-form-card">
-        
+
         {errorMessage && (
           <div className="checkout-error-alert">
             <i className="fa-solid fa-triangle-exclamation checkout-error-icon"></i> {errorMessage}
@@ -94,51 +94,51 @@ const CheckoutView = ({ cart, clearCart, navigate }) => {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Họ và tên nhận hàng <span className="checkout-required-star">*</span></label>
-            <input 
-              type="text" 
-              className="form-input" 
-              required 
-              placeholder="Nhập họ tên của bạn" 
+            <input
+              type="text"
+              className="form-input"
+              required
+              placeholder="Nhập họ tên của bạn"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
             />
           </div>
-          
+
           <div className="form-group">
             <label>Số điện thoại liên hệ <span className="checkout-required-star">*</span></label>
-            <input 
-              type="tel" 
-              required 
-              className="form-input" 
-              placeholder="Nhập số điện thoại" 
+            <input
+              type="tel"
+              required
+              className="form-input"
+              placeholder="Nhập số điện thoại"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
           </div>
-          
+
           <div className="form-group">
             <label>Địa chỉ nhận hàng <span className="checkout-required-star">*</span></label>
-            <input 
-              type="text" 
-              required 
-              className="form-input" 
-              placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố" 
+            <input
+              type="text"
+              required
+              className="form-input"
+              placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
             />
           </div>
-          
+
           <div className="form-group">
             <label>Ghi chú đơn hàng (Tùy chọn)</label>
-            <textarea 
-              className="form-input" 
-              rows="3" 
-              placeholder="Ghi chú về thời gian giao hàng, lời nhắn..." 
+            <textarea
+              className="form-input"
+              rows="3"
+              placeholder="Ghi chú về thời gian giao hàng, lời nhắn..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
             ></textarea>
           </div>
-          
+
           <div className="checkout-actions-row">
             <button type="button" className="btn btn-outline checkout-action-btn" onClick={() => navigate('cart')} disabled={loading}>
               Quay lại giỏ hàng

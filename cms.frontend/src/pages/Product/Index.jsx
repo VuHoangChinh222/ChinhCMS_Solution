@@ -1,13 +1,14 @@
 // export default HomeView;
 import { useState, useEffect } from 'react';
-import ProductCard from '../components/ProductCard';
+import ProductCard from '../../components/ProductCard';
+import HeroBanner from '../../components/HeroBanner';
 
 // IMPORT các file gọi API chuyên biệt của bạn (Hãy điều chỉnh lại đường dẫn ../ cho đúng thư mục dự án)
-import productService from '../services/productService';
-import categoryProductService from '../services/categoryProductService';
+import productService from '../../services/productService';
+import categoryProductService from '../../services/categoryProductService';
 
 // Import css
-import '../assets/css/ProductView.css';
+import '../../assets/css/ProductView.css';
 
 const BASE_URL = "https://localhost:7291"; // Cấu hình lấy ảnh từ wwwroot/uploads của Backend
 
@@ -101,7 +102,7 @@ const ProductView = ({ navigate }) => {
         }
         return {
             ...cat,
-            image: cat.imageUrl 
+            image: cat.imageUrl
                 ? (cat.imageUrl.startsWith('http') ? cat.imageUrl : `${BASE_URL}${cat.imageUrl}`)
                 : 'src/assets/images/shoe_product_1_1778727884422.png'
         };
@@ -110,24 +111,21 @@ const ProductView = ({ navigate }) => {
     return (
         <div className="page-transition">
             {/* SECTION HERO */}
-            <section className="hero">
-                <div className="hero-bg">
-                    <img src="src/assets/images/hero_basketball_1778727871576.png" alt="Hero" />
-                </div>
-                <div className="hero-content">
-                    <span className="hero-tag">Bộ sưu tập mới 2026</span>
-                    <h1 className="hero-title">ELEVATE YOUR <span>GAME</span></h1>
-                    <p className="hero-desc">Trang bị những sản phẩm bóng rổ đỉnh cao nhất. Từ đôi giày hiệu năng cao đến trang phục chuyên nghiệp, Astra Hoops đồng hành cùng bạn trên mọi mặt sân.</p>
-                    <button className="btn btn-primary" onClick={() => document.getElementById('products-sec').scrollIntoView({ behavior: 'smooth' })}>Mua Sắm Ngay</button>
-                </div>
-            </section>
+            <HeroBanner
+                tag="Bộ sưu tập mới 2026"
+                title={<>ELEVATE YOUR <span>GAME</span></>}
+                desc="Trang bị những sản phẩm bóng rổ đỉnh cao nhất. Từ đôi giày hiệu năng cao đến trang phục chuyên nghiệp, Astra Hoops đồng hành cùng bạn trên mọi mặt sân."
+                image="src/assets/images/hero_basketball_1778727871576.png"
+                buttonText="Mua Sắm Ngay"
+                onButtonClick={() => document.getElementById('products-sec').scrollIntoView({ behavior: 'smooth' })}
+            />
 
             {/* SECTION DANH SÁCH SẢN PHẨM */}
             <section id="products-sec" className="products-section">
                 <div className="section-header-custom">
                     <h2 className="section-title">
-                        {categories.find(c => c.id === activeCategoryId)?.name === 'Tất cả' 
-                            ? 'Tất cả sản phẩm' 
+                        {categories.find(c => c.id === activeCategoryId)?.name === 'Tất cả'
+                            ? 'Tất cả sản phẩm'
                             : (categories.find(c => c.id === activeCategoryId)?.name || 'Sản phẩm')}
                     </h2>
                     <p className="section-subtitle">Khám phá các danh mục sản phẩm thể thao chuyên nghiệp chất lượng hàng đầu</p>
@@ -163,8 +161,8 @@ const ProductView = ({ navigate }) => {
                                 // Xử lý gắn link domain Backend (https://localhost:7291) vào đường dẫn ảnh cục bộ (/uploads/xxx.png)
                                 const processedProduct = {
                                     ...product,
-                                    image: product.imageUrl 
-                                        ? (product.imageUrl.startsWith('http') ? product.imageUrl : `${BASE_URL}${product.imageUrl}`) 
+                                    image: product.imageUrl
+                                        ? (product.imageUrl.startsWith('http') ? product.imageUrl : `${BASE_URL}${product.imageUrl}`)
                                         : 'src/assets/images/default_product.png'
                                 };
 

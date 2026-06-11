@@ -5,13 +5,14 @@
  */
 
 import { useState, useEffect } from 'react';
-import ProductCard from '../components/ProductCard';
-import PostCard from '../components/PostCard';
-import productService from '../services/productService';
-import postService from '../services/postService';
+import ProductCard from '../../components/ProductCard';
+import PostCard from '../../components/PostCard';
+import HeroBanner from '../../components/HeroBanner';
+import productService from '../../services/productService';
+import postService from '../../services/postService';
 
 // Import các file CSS cần thiết
-import '../assets/css/HomeView.css';
+import '../../assets/css/HomeView.css';
 
 const HomeView = ({ navigate }) => {
   const [newestProducts, setNewestProducts] = useState([]);
@@ -24,7 +25,7 @@ const HomeView = ({ navigate }) => {
     const loadHomeData = async () => {
       try {
         setLoading(true);
-        
+
         // Tải top 5 sản phẩm mới nhất
         const newestRes = await productService.getNewestProducts();
         if (newestRes && Array.isArray(newestRes)) {
@@ -55,21 +56,14 @@ const HomeView = ({ navigate }) => {
   return (
     <div className="page-transition">
       {/* SECTION 1: HERO BANNER */}
-      <section className="hero">
-        <div className="hero-bg">
-          <img src="src/assets/images/hero_basketball_1778727871576.png" alt="Astra Hoops Hero" />
-        </div>
-        <div className="hero-content">
-          <span className="hero-tag">Bộ sưu tập mới 2026</span>
-          <h1 className="hero-title">ELEVATE YOUR <span>GAME</span></h1>
-          <p className="hero-desc">
-            Trang bị những sản phẩm bóng rổ đỉnh cao nhất. Từ đôi giày hiệu năng cao đến trang phục chuyên nghiệp, Astra Hoops đồng hành cùng bạn trên mọi mặt sân.
-          </p>
-          <button className="btn btn-primary" onClick={() => navigate('products')}>
-            Mua Sắm Ngay
-          </button>
-        </div>
-      </section>
+      <HeroBanner
+        tag="Bộ sưu tập mới 2026"
+        title={<>ELEVATE YOUR <span>GAME</span></>}
+        desc="Trang bị những sản phẩm bóng rổ đỉnh cao nhất. Từ đôi giày hiệu năng cao đến trang phục chuyên nghiệp, Astra Hoops đồng hành cùng bạn trên mọi mặt sân."
+        image="src/assets/images/hero_basketball_1778727871576.png"
+        buttonText="Mua Sắm Ngay"
+        onButtonClick={() => navigate('products')}
+      />
 
       {/* SECTION 2: GỢI Ý MUA SẮM THÔNG MINH (TOP 5 MỚI & BÁN CHẠY) */}
       <section className="featured-sections" style={{ padding: '3rem 4%', display: 'flex', flexDirection: 'column', gap: '4rem' }}>

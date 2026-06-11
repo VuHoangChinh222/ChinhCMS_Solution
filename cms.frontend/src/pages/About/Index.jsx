@@ -5,8 +5,8 @@
  */
 
 import React from 'react';
-import ProfileCard from '../components/ProfileCard';
-import '../assets/css/AboutView.css';
+import ProfileCard from '../../components/ProfileCard';
+import '../../assets/css/AboutView.css';
 
 const AboutView = () => (
   <div className="page-container page-transition">
@@ -23,14 +23,14 @@ const AboutView = () => (
         <p className="about-text-para-last">
           Với tầm nhìn trở thành thương hiệu đồ thể thao bóng rổ số 1 Đông Nam Á, Astra Hoops cam kết 100% hàng chính hãng, dịch vụ chăm sóc khách hàng chuyên nghiệp và luôn đồng hành cùng đam mê của bạn trên mọi mặt sân.
         </p>
-        
+
         <div className="project-info-box">
           <h4 className="project-info-box-title">
             THÔNG TIN ĐỒ ÁN CHINHCMS
           </h4>
           <p className="project-info-box-desc">
-            Dự án này là sản phẩm thực hành Chuyên đề ASP.NET Core kết hợp ReactJS của sinh viên Vũ Hoàng Chính. 
-            Backend cung cấp hệ thống quản trị dữ liệu sản phẩm, đơn hàng và danh mục kết hợp RESTful API mạnh mẽ, 
+            Dự án này là sản phẩm thực hành Chuyên đề ASP.NET Core kết hợp ReactJS của sinh viên Vũ Hoàng Chính.
+            Backend cung cấp hệ thống quản trị dữ liệu sản phẩm, đơn hàng và danh mục kết hợp RESTful API mạnh mẽ,
             kết hợp cùng Frontend ReactJS tối ưu trải nghiệm người dùng cuối.
           </p>
         </div>

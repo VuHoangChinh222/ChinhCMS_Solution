@@ -5,9 +5,9 @@
  */
 
 import { useState, useEffect } from 'react';
-import { getCookie, eraseCookie } from '../utils/cookieHelper';
-import orderService from '../services/orderService';
-import '../assets/css/UserInfoView.css';
+import { getCookie, eraseCookie } from '../../utils/cookieHelper';
+import orderService from '../../services/orderService';
+import '../../assets/css/UserInfoView.css';
 
 export const formatPrice = (price) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
 
@@ -32,7 +32,7 @@ const UserInfoView = ({ navigate }) => {
       .then(data => {
         if (data && Array.isArray(data)) {
           setOrders(data);
-          
+
           // Tính tổng tích lũy từ các đơn hàng để làm cơ sở phân hạng VIP động
           const sum = data.reduce((acc, order) => acc + (order.totalAmount || 0), 0);
           setTotalSpent(sum);
@@ -58,34 +58,34 @@ const UserInfoView = ({ navigate }) => {
   // 3. Quy trình tính toán cấp bậc Hạng thành viên động
   const getVipRank = (totalAmount) => {
     if (totalAmount <= 0) {
-      return { 
-        name: "Chưa phân hạng ❌", 
-        className: "rank-none", 
-        description: "Hãy mua sắm để được tích điểm phân hạng!" 
+      return {
+        name: "Chưa phân hạng ❌",
+        className: "rank-none",
+        description: "Hãy mua sắm để được tích điểm phân hạng!"
       };
     } else if (totalAmount > 0 && totalAmount <= 1000000) {
-      return { 
-        name: "Hạng Đồng 🤎", 
-        className: "rank-bronze", 
-        description: "Hạng Đồng (Tích lũy từ 1đ - 1 triệu VND)" 
+      return {
+        name: "Hạng Đồng 🤎",
+        className: "rank-bronze",
+        description: "Hạng Đồng (Tích lũy từ 1đ - 1 triệu VND)"
       };
     } else if (totalAmount > 1000000 && totalAmount <= 10000000) {
-      return { 
-        name: "Hạng Bạc 🥈", 
-        className: "rank-silver", 
-        description: "Hạng Bạc (Tích lũy từ 1 triệu - 10 triệu VND)" 
+      return {
+        name: "Hạng Bạc 🥈",
+        className: "rank-silver",
+        description: "Hạng Bạc (Tích lũy từ 1 triệu - 10 triệu VND)"
       };
     } else if (totalAmount > 10000000 && totalAmount <= 20000000) {
-      return { 
-        name: "Hạng Vàng 🥇", 
-        className: "rank-gold", 
-        description: "Hạng Vàng (Tích lũy từ 10 triệu - 20 triệu VND)" 
+      return {
+        name: "Hạng Vàng 🥇",
+        className: "rank-gold",
+        description: "Hạng Vàng (Tích lũy từ 10 triệu - 20 triệu VND)"
       };
     } else {
-      return { 
-        name: "Hạng Kim Cương 💎", 
-        className: "rank-diamond", 
-        description: "Hạng Kim Cương tối cao (Tích lũy trên 20 triệu VND)" 
+      return {
+        name: "Hạng Kim Cương 💎",
+        className: "rank-diamond",
+        description: "Hạng Kim Cương tối cao (Tích lũy trên 20 triệu VND)"
       };
     }
   };
@@ -111,7 +111,7 @@ const UserInfoView = ({ navigate }) => {
               {customer.phone && <span><i className="fa-solid fa-phone"></i> {customer.phone}</span>}
               {customer.address && <span><i className="fa-solid fa-location-dot"></i> {customer.address}</span>}
             </div>
-            
+
             <div className="user-profile-badge-row">
               <span className="user-profile-badge-label">Cấp bậc khách hàng:</span>
               <span className={`rank-badge ${vipRank.className}`} title={vipRank.description}>
@@ -132,7 +132,7 @@ const UserInfoView = ({ navigate }) => {
           <h3 className="orders-title">
             <i className="fa-solid fa-receipt orders-title-icon"></i> Lịch sử đơn hàng
           </h3>
-          
+
           {loading ? (
             <div className="user-profile-loading">
               <i className="fa-solid fa-spinner fa-spin user-profile-loading-icon"></i> Đang tải dữ liệu đơn hàng...

@@ -5,9 +5,9 @@
  */
 
 import { useState, useEffect } from 'react';
-import productService from '../services/productService';
-import { getCookie } from '../utils/cookieHelper';
-import '../assets/css/ProductDetailView.css';
+import productService from '../../services/productService';
+import { getCookie } from '../../utils/cookieHelper';
+import '../../assets/css/ProductDetailView.css';
 
 // Cấu hình URL Backend để lấy hình ảnh từ wwwroot/uploads
 const BASE_URL = "https://localhost:7291";
@@ -28,7 +28,7 @@ const ProductDetailView = ({ params, addToCart, navigate }) => {
     if (!productSlug && !productId) return;
     setLoading(true);
 
-    const fetchPromise = productSlug 
+    const fetchPromise = productSlug
       ? productService.getProductBySlug(productSlug)
       : productService.getProductById(productId);
 
@@ -75,10 +75,10 @@ const ProductDetailView = ({ params, addToCart, navigate }) => {
 
   // Quyết định các kích cỡ hỗ trợ
   const category = product.categoryName || '';
-  const sizes = (category.toLowerCase().includes('giày') || category.toLowerCase().includes('shoe')) 
-    ? ['US 7', 'US 8', 'US 9', 'US 10', 'US 11'] 
-    : (category.toLowerCase().includes('vớ') || category.toLowerCase().includes('tất')) 
-      ? ['Free'] 
+  const sizes = (category.toLowerCase().includes('giày') || category.toLowerCase().includes('shoe'))
+    ? ['US 7', 'US 8', 'US 9', 'US 10', 'US 11']
+    : (category.toLowerCase().includes('vớ') || category.toLowerCase().includes('tất'))
+      ? ['Free']
       : ['S', 'M', 'L', 'XL'];
 
   // Xử lý thêm vào giỏ hàng
@@ -131,7 +131,7 @@ const ProductDetailView = ({ params, addToCart, navigate }) => {
           <div className="product-category">{product.categoryName}</div>
           <h1 className="detail-name-heading">{product.name}</h1>
           <div className="detail-price">{formatPrice(product.price)}</div>
-          
+
           <div className="detail-stock-row">
             {product.stockQuantity > 0 ? (
               <span className="detail-badge-instock">
@@ -145,13 +145,13 @@ const ProductDetailView = ({ params, addToCart, navigate }) => {
           </div>
 
           <p className="detail-desc">{product.description}</p>
-          
+
           <span className="detail-section-title">Kích cỡ / Size:</span>
           <div className="size-selector">
             {sizes.map(s => (
-              <button 
-                key={s} 
-                className={`size-btn ${size === s ? 'active' : ''}`} 
+              <button
+                key={s}
+                className={`size-btn ${size === s ? 'active' : ''}`}
                 onClick={() => setSize(s)}
                 disabled={product.stockQuantity <= 0}
               >
@@ -159,15 +159,15 @@ const ProductDetailView = ({ params, addToCart, navigate }) => {
               </button>
             ))}
           </div>
-          
+
           <span className="detail-section-title">Số lượng mua:</span>
           <div className="add-cart-wrap">
-            <input 
-              type="number" 
-              className="form-input qty-input" 
-              value={qty} 
-              min="1" 
-              max={product.stockQuantity || 1} 
+            <input
+              type="number"
+              className="form-input qty-input"
+              value={qty}
+              min="1"
+              max={product.stockQuantity || 1}
               disabled={product.stockQuantity <= 0}
               onChange={(e) => {
                 const val = parseInt(e.target.value) || 1;
@@ -177,7 +177,7 @@ const ProductDetailView = ({ params, addToCart, navigate }) => {
                 } else {
                   setQty(Math.max(1, val));
                 }
-              }} 
+              }}
             />
             {product.stockQuantity > 0 ? (
               <button className="btn btn-primary detail-add-cart-btn" onClick={handleAdd}>
