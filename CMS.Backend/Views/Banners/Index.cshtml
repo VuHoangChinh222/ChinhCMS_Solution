@@ -1,0 +1,133 @@
+@model IEnumerable<CMS.Data.Entities.Banner>
+
+@{
+    ViewData["Title"] = "Quản lý Banner quảng cáo";
+    Layout = "_LayoutAdmin";
+
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int totalItems = ViewBag.TotalItems ?? 0;
+}
+
+@* /*
+ * Sinh viên : Vũ Hoàng Chính
+ * Mã sinh viên: 2122110380
+ * Lớp: CCQ2211J
+ * Ngày tạo: 11/06/2026
+ * Version: 1.0
+ */ *@
+
+<div class="container-fluid mt-4">
+    <!-- Tiêu đề & Nút thêm mới -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4">
+        <div class="card-body p-4 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">QUẢN LÝ BANNER QUẢNG CÁO</h3>
+                <p class="text-muted small mb-0">Quản lý và hiển thị các slide quảng cáo lớn ở trang chủ và trang sản phẩm.</p>
+            </div>
+            <a asp-action="Create" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm d-inline-flex align-items-center gap-2" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); border: none;">
+                <i class="bi bi-image-fill"></i> Thêm banner mới
+            </a>
+        </div>
+    </div>
+
+    <!-- Bảng danh sách banner -->
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="min-width: 800px;">
+                    <thead class="table-light text-uppercase text-secondary" style="font-size: 12px; letter-spacing: 0.5px;">
+                        <tr>
+                            <th class="ps-4 py-3" style="width: 100px;">ID</th>
+                            <th class="py-3" style="width: 200px;">Hình ảnh</th>
+                            <th class="py-3" style="width: 250px;">Tên banner</th>
+                            <th class="py-3">Mô tả</th>
+                            <th class="py-3 text-center" style="width: 150px;">Trạng thái</th>
+                            <th class="pe-4 py-3 text-end" style="width: 200px;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-image fs-1 d-block mb-3 text-secondary"></i>
+                                    Chưa có banner nào trong hệ thống.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 py-3 fw-bold text-dark">#@item.Id</td>
+                                    <td class="py-3">
+                                        <div class="rounded overflow-hidden shadow-sm" style="width: 150px; height: 75px;">
+                                            <img src="@item.ImageUrl" alt="@item.Name" class="w-100 h-100" style="object-fit: cover;" />
+                                        </div>
+                                    </td>
+                                    <td class="py-3">
+                                        <div class="fw-bold text-dark">@item.Name</div>
+                                        <small class="text-muted">Tạo lúc: @item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</small>
+                                    </td>
+                                    <td class="py-3 text-muted" style="font-size: 14px; max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        @item.Description
+                                    </td>
+                                    <td class="py-3 text-center">
+                                        @if (item.Status == 1)
+                                        {
+                                            <span class="badge bg-success rounded-pill px-3 py-2"><i class="bi bi-eye-fill me-1"></i> Hiển thị</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary rounded-pill px-3 py-2"><i class="bi bi-eye-slash-fill me-1"></i> Ẩn</span>
+                                        }
+                                    </td>
+                                    <td class="pe-4 py-3 text-end">
+                                        <div class="d-inline-flex gap-2">
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary rounded-pill px-3" title="Chỉnh sửa thông tin">
+                                                <i class="bi bi-pencil-square"></i> Sửa
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger rounded-pill px-3" title="Xóa banner">
+                                                <i class="bi bi-trash-fill"></i> Xóa
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Phân trang -->
+        @if (totalPages > 1)
+        {
+            <div class="card-footer bg-white border-0 py-3 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 border-top border-light">
+                <span class="text-muted small">Hiển thị trang @currentPage/@totalPages (Tổng số @totalItems banner)</span>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { page = currentPage - 1 })" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        @for (int i = 1; i <= totalPages; i++)
+                        {
+                            <li class="page-item @(i == currentPage ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { page = i })">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { page = currentPage + 1 })" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
+    </div>
+</div>

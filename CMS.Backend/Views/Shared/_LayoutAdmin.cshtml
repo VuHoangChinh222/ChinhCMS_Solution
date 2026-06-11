@@ -32,7 +32,7 @@
         /* Phong cách thanh Sidebar Admin tối màu sang trọng */
         .admin-sidebar { 
             width: 240px;
-            min-height: 100vh;
+            height: 100vh;
             background-color: #212529; 
             color: #ffffff; 
             box-shadow: 2px 0 5px rgba(0,0,0,0.15);
@@ -171,6 +171,9 @@
             <a href="@Url.Action("Index", "Post")" class="nav-link-item d-flex align-items-center gap-2 px-3 py-2 text-decoration-none @(currentController == "Post" ? "active bg-primary text-white fw-bold" : "text-light")">
                 <i class="bi bi-file-earmark-post-fill"></i> Quản lý bài viết
             </a>
+            <a href="@Url.Action("Index", "Banners")" class="nav-link-item d-flex align-items-center gap-2 px-3 py-2 text-decoration-none @(currentController == "Banners" ? "active bg-primary text-white fw-bold" : "text-light")">
+                <i class="bi bi-image-fill"></i> Quản lý Banner
+            </a>
             <div class="px-3 pt-3 pb-1 text-uppercase small text-secondary fw-bold" style="letter-spacing:1px; font-size:0.75rem;">Kinh doanh</div>
             <a href="@Url.Action("Index", "CategoriesProducts")" class="nav-link-item d-flex align-items-center gap-2 px-3 py-2 text-decoration-none @(currentController == "CategoriesProducts" ? "active bg-primary text-white fw-bold" : "text-light")">
                 <i class="bi bi-tags"></i> Danh mục sản phẩm
@@ -219,7 +222,7 @@
             </div>
         }
 
-        <div class="mt-2">
+        <div class="mt-2 pb-5">
             <!-- Mục 1: Bảng điều khiển chung -->
             <a asp-controller="Home" asp-action="Index" class="nav-link-item @(currentController == "Home" && currentAction == "Index" ? "active" : "")">
                 <i class="bi bi-speedometer2"></i> Bảng điều khiển
@@ -233,6 +236,9 @@
             </a>
             <a asp-controller="Post" asp-action="Index" class="nav-link-item @(currentController == "Post" ? "active" : "")">
                 <i class="bi bi-file-earmark-post-fill"></i> Quản lý bài viết
+            </a>
+            <a asp-controller="Banners" asp-action="Index" class="nav-link-item @(currentController == "Banners" ? "active" : "")">
+                <i class="bi bi-image-fill"></i> Quản lý Banner
             </a>
             
             <!-- Nhóm chức năng Quản lý sản phẩm và đơn hàng (E-Commerce) -->

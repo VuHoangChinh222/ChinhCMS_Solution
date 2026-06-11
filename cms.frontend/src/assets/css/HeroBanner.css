@@ -93,6 +93,7 @@
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -105,9 +106,11 @@
         margin: 2rem 4%;
         height: 420px;
     }
+
     .hero-banner-content {
         padding: 2.5rem 4rem;
     }
+
     .hero-banner-title {
         font-size: 2.2rem;
     }
@@ -118,12 +121,15 @@
         height: 360px;
         border-radius: 16px;
     }
+
     .hero-banner-content {
         padding: 2rem;
     }
+
     .hero-banner-title {
         font-size: 1.8rem;
     }
+
     .hero-banner-desc {
         font-size: 0.95rem;
         display: -webkit-box;
@@ -131,8 +137,127 @@
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
+
     .hero-banner-btn {
         padding: 10px 22px;
         font-size: 0.9rem;
+    }
+}
+
+/* ==========================================================================
+   SLIDER MODE STYLES FOR DYNAMIC BANNERS
+   ========================================================================== */
+.hero-banner-container.slider-mode {
+    position: relative;
+    height: 480px;
+}
+
+.hero-banner-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+    display: flex;
+    align-items: flex-end;
+}
+
+.hero-banner-slide.active {
+    opacity: 1;
+    z-index: 2;
+}
+
+.hero-banner-slide.active .hero-banner-content {
+    animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Control buttons for banner navigation */
+.hero-banner-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    background: rgba(15, 23, 42, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    color: white;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(8px);
+}
+
+.hero-banner-control:hover {
+    background: #f97316;
+    border-color: #f97316;
+    box-shadow: 0 0 15px rgba(249, 115, 22, 0.45);
+    transform: translateY(-50%) scale(1.08);
+}
+
+.hero-banner-control.prev {
+    left: 24px;
+}
+
+.hero-banner-control.next {
+    right: 24px;
+}
+
+/* Dot pagination indicators */
+.hero-banner-dots {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+}
+
+.hero-banner-dot {
+    width: 24px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.hero-banner-dot.active {
+    background: #f97316;
+    width: 40px;
+    box-shadow: 0 0 8px rgba(249, 115, 22, 0.5);
+}
+
+@media (max-width: 768px) {
+    .hero-banner-container.slider-mode {
+        height: 360px;
+    }
+
+    .hero-banner-control {
+        width: 38px;
+        height: 38px;
+        font-size: 0.9rem;
+    }
+
+    .hero-banner-control.prev {
+        left: 12px;
+    }
+
+    .hero-banner-control.next {
+        right: 12px;
+    }
+
+    .hero-banner-dots {
+        bottom: 16px;
     }
 }
