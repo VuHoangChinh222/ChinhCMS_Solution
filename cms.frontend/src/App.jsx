@@ -42,7 +42,7 @@ const App = () => {
   const renderView = () => {
     switch (currentView.name) {
       case 'home': return <HomeView navigate={navigate} />;
-      case 'products': return <ProductView navigate={navigate} />;
+      case 'products': return <ProductView params={currentView.params} navigate={navigate} />;
       case 'blog': return <BlogView navigate={navigate} />;
       case 'detail': return <ProductDetailView params={currentView.params} navigate={navigate} addToCart={addToCart} />;
       case 'cart': return <CartView cart={cart} updateQty={updateQty} removeFromCart={removeFromCart} navigate={navigate} />;

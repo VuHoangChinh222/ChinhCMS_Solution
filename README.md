@@ -139,6 +139,26 @@ Dự án `ChinhCMS_Solution` được chia làm 3 dự án nhỏ bên trong:
 - **Thống nhất mã nguồn Services**: Hợp nhất các cuộc gọi API bài viết và chuyên mục bài viết vào tệp `postService.js` thay vì tạo file dịch vụ trùng lặp, giúp tối ưu hóa cấu trúc dự án ReactJS.
 - **Tách mã CSS sạch**: Tách toàn bộ CSS nhúng (inline styles) trong các file JSX sang các file `.css` chuyên biệt như `AboutView.css`, `SearchView.css`, `ProductDetailView.css`, `CheckoutView.css`, `BlogView.css`, `BlogCategoryList.css` và `UserInfoView.css` trong thư mục `src/assets/css`.
 
+### 10. Tích hợp Quản lý Banner, Slider bài viết mượt mà, Footer động & Khóa danh mục hệ thống (Buổi 10) - [MỚI]
+
+- **Thêm trường hình ảnh cho danh mục**:
+  - Bổ sung trường `ImageUrl` cho cả hai thực thể `Category` và `CategoryProduct`.
+  - Cập nhật chức năng Upload ảnh trực tiếp từ thiết bị của quản trị viên (loại bỏ nhập URL tĩnh) và hiển thị trên giao diện thẻ danh mục sản phẩm đẹp mắt.
+- **Nâng cấp trang chủ & Slider tin tức**:
+  - Trích xuất phần Hero Banner lặp lại thành component dùng chung `HeroBanner.jsx`.
+  - Thiết kế Slider trình chiếu 5 bài viết mới nhất với hiệu ứng chuyển trang mượt mà trên trang tin tức `Blog/Index.jsx`.
+- **Hệ thống Quản lý Banner động**:
+  - Tạo thực thể CSDL `Banner` (chứa các trường ID, Tên, Mô tả, Đường dẫn ảnh, Trạng thái ẩn/hiện, Ngày tạo).
+  - Viết bộ API `ApiBannerController.cs` và dịch vụ `bannerService.js` tải các banner kích hoạt lên giao diện.
+  - Thiết kế trang CRUD quản lý Banner trong Admin Dashboard kèm chức năng upload ảnh vào thư mục `wwwroot/uploads` và tự động xóa tệp tin ảnh vật lý cũ trên máy chủ khi cập nhật/xóa.
+  - Tích hợp hiệu ứng Banner Slider/Carousel cao cấp tự động chuyển slide mỗi 6 giây có nút bấm trái/phải và chấm tròn chỉ mục tại component `HeroBanner.jsx`. Khi cơ sở dữ liệu trống, component tự động chuyển về chế độ hiển thị tĩnh (fallback) an toàn.
+- **Bảo mật chuyên mục hệ thống & Footer động**:
+  - Khóa cứng hai danh mục hệ thống mặc định là "Tất cả bài viết" (ID: 13) và "Tất cả sản phẩm" (ID: 7) trên Server Controller. Nếu cố tình gửi yêu cầu xóa, hệ thống sẽ chặn lại, lưu thông báo tiếng Việt trực quan vào `TempData["ErrorMessage"]` và chuyển hướng an toàn kèm Alert thông báo.
+  - Cập nhật menu liên kết "Danh mục" ở chân trang (Footer) tự động truy vấn dữ liệu thực tế từ cơ sở dữ liệu và lọc bỏ mục "Tất cả sản phẩm".
+- **Việt hóa thông báo lỗi & Sửa lỗi Sidebar cuộn**:
+  - Cập nhật thuộc tính xác thực Data Annotations tiếng Việt thân thiện tại lớp thực thể Banner.cs.
+  - Cấu hình lại chiều cao `.admin-sidebar { height: 100vh; }` thay vì `min-height` để thanh menu Sidebar cố định bên trái của Admin Panel có thể cuộn dọc mượt mà khi màn hình có độ phân giải thấp, giúp quản trị viên click được mục "Quản lý thành viên".
+
 ---
 
 ## HƯỚNG DẪN CÀI ĐẶT VÀ KHỞI CHẠY

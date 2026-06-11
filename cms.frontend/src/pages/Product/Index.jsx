@@ -15,11 +15,22 @@ const BASE_URL = "https://localhost:7291"; // Cấu hình lấy ảnh từ wwwro
 export const formatPrice = (price) =>
     new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
 
-const ProductView = ({ navigate }) => {
+const ProductView = ({ params, navigate }) => {
     // --- Khai báo các State quản lý dữ liệu ---
     const [products, setProducts] = useState([]);          // Mảng chứa danh sách sản phẩm hiển thị
     const [categories, setCategories] = useState([]);      // Mảng chứa danh mục [{id: 'all', name: 'Tất cả'}, {id: 1, name: 'Giày'}, ...]
-    const [activeCategoryId, setActiveCategoryId] = useState('all'); // Lưu ID danh mục đang chọn ('all' hoặc số nguyên ID)
+    const [activeCategoryId, setActiveCategoryId] = useState(params?.categoryId || 'all'); // Lưu ID danh mục đang chọn
+
+    // Lắng nghe sự thay đổi của danh mục truyền qua route params (ví dụ từ Footer)
+    useEffect(() => {
+        if (params?.categoryId) {
+            setActiveCategoryId(params.categoryId);
+            setPageNumber(1);
+        } else {
+            setActiveCategoryId('all');
+            setPageNumber(1);
+        }
+    }, [params?.categoryId]);
 
     // State quản lý phân trang
     const [pageNumber, setPageNumber] = useState(1);       // Trang hiện tại
