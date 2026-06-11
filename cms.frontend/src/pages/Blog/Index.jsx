@@ -24,6 +24,9 @@ const BlogView = ({ navigate }) => {
   const [featuredPosts, setFeaturedPosts] = useState([]);
   const [activeSlide, setActiveSlide] = useState(0);
 
+  // Mảng chứa chuyên mục bài viết để tìm chuyên mục "Tất cả bài viết" từ DB
+  const [categories, setCategories] = useState([]);
+
   // Reset trang về 1 khi đổi chuyên mục lọc
   const handleCategorySelect = (categoryId) => {
     setActiveCategoryId(categoryId);
@@ -60,7 +63,12 @@ const BlogView = ({ navigate }) => {
       try {
         setLoading(true);
         let response;
-        if (activeCategoryId === 'all') {
+        
+        // Tìm ID của chuyên mục "Tất cả bài viết" từ DB nếu có
+        const allCat = categories.find(c => c.name === 'Tất cả bài viết');
+        const allCatId = allCat ? allCat.id : 'all';
+
+        if (activeCategoryId === 'all' || activeCategoryId === allCatId) {
           response = await postService.getLatestPosts(currentPage, pageSize);
         } else {
           response = await postService.getPostsByCategory(activeCategoryId, currentPage, pageSize);
@@ -147,6 +155,7 @@ const BlogView = ({ navigate }) => {
           <BlogCategoryList
             activeCategoryId={activeCategoryId}
             onSelectCategory={handleCategorySelect}
+            onCategoriesLoaded={setCategories}
           />
         </aside>
 

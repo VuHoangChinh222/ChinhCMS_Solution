@@ -168,6 +168,13 @@ namespace CMS.Backend.Controllers
         [HttpGet]
         public IActionResult Delete(int id)
         {
+            // Chặn không cho xóa danh mục hệ thống mặc định "Tất cả sản phẩm" (ID: 7)
+            if (id == 7)
+            {
+                TempData["ErrorMessage"] = "Không thể xóa danh mục hệ thống mặc định 'Tất cả sản phẩm'!";
+                return RedirectToAction("Index");
+            }
+
             // Tìm danh mục kèm danh sách sản phẩm liên kết
             var category = _context.CategoriesProducts
                                    .Include(c => c.Products)
@@ -191,6 +198,13 @@ namespace CMS.Backend.Controllers
         [HttpPost, ActionName("Delete")]
         public IActionResult DeleteConfirmed(int id)
         {
+            // Chặn không cho xóa danh mục hệ thống mặc định "Tất cả sản phẩm" (ID: 7)
+            if (id == 7)
+            {
+                TempData["ErrorMessage"] = "Không thể xóa danh mục hệ thống mặc định 'Tất cả sản phẩm'!";
+                return RedirectToAction("Index");
+            }
+
             var category = _context.CategoriesProducts
                                    .Include(c => c.Products)
                                    .FirstOrDefault(c => c.Id == id);

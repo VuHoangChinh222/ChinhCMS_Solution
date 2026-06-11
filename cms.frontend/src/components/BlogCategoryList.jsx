@@ -10,7 +10,7 @@ import '../assets/css/BlogCategoryList.css';
 
 const BASE_URL = "https://localhost:7291";
 
-const BlogCategoryList = ({ activeCategoryId, onSelectCategory }) => {
+const BlogCategoryList = ({ activeCategoryId, onSelectCategory, onCategoriesLoaded }) => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -20,8 +20,15 @@ const BlogCategoryList = ({ activeCategoryId, onSelectCategory }) => {
       try {
         setLoading(true);
         const data = await postService.getBlogCategories();
-        // Thêm lựa chọn mặc định "Tất cả chủ đề" vào đầu danh sách
-        setCategories([{ id: 'all', name: 'Tất cả chủ đề' }, ...(data || [])]);
+        
+        // Kiểm tra xem backend đã trả về "Tất cả bài viết" chưa
+        const hasAll = (data || []).some(c => c.name === 'Tất cả bài viết');
+        const dynamicCategories = hasAll ? (data || []) : [{ id: 'all', name: 'Tất cả bài viết' }, ...(data || [])];
+        
+        setCategories(dynamicCategories);
+        if (onCategoriesLoaded) {
+          onCategoriesLoaded(dynamicCategories);
+        }
       } catch (err) {
         console.error("Lỗi khi tải chuyên mục bài viết:", err);
       } finally {
@@ -29,7 +36,7 @@ const BlogCategoryList = ({ activeCategoryId, onSelectCategory }) => {
       }
     };
     fetchCategories();
-  }, []);
+  }, [onCategoriesLoaded]);
 
   if (loading) {
     return (
@@ -49,8 +56,8 @@ const BlogCategoryList = ({ activeCategoryId, onSelectCategory }) => {
           const imageSrc = cat.id === 'all'
             ? 'src/assets/images/hero_basketball_1778727871576.png'
             : (cat.imageUrl
-                ? (cat.imageUrl.startsWith('http') ? cat.imageUrl : `${BASE_URL}${cat.imageUrl}`)
-                : 'src/assets/images/shoe_product_1_1778727884422.png');
+              ? (cat.imageUrl.startsWith('http') ? cat.imageUrl : `${BASE_URL}${cat.imageUrl}`)
+              : 'src/assets/images/shoe_product_1_1778727884422.png');
 
           return (
             <button

@@ -34,8 +34,9 @@ const ProductView = ({ navigate }) => {
     useEffect(() => {
         categoryProductService.getAllCategoryProducts()
             .then(data => {
-                // Tạo phần tử "Tất cả" cứng ở đầu mảng, sau đó rải (spread) dữ liệu danh mục thực tế từ API vào sau
-                const dynamicCategories = [{ id: 'all', name: 'Tất cả' }, ...data];
+                // Kiểm tra xem backend đã trả về "Tất cả sản phẩm" chưa
+                const hasAll = (data || []).some(c => c.name === 'Tất cả sản phẩm');
+                const dynamicCategories = hasAll ? (data || []) : [{ id: 'all', name: 'Tất cả sản phẩm' }, ...(data || [])];
                 setCategories(dynamicCategories);
             })
             .catch(err => console.error("Lỗi khi tải danh mục từ API:", err));
@@ -50,8 +51,12 @@ const ProductView = ({ navigate }) => {
         // Khai báo biến hứng dữ liệu phản hồi chung
         let apiCall;
 
-        if (activeCategoryId === 'all') {
-            // Nếu đang chọn danh mục "Tất cả" -> Gọi API lấy toàn bộ sản phẩm (có phân trang)
+        // Tìm ID của danh mục "Tất cả sản phẩm" từ DB nếu có
+        const allCat = categories.find(c => c.name === 'Tất cả sản phẩm');
+        const allCatId = allCat ? allCat.id : 'all';
+
+        if (activeCategoryId === 'all' || activeCategoryId === allCatId) {
+            // Nếu đang chọn danh mục "Tất cả sản phẩm" -> Gọi API lấy toàn bộ sản phẩm (có phân trang)
             apiCall = productService.getAllProducts(pageNumber, pageSize);
         } else {
             // Nếu chọn danh mục cụ thể (Giày, Áo, Quần...) -> Gọi API lọc theo Category ID (có phân trang)
@@ -71,7 +76,7 @@ const ProductView = ({ navigate }) => {
                 setProducts([]);
                 setLoading(false);
             });
-    }, [pageNumber, activeCategoryId]); // Lắng nghe sự thay đổi của cả số trang lẫn bộ lọc danh mục
+    }, [pageNumber, activeCategoryId, categories]); // Lắng nghe sự thay đổi của cả số trang lẫn bộ lọc danh mục
 
     // ==========================================
     // 3. CÁC HÀM XỬ LÝ SỰ KIỆN (EVENT HANDLERS)
@@ -124,9 +129,7 @@ const ProductView = ({ navigate }) => {
             <section id="products-sec" className="products-section">
                 <div className="section-header-custom">
                     <h2 className="section-title">
-                        {categories.find(c => c.id === activeCategoryId)?.name === 'Tất cả'
-                            ? 'Tất cả sản phẩm'
-                            : (categories.find(c => c.id === activeCategoryId)?.name || 'Sản phẩm')}
+                        {categories.find(c => c.id === activeCategoryId)?.name || 'Sản phẩm'}
                     </h2>
                     <p className="section-subtitle">Khám phá các danh mục sản phẩm thể thao chuyên nghiệp chất lượng hàng đầu</p>
                 </div>

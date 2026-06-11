@@ -18,6 +18,18 @@
  */ *@
 
 <div class="container-fluid mt-4">
+    <!-- Hộp thông báo lỗi nếu có -->
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm border-0 d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-4 me-3 text-danger"></i>
+            <div>
+                <strong>Lỗi hệ thống:</strong> @TempData["ErrorMessage"]
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <!-- Tiêu đề & Nút thêm mới -->
     <div class="card border-0 shadow-sm rounded-3 mb-4">
         <div class="card-body p-4 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">

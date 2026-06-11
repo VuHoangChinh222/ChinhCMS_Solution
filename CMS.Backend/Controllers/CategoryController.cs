@@ -194,6 +194,13 @@ namespace CMS.Backend.Controllers
         [HttpGet]
         public IActionResult Delete(int id)
         {
+            // Chặn không cho xóa chuyên mục hệ thống mặc định "Tất cả bài viết" (ID: 13)
+            if (id == 13)
+            {
+                TempData["ErrorMessage"] = "Không thể xóa chuyên mục hệ thống mặc định 'Tất cả bài viết'!";
+                return RedirectToAction("Index");
+            }
+
             // Tìm kiếm danh mục cần xóa theo mã số, đồng thời nạp kèm danh sách bài viết thuộc danh mục đó
             var category = _context.Categories
                                    .Include(c => c.Posts)
@@ -214,6 +221,13 @@ namespace CMS.Backend.Controllers
         [HttpPost, ActionName("Delete")]
         public IActionResult DeleteConfirmed(int id)
         {
+            // Chặn không cho xóa chuyên mục hệ thống mặc định "Tất cả bài viết" (ID: 13)
+            if (id == 13)
+            {
+                TempData["ErrorMessage"] = "Không thể xóa chuyên mục hệ thống mặc định 'Tất cả bài viết'!";
+                return RedirectToAction("Index");
+            }
+
             // Tìm kiếm đối tượng danh mục cần xóa trong cơ sở dữ liệu
             var category = _context.Categories.Find(id);
 
