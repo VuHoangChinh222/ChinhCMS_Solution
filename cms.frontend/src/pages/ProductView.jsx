@@ -91,6 +91,22 @@ const ProductView = ({ navigate }) => {
         }
     };
 
+    // Xử lý đường dẫn ảnh đại diện cho các danh mục sản phẩm (bao gồm ảnh 'Tất cả' mặc định)
+    const processedCategories = categories.map(cat => {
+        if (cat.id === 'all') {
+            return {
+                ...cat,
+                image: 'src/assets/images/hero_basketball_1778727871576.png'
+            };
+        }
+        return {
+            ...cat,
+            image: cat.imageUrl 
+                ? (cat.imageUrl.startsWith('http') ? cat.imageUrl : `${BASE_URL}${cat.imageUrl}`)
+                : 'src/assets/images/shoe_product_1_1778727884422.png'
+        };
+    });
+
     return (
         <div className="page-transition">
             {/* SECTION HERO */}
@@ -108,27 +124,30 @@ const ProductView = ({ navigate }) => {
 
             {/* SECTION DANH SÁCH SẢN PHẨM */}
             <section id="products-sec" className="products-section">
-                <div className="section-header">
-                    <div>
-                        <h2 className="section-title">
-                            {categories.find(c => c.id === activeCategoryId)?.name === 'Tất cả' 
-                                ? 'Tất cả sản phẩm' 
-                                : (categories.find(c => c.id === activeCategoryId)?.name || 'Sản phẩm')}
-                        </h2>
-                    </div>
+                <div className="section-header-custom">
+                    <h2 className="section-title">
+                        {categories.find(c => c.id === activeCategoryId)?.name === 'Tất cả' 
+                            ? 'Tất cả sản phẩm' 
+                            : (categories.find(c => c.id === activeCategoryId)?.name || 'Sản phẩm')}
+                    </h2>
+                    <p className="section-subtitle">Khám phá các danh mục sản phẩm thể thao chuyên nghiệp chất lượng hàng đầu</p>
+                </div>
 
-                    {/* Menu danh mục nút lọc */}
-                    <div className="categories">
-                        {categories.map(cat => (
-                            <button
-                                key={cat.id}
-                                className={`category-btn ${activeCategoryId === cat.id ? 'active' : ''}`}
-                                onClick={() => handleCategoryClick(cat.id)}
-                            >
-                                {cat.name}
-                            </button>
-                        ))}
-                    </div>
+                {/* Danh sách danh mục dạng thẻ tròn cao cấp có hình ảnh đại diện */}
+                <div className="category-cards-container">
+                    {processedCategories.map(cat => (
+                        <div
+                            key={cat.id}
+                            className={`category-card ${activeCategoryId === cat.id ? 'active' : ''}`}
+                            onClick={() => handleCategoryClick(cat.id)}
+                        >
+                            <div className="category-card-image-wrapper">
+                                <img src={cat.image} alt={cat.name} className="category-card-image" />
+                                <div className="category-card-overlay"></div>
+                            </div>
+                            <span className="category-card-name">{cat.name}</span>
+                        </div>
+                    ))}
                 </div>
 
                 {/* Khối hiển thị dữ liệu hoặc thông báo Loading */}

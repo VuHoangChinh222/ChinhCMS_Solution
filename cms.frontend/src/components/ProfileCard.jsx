@@ -59,7 +59,7 @@ const ProfileCard = () => {
             <i className="fa-brands fa-github"></i> GitHub
           </a>
           <button
-            onClick={() => alert("Thông tin liên hệ: vuhoangchinh.ccq2211j@gmail.com")}
+            onClick={() => alert("Thông tin liên hệ: vuhoangchinh222@gmail.com")}
             className="profile-card-btn profile-card-btn-secondary"
           >
             Liên Hệ
