@@ -5,9 +5,10 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import categoryProductService from '../services/categoryProductService';
 
-const Footer = ({ navigate }) => {
+const Footer = () => {
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
@@ -26,14 +27,13 @@ const Footer = ({ navigate }) => {
     <footer>
       <div className="footer-content">
         <div className="footer-col">
-          <div className="logo" style={{ marginBottom: '1rem', fontSize: '1.5rem' }} onClick={() => navigate('home')}>
+          <Link to="/" className="logo" style={{ marginBottom: '1rem', fontSize: '1.5rem', textDecoration: 'none', color: 'inherit' }}>
             <i className="fa-solid fa-basketball"></i> ASTRA <span>HOOPS</span>
-          </div>
+          </Link>
           <p>Nâng tầm đam mê bóng rổ của bạn với những trang bị chất lượng hàng đầu. Chúng tôi cung cấp những sản phẩm chính hãng tốt nhất.</p>
           <div className="social-links">
-            <a href="#"><i className="fa-brands fa-facebook-f"></i></a>
-            <a href="#"><i className="fa-brands fa-instagram"></i></a>
-            <a href="#"><i className="fa-brands fa-tiktok"></i></a>
+            <a href="https://www.facebook.com/chinh.vuhoang.5/" target='blank'><i className="fa-brands fa-facebook-f"></i></a>
+            <a href="https://github.com/VuHoangChinh222" target='blank'><i className="fa-brands fa-github"></i></a>
           </div>
         </div>
         <div className="footer-col">
@@ -41,16 +41,16 @@ const Footer = ({ navigate }) => {
           <div className="footer-links">
             {categories.length > 0 ? (
               categories.map(cat => (
-                <button
+                <Link
                   key={cat.id}
-                  onClick={() => navigate('products', { categoryId: cat.id })}
+                  to={`/products?categoryId=${cat.id}`}
                 >
                   {cat.name}
-                </button>
+                </Link>
               ))
             ) : (
               <>
-                <button onClick={() => navigate('products')}>Sản phẩm</button>
+                <Link to="/products">Sản phẩm</Link>
               </>
             )}
           </div>
@@ -58,7 +58,7 @@ const Footer = ({ navigate }) => {
         <div className="footer-col">
           <h3>Hỗ trợ</h3>
           <div className="footer-links">
-            <button onClick={() => navigate('about')}>Về chúng tôi</button>
+            <Link to="/about">Về chúng tôi</Link>
             <a href="#">Chính sách đổi trả</a>
             <a href="#">Hướng dẫn chọn size</a>
           </div>

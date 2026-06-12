@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import BlogCategoryList from '../../components/BlogCategoryList';
 import PostCard from '../../components/PostCard';
 import postService from '../../services/postService';
@@ -63,7 +64,7 @@ const BlogView = ({ navigate }) => {
       try {
         setLoading(true);
         let response;
-        
+
         // Tìm ID của chuyên mục "Tất cả bài viết" từ DB nếu có
         const allCat = categories.find(c => c.name === 'Tất cả bài viết');
         const allCatId = allCat ? allCat.id : 'all';
@@ -104,11 +105,11 @@ const BlogView = ({ navigate }) => {
               : 'src/assets/images/default_post.png');
 
             return (
-              <div
+              <Link
                 key={post.id}
+                to={`/blog/${post.id}`}
                 className={`blog-slide ${index === activeSlide ? 'active' : ''}`}
-                style={{ backgroundImage: `url(${imageSrc})` }}
-                onClick={() => navigate('postDetail', { id: post.id })}
+                style={{ backgroundImage: `url(${imageSrc})`, textDecoration: 'none', color: 'inherit' }}
               >
                 <div className="blog-slide-overlay"></div>
                 <div className="blog-slide-content">
@@ -119,7 +120,7 @@ const BlogView = ({ navigate }) => {
                     <span>📅 {post.createdDate ? new Date(post.createdDate).toLocaleDateString('vi-VN') : '26/05/2026'}</span>
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
 

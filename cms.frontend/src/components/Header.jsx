@@ -1,35 +1,31 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
-const Header = ({ currentView, navigate, cartCount }) => {
+const Header = ({ currentView, cartCount }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const handleNav = (view) => {
-    navigate(view);
-    setIsMobileMenuOpen(false);
-  };
 
   return (
     <header className="header">
-      <div className="logo" onClick={() => handleNav('home')}>
+      <Link to="/" className="logo" onClick={() => setIsMobileMenuOpen(false)} style={{ textDecoration: 'none', color: 'inherit' }}>
         <i className="fa-solid fa-basketball"></i> ASTRA <span>HOOPS</span>
-      </div>
+      </Link>
       <ul className={`nav-links ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
-        <li><button className={currentView.name === 'home' ? 'active' : ''} onClick={() => handleNav('home')}>Trang chủ</button></li>
-        <li><button className={currentView.name === 'products' ? 'active' : ''} onClick={() => handleNav('products')}>Sản phẩm</button></li>
-        <li><button className={currentView.name === 'blog' ? 'active' : ''} onClick={() => handleNav('blog')}>Bài viết</button></li>
-        <li><button className={currentView.name === 'about' ? 'active' : ''} onClick={() => handleNav('about')}>Về chúng tôi</button></li>
+        <li><Link className={currentView.name === 'home' ? 'active' : ''} to="/" onClick={() => setIsMobileMenuOpen(false)}>Trang chủ</Link></li>
+        <li><Link className={currentView.name === 'products' ? 'active' : ''} to="/products" onClick={() => setIsMobileMenuOpen(false)}>Sản phẩm</Link></li>
+        <li><Link className={currentView.name === 'blog' ? 'active' : ''} to="/blog" onClick={() => setIsMobileMenuOpen(false)}>Bài viết</Link></li>
+        <li><Link className={currentView.name === 'about' ? 'active' : ''} to="/about" onClick={() => setIsMobileMenuOpen(false)}>Về chúng tôi</Link></li>
       </ul>
       <div className="header-actions">
-        <button className="action-btn" onClick={() => handleNav('search')} title="Tìm kiếm">
+        <Link className="action-btn" to="/search" title="Tìm kiếm" onClick={() => setIsMobileMenuOpen(false)}>
           <i className="fa-solid fa-magnifying-glass"></i>
-        </button>
-        <button className="action-btn" onClick={() => handleNav('user')} title="Tài khoản">
+        </Link>
+        <Link className="action-btn" to="/user" title="Tài khoản" onClick={() => setIsMobileMenuOpen(false)}>
           <i className="fa-solid fa-user"></i>
-        </button>
-        <button className="action-btn" onClick={() => handleNav('cart')} title="Giỏ hàng">
+        </Link>
+        <Link className="action-btn" to="/cart" title="Giỏ hàng" onClick={() => setIsMobileMenuOpen(false)}>
           <i className="fa-solid fa-bag-shopping"></i>
           {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
-        </button>
+        </Link>
         <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
           <i className={`fa-solid ${isMobileMenuOpen ? 'fa-xmark' : 'fa-bars'}`}></i>
         </button>

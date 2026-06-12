@@ -1,4 +1,6 @@
 
+import { Link } from 'react-router-dom';
+
 export const productsData = [
   { id: 1, name: 'Ignite Red X', category: 'Giày bóng rổ', price: 3500000, image: 'src/assets/images/shoe_product_1_1778727884422.png', badge: 'Mới', desc: 'Đôi giày bứt phá mọi giới hạn tốc độ. Thiết kế ôm sát cổ chân, đế đệm bật nảy cực cao, giúp bạn thực hiện những pha lên rổ hoàn hảo.' },
   { id: 2, name: 'Velocity HX-1 Neo', category: 'Giày bóng rổ', price: 4200000, image: 'src/assets/images/shoe_product_2_1778727899404.png', badge: 'Bán chạy', desc: 'Trang bị công nghệ viền đèn Neon ẩn, Velocity HX-1 mang đến vẻ ngoài đến từ tương lai cùng hiệu năng đỉnh cao. Chất liệu siêu nhẹ hỗ trợ bứt tốc.' },
@@ -12,22 +14,20 @@ export const categories = ['Tất cả', 'Giày bóng rổ', 'Áo', 'Quần', 'V
 
 export const formatPrice = (price) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
 
-const ProductCard = ({ product, navigate }) => {
-  const handleDetail = (e) => {
-    if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'I') {
-        navigate('detail', { slug: product.slug || product.id });
-    }
-  };
-
+const ProductCard = ({ product }) => {
   const imageSrc = product.image || (product.imageUrl ? (product.imageUrl.startsWith('http') ? product.imageUrl : `https://localhost:7291${product.imageUrl}`) : 'src/assets/images/default_product.png');
 
   return (
-    <div className="product-card" onClick={handleDetail}>
+    <Link
+      to={`/product/${product.slug || product.id}`}
+      className="product-card"
+      style={{ textDecoration: 'none', color: 'inherit' }}
+    >
       {product.badge && <div className="product-badge">{product.badge}</div>}
       <div className="product-img">
         <img src={imageSrc} alt={product.name} />
         <div className="product-action">
-          <button onClick={(e) => { e.stopPropagation(); navigate('detail', { slug: product.slug || product.id }); }}>
+          <button type="button">
             <i className="fa-solid fa-eye"></i> Xem chi tiết
           </button>
         </div>
@@ -37,7 +37,7 @@ const ProductCard = ({ product, navigate }) => {
         <h3 className="product-name">{product.name}</h3>
         <div className="product-price">{formatPrice(product.price)}</div>
       </div>
-    </div>
+    </Link>
   );
 };
 

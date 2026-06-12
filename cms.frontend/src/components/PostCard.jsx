@@ -1,24 +1,20 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
-const PostCard = ({ post, navigate }) => {
-    // Hàm điều hướng bao quanh thẻ khi click vào vùng trống của Card
-    const handleDetail = (e) => {
-        if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'I') {
-            // CHỈNH SỬA TẠI ĐÂY: Khớp chuẩn cấu trúc navigate của App.jsx
-            navigate('postDetail', { id: post.id });
-        }
-    };
-
+const PostCard = ({ post }) => {
     const imageSrc = post.image || (post.imageUrl ? (post.imageUrl.startsWith('http') ? post.imageUrl : `https://localhost:7291${post.imageUrl}`) : 'src/assets/images/default_post.png');
 
     return (
-        <div className="product-card post-card-sync" onClick={handleDetail}>
+        <Link
+            to={`/blog/${post.id}`}
+            className="product-card post-card-sync"
+            style={{ textDecoration: 'none', color: 'inherit' }}
+        >
             {/* Phần hình ảnh bài viết */}
             <div className="product-img">
                 <img src={imageSrc} alt={post.title} />
                 <div className="product-action">
-                    {/* CHỈNH SỬA TẠI ĐÂY: Sửa nút bấm Xem chi tiết cho đồng bộ */}
-                    <button onClick={(e) => { e.stopPropagation(); navigate('postDetail', { id: post.id }); }}>
+                    <button type="button">
                         <i className="fa-solid fa-eye"></i> Xem chi tiết
                     </button>
                 </div>
@@ -46,7 +42,7 @@ const PostCard = ({ post, navigate }) => {
                     📅 {post.createdDate ? new Date(post.createdDate).toLocaleDateString('vi-VN') : '26/05/2026'}
                 </div>
             </div>
-        </div>
+        </Link>
     );
 };
 
