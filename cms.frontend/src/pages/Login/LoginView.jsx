@@ -65,7 +65,7 @@ const LoginView = ({ navigate }) => {
 
   return (
     <div className="page-container page-transition">
-      <h2 className="page-title">{isLogin ? 'Đăng Nhập' : 'Đăng Ký Khách Hàng'}</h2>
+      <h2 className="page-title">{isLogin ? 'Đăng Nhập' : 'Đăng Ký'}</h2>
       <div className="form-card" style={{ maxWidth: '480px', margin: '0 auto' }}>
 
         {errorMessage && (

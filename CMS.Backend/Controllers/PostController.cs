@@ -93,7 +93,7 @@ namespace CMS.Backend.Controllers
 
         // 2. Hàm tiếp nhận dữ liệu và thực thi lưu trữ bài viết mới (POST)
         [HttpPost]
-        public IActionResult Create(Post model, IFormFile uploadImage)
+        public IActionResult Create(Post model, IFormFile? uploadImage)
         {
             // Bỏ qua xác thực tự động đối với thuộc tính Category liên kết ảo của EF Core
             // để tránh lỗi không lưu được bài viết do quy tắc nghiêm ngặt Nullable của .NET 8
@@ -182,7 +182,7 @@ namespace CMS.Backend.Controllers
 
         // 4. Hàm tiếp nhận dữ liệu đã chỉnh sửa và cập nhật thay đổi bài viết (POST)
         [HttpPost]
-        public IActionResult Edit(Post model, IFormFile uploadImage)
+        public IActionResult Edit(Post model, IFormFile? uploadImage)
         {
             // Bỏ qua xác thực tự động đối với thuộc tính Category liên kết ảo
             ModelState.Remove("Category");

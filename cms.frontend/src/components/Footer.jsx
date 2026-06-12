@@ -66,9 +66,9 @@ const Footer = ({ navigate }) => {
         <div className="footer-col">
           <h3>Liên hệ</h3>
           <div className="footer-links">
-            <p><i className="fa-solid fa-location-dot" style={{ color: 'var(--accent)', marginRight: '10px' }}></i> 123 Đường Cầu Giấy, Hà Nội</p>
-            <p><i className="fa-solid fa-phone" style={{ color: 'var(--accent)', marginRight: '10px' }}></i> 0123.456.789</p>
-            <p><i className="fa-solid fa-envelope" style={{ color: 'var(--accent)', marginRight: '10px' }}></i> support@astrahoops.vn</p>
+            <p><i className="fa-solid fa-location-dot" style={{ color: 'var(--accent)', marginRight: '10px' }}></i>Cao Đẳng Công Thương TP.HCM </p>
+            <p><i className="fa-solid fa-phone" style={{ color: 'var(--accent)', marginRight: '10px' }}></i> 039.380.7472</p>
+            <p><i className="fa-solid fa-envelope" style={{ color: 'var(--accent)', marginRight: '10px' }}></i> vuhoangchinh222@gmail.com</p>
           </div>
         </div>
       </div>
