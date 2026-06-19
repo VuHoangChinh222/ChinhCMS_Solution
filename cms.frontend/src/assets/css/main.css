@@ -418,3 +418,51 @@ button {
         text-align: center;
     }
 }
+
+/* ==========================================================================
+   BỘ PHÂN TRANG TOÀN CỤC (Áp dụng đồng nhất cho danh sách Sản phẩm & Tin tức)
+   ========================================================================== */
+
+/* Khung bọc bộ phân trang (căn giữa các nút bấm, tạo khoảng giãn trên dưới) */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px; /* Khoảng cách giữa các nút */
+    margin-top: 3.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Các nút bấm số trang và nút Trước/Sau */
+.page-btn {
+    background-color: #f4f4f5; /* Nền xám sáng */
+    border: 1px solid #e4e4e7; /* Viền xám mờ */
+    color: #18181b; /* Màu chữ tối dễ đọc */
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out; /* Hiệu ứng chuyển tiếp mượt mà */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Hiệu ứng di chuột vào nút (hover) - ngoại trừ nút bị vô hiệu hóa */
+.page-btn:hover:not(:disabled) {
+    background-color: #e4e4e7; /* Đổi nền xám đậm hơn chút */
+}
+
+/* Kiểu hiển thị cho trang hiện tại đang được chọn (Active) */
+.page-btn.active {
+    background-color: #f97316; /* Nền màu cam thương hiệu */
+    color: white; /* Chữ trắng */
+    border-color: #f97316; /* Viền trùng màu nền */
+}
+
+/* Kiểu hiển thị khi nút bị vô hiệu hóa (ví dụ nút Trước khi ở trang 1) */
+.page-btn:disabled {
+    opacity: 0.4; /* Độ mờ 40% */
+    cursor: not-allowed; /* Con trỏ dạng cấm */
+}

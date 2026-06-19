@@ -31,7 +31,7 @@ namespace CMS.Backend.Controllers
         public IActionResult Index(int? id, int page = 1)
         {
             if (page < 1) page = 1;
-            int pageSize = 10;
+            int pageSize = 6;
 
             IQueryable<Post> query = _context.Posts.Include(p => p.Category);
             if (id != null)
@@ -87,8 +87,8 @@ namespace CMS.Backend.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            // Lấy danh sách danh mục đổ vào SelectList để làm menu chọn chuyên mục bài viết
-            ViewBag.CategoryList = new SelectList(_context.Categories, "Id", "Name");
+            // Lấy danh sách danh mục đổ vào SelectList để làm menu chọn chuyên mục bài viết (không hiển thị chuyên mục "Tất cả bài viết" hệ thống)
+            ViewBag.CategoryList = new SelectList(_context.Categories.Where(c => c.Id != 13), "Id", "Name");
             return View();
         }
 
@@ -171,7 +171,7 @@ namespace CMS.Backend.Controllers
             }
 
             // Nếu dữ liệu không hợp lệ, nạp lại danh sách danh mục và trả về giao diện biểu mẫu nhập liệu
-            ViewBag.CategoryList = new SelectList(_context.Categories, "Id", "Name", model.CategoryId);
+            ViewBag.CategoryList = new SelectList(_context.Categories.Where(c => c.Id != 13), "Id", "Name", model.CategoryId);
             return View(model);
         }
 
@@ -187,7 +187,7 @@ namespace CMS.Backend.Controllers
             }
 
             // Nạp lại danh sách danh mục và giữ nguyên danh mục đang được lựa chọn của bài viết
-            ViewBag.CategoryList = new SelectList(_context.Categories, "Id", "Name", post.CategoryId);
+            ViewBag.CategoryList = new SelectList(_context.Categories.Where(c => c.Id != 13), "Id", "Name", post.CategoryId);
             return View(post);
         }
 
@@ -289,7 +289,7 @@ namespace CMS.Backend.Controllers
             }
 
             // Nếu dữ liệu bị lỗi, nạp lại danh sách danh mục và trả về giao diện biểu mẫu sửa
-            ViewBag.CategoryList = new SelectList(_context.Categories, "Id", "Name", model.CategoryId);
+            ViewBag.CategoryList = new SelectList(_context.Categories.Where(c => c.Id != 13), "Id", "Name", model.CategoryId);
             return View(model);
         }
 

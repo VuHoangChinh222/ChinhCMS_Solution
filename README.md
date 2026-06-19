@@ -203,6 +203,20 @@ Dự án `ChinhCMS_Solution` được chia làm 3 dự án nhỏ bên trong:
     - `ProductCard.css` cho thẻ Card sản phẩm.
     - `ProductDetail.css` cho trang chi tiết sản phẩm.
   - Tệp `main.css` giờ đây chỉ chứa các biến toàn cục (colors, fonts), reset CSS và các class biểu mẫu/nút bấm dùng chung.
+- **Cấu hình Phân trang 8 thành phần & Đồng nhất giao diện**:
+  - Thiết lập giá trị `pageSize = 8` cho cả trang Danh sách sản phẩm (`Product/Index.jsx`) và trang Tin tức (`Blog/Index.jsx`) để chỉ hiển thị tối đa 8 đối tượng trên một trang.
+  - Đồng nhất bộ phân trang toàn cục: Chuyển các lớp CSS phân trang `.pagination-container` và `.page-btn` thành các lớp dùng chung trong tệp `main.css`, mang lại giao diện và hiệu ứng hover/active/disabled đồng điệu 100% trên toàn website.
+- **Ẩn danh mục hệ thống mặc định trong Admin**:
+  - Loại bỏ các danh mục hệ thống "Tất cả sản phẩm" (ID: 7) và "Tất cả bài viết" (ID: 13) khỏi danh sách chọn danh mục (dropdown list) khi quản trị viên thực hiện Thêm mới hoặc Chỉnh sửa sản phẩm và bài viết ở giao diện quản trị Admin.
+- **Nâng cấp Header Đăng nhập & Tối ưu hóa UI/UX trên Di động (Mobile)**:
+  - Header hiển thị lời chào `"Chào, {Họ tên}"` kèm avatar hình tròn chứa chữ cái đầu tiên của khách hàng khi đã đăng nhập (lấy dữ liệu tự động từ cookie).
+  - Khi xem trên điện thoại, thanh Header thu gọn tinh giản tối đa (chỉ hiện Logo và nút Menu Hamburger). Các tiện ích như thông tin khách hàng, thanh tìm kiếm Autocomplete trực quan và liên kết văn bản `"Giỏ hàng ({Số lượng})"` đều được gom gọn gàng bên trong menu trượt xuống, hỗ trợ thanh cuộn độc lập (`overflow-y: auto`) tránh tràn màn hình.
+- **Tích hợp Chú thích tiếng Việt chi tiết (Code Annotations)**:
+  - Bổ sung hệ thống chú thích và giải thích chi tiết bằng tiếng Việt trong các file mã nguồn cốt lõi (`Header.jsx`, `Header.css`, `main.css`, `Blog/Index.jsx`) phục vụ tốt nhất cho việc học tập, báo cáo và tự giải thích mã nguồn.
+- **Tạo các trang Hỗ trợ mới (Bảo mật & Hướng dẫn size)**:
+  - Trang **Chính sách bảo mật** (`pages/PrivacyPolicy/Index.jsx`): Cam kết bảo mật, mã hóa dữ liệu BCrypt và cách thu thập/sử dụng thông tin khách hàng.
+  - Trang **Hướng dẫn chọn size** (`pages/SizeGuide/Index.jsx`): Tích hợp bảng so sánh size giày (US, UK, EU, CM) và quần áo (S, M, L, XL, XXL) với các tab chuyển đổi mượt mà cùng hướng dẫn tự đo kích cỡ chi tiết.
+  - Cập nhật định tuyến chuẩn React Router và liên kết đầy đủ ở chân trang `Footer.jsx`.
 
 ---
 
@@ -250,7 +264,7 @@ Mở file `CMS.Backend/appsettings.json` và điều chỉnh chuỗi kết nối
 | **Buổi 9** | Nâng cấp hệ thống SEO Slug và cấu trúc dữ liệu cho thực thể sản phẩm (Product). | **Đã hoàn thành** | **Tích hợp SlugHelper tự sinh URL thân thiện tiếng Việt không dấu, ràng buộc Unique Index trên database SQL Server. Xây dựng API và client service tải sản phẩm theo Slug, nâng cấp ProductCard và ProductDetailView sang định tuyến SEO.** |
 | **Buổi 10** | Tích hợp Banner Carousel động, khóa danh mục hệ thống & Sửa lỗi cuộn Sidebar. | **Đã hoàn thành** | **Tạo bảng Banner, ApiBannerController, CRUD Banner Admin Dashboard upload ảnh và xóa tệp vật lý cũ, slider động HeroBanner. Khóa cứng danh mục 7 & 13. Sửa lỗi Sidebar cuộn.** |
 | **Buổi 11** | Tái cấu trúc SPA với React Router DOM, sửa lỗi cập nhật bài viết & Căn giữa Header. | **Đã hoàn thành** | **Tích hợp BrowserRouter/Link thay thế custom navigate, sửa tham số IFormFile? cho PostController, cân bằng flex Header căn giữa menu.** |
-| **Buổi 12** | Tích hợp giỏ hàng nâng cao, ô nhập số lượng bàn phím, trì hoãn luồng đặt hàng, đổi nhanh trạng thái Banner, Live Search Autocomplete & Tách nhỏ CSS. | **Đã hoàn thành** | **Thiết kế lại ProductCard; đệm đăng nhập tự động; ô nhập số lượng bàn phím giỏ hàng; giao diện Checkout 2 cột; AJAX đổi nhanh trạng thái Banner; phân tách Component Sidebar; tích hợp live-search Autocomplete trung tâm Header và SEO Slug cho bài viết (Post); phân rã main.css cồng kềnh thành các file CSS module riêng biệt (Header.css, Footer.css, Cart.css, ProductCard.css, ProductDetail.css) để tối ưu hóa khả năng bảo trì.** |
+| **Buổi 12** | Tích hợp giỏ hàng nâng cao, ô nhập số lượng bàn phím, trì hoãn luồng đặt hàng, đổi nhanh trạng thái Banner, Live Search Autocomplete, Tách nhỏ CSS, Phân trang 8 & Ẩn danh mục hệ thống. | **Đã hoàn thành** | **Thiết kế lại ProductCard; đệm đăng nhập tự động; ô nhập số lượng bàn phím giỏ hàng; giao diện Checkout 2 cột; AJAX đổi nhanh trạng thái Banner; phân tách Component Sidebar; tích hợp live-search Autocomplete trung tâm Header và SEO Slug cho bài viết (Post); phân rã main.css cồng kềnh thành các file CSS module riêng biệt (Header.css, Footer.css, Cart.css, ProductCard.css, ProductDetail.css); cấu hình phân trang hiển thị tối đa 8 thành phần mỗi trang cho cả sản phẩm và bài viết; loại bỏ danh mục mặc định "Tất cả" (ID: 7 và 13) khỏi dropdown list trong màn hình Thêm mới/Chỉnh sửa ở Admin; đồng nhất CSS phân trang toàn cục; thiết kế lại Header thông minh trên Mobile (tích hợp profile, search, và text giỏ hàng vào menu trượt); viết hệ thống chú thích tiếng Việt cho toàn bộ mã nguồn.** |
 ---
 
 

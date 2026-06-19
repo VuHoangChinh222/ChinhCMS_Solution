@@ -21,6 +21,9 @@ import UserInfoView from './pages/User/Index';
 import AboutView from './pages/About/Index';
 import PostDetailView from './pages/Blog/Detail';
 import BlogView from './pages/Blog/Index';
+import ReturnPolicyView from './pages/ReturnPolicy/Index';
+import PrivacyPolicyView from './pages/PrivacyPolicy/Index';
+import SizeGuideView from './pages/SizeGuide/Index';
 
 // Wrapper Component để xử lý giỏ hàng, định tuyến và truyền props kế thừa cho các View
 const AppContent = ({ cart, addToCart, updateQty, removeFromCart, clearCart }) => {
@@ -149,6 +152,9 @@ const AppContent = ({ cart, addToCart, updateQty, removeFromCart, clearCart }) =
           <Route path="/register" element={<RegisterView />} />
           <Route path="/user" element={<UserInfoView navigate={navigate} />} />
           <Route path="/about" element={<AboutView />} />
+          <Route path="/return-policy" element={<ReturnPolicyView />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyView />} />
+          <Route path="/size-guide" element={<SizeGuideView />} />
 
           {/* Xử lý lỗi 404 không tìm thấy trang */}
           <Route path="*" element={

@@ -29,42 +29,7 @@
     width: 100%;
 }
 
-/* Khu vực thanh phân trang */
-.pagination-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    margin-top: 3.5rem;
-    margin-bottom: 2rem;
-}
 
-.page-btn {
-    background-color: #f4f4f5;
-    border: 1px solid #e4e4e7;
-    color: #18181b;
-    padding: 8px 15px;
-    font-size: 14px;
-    font-weight: 500;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-}
-
-.page-btn:hover:not(:disabled) {
-    background-color: #e4e4e7;
-}
-
-.page-btn.active {
-    background-color: #f97316;
-    color: white;
-    border-color: #f97316;
-}
-
-.page-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
 
 .loading-text {
     text-align: center;

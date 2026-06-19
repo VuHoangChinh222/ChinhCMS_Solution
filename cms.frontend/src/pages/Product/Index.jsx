@@ -37,7 +37,7 @@ const ProductView = ({ params, navigate, addToCart }) => {
     const [loading, setLoading] = useState(true);          // Trạng thái chờ tải dữ liệu
     const [hasError, setHasError] = useState(false);       // Trạng thái lỗi kết nối API
 
-    const pageSize = 20; // Yêu cầu: Hiển thị tối đa 20 sản phẩm trên 1 trang
+    const pageSize = 8; // Yêu cầu: Hiển thị tối đa 8 sản phẩm trên 1 trang
 
     // ==========================================
     // GỌI API LẤY SẢN PHẨM (Chạy lại khi ĐỔI TRANG hoặc ĐỔI DANH MỤC)

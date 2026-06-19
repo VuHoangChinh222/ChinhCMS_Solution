@@ -61,8 +61,8 @@ namespace CMS.Backend.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            // Nạp danh sách danh mục sản phẩm vào ViewBag để làm menu thả xuống
-            ViewBag.CategoryProductList = new SelectList(_context.CategoriesProducts, "Id", "Name");
+            // Nạp danh sách danh mục sản phẩm vào ViewBag để làm menu thả xuống (không hiển thị danh mục "Tất cả sản phẩm" hệ thống)
+            ViewBag.CategoryProductList = new SelectList(_context.CategoriesProducts.Where(c => c.Id != 7), "Id", "Name");
             return View();
         }
 
@@ -161,7 +161,7 @@ namespace CMS.Backend.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.CategoryProductList = new SelectList(_context.CategoriesProducts, "Id", "Name", model.CategoryProductId);
+            ViewBag.CategoryProductList = new SelectList(_context.CategoriesProducts.Where(c => c.Id != 7), "Id", "Name", model.CategoryProductId);
             return View(model);
         }
 
@@ -177,7 +177,7 @@ namespace CMS.Backend.Controllers
                 return NotFound("Không tìm thấy sản phẩm này trong hệ thống.");
             }
 
-            ViewBag.CategoryProductList = new SelectList(_context.CategoriesProducts, "Id", "Name", product.CategoryProductId);
+            ViewBag.CategoryProductList = new SelectList(_context.CategoriesProducts.Where(c => c.Id != 7), "Id", "Name", product.CategoryProductId);
             return View(product);
         }
 
@@ -302,7 +302,7 @@ namespace CMS.Backend.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.CategoryProductList = new SelectList(_context.CategoriesProducts, "Id", "Name", model.CategoryProductId);
+            ViewBag.CategoryProductList = new SelectList(_context.CategoriesProducts.Where(c => c.Id != 7), "Id", "Name", model.CategoryProductId);
             return View(model);
         }
 
