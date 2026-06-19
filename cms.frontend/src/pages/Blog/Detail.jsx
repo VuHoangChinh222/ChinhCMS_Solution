@@ -10,20 +10,24 @@ const BASE_URL = "https://localhost:7291";
 
 
 
-const PostDetailView = ({ id, navigate }) => {
-    // Nếu dự án của bạn sử dụng React Router DOM chuẩn, hãy bỏ comment dòng dưới và xóa "id" ở props:
-    // const { id } = useParams();
+const PostDetailView = ({ params, navigate }) => {
+    const slug = params?.slug;
 
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Gọi API lấy dữ liệu bài viết chi tiết khi trang được nạp hoặc ID thay đổi
+    // Gọi API lấy dữ liệu bài viết chi tiết khi trang được nạp hoặc ID/Slug thay đổi
     useEffect(() => {
-        if (!id) return;
+        if (!slug) return;
 
         setLoading(true);
-        postService.getPostById(id)
+        const isNumeric = !isNaN(Number(slug));
+        const fetchPromise = isNumeric
+            ? postService.getPostById(Number(slug))
+            : postService.getPostBySlug(slug);
+
+        fetchPromise
             .then(data => {
                 setPost(data);
                 setLoading(false);
@@ -35,7 +39,7 @@ const PostDetailView = ({ id, navigate }) => {
                 setError("Không thể tải nội dung bài viết này hoặc bài viết không tồn tại.");
                 setLoading(false);
             });
-    }, [id]);
+    }, [slug]);
 
     // Hàm bổ trợ xử lý ghép link domain Backend cho ảnh
     const processImage = (imageUrl) => {

@@ -112,7 +112,7 @@ const BlogView = ({ navigate }) => {
             return (
               <Link
                 key={post.id}
-                to={`/blog/${post.id}`}
+                to={`/blog/${post.slug || post.id}`}
                 className={`blog-slide ${index === activeSlide ? 'active' : ''}`}
                 style={{ backgroundImage: `url(${imageSrc})`, textDecoration: 'none', color: 'inherit' }}
               >

@@ -185,6 +185,26 @@ Dự án `ChinhCMS_Solution` được chia làm 3 dự án nhỏ bên trong:
 - **Thay đổi nhanh trạng thái hiển thị Banner**:
   - Tích hợp thêm Action POST `ToggleStatus` trong `BannersController.cs` và Ajax Fetch trong `Banners/Index.cshtml`.
   - Người điều hành chỉ cần click trực tiếp vào nhãn trạng thái "Hiển thị" hoặc "Ẩn" để bật tắt hiển thị slide mà không phải vào trang sửa.
+- **Tái cấu trúc Sidebar Danh mục sản phẩm & CSS productCSS**:
+  - Phân tách và rút gọn tệp `Product/Index.jsx` bằng cách trích xuất thanh danh mục dọc thành component `ProductCategoryList.jsx` nằm ngay trong thư mục `src/pages/Product/`.
+  - Sửa đổi giao diện từ các thẻ tròn cuộn ngang cũ thành dạng danh mục sidebar dọc tương đồng với Blog, mang lại trải nghiệm nhất quán.
+  - Chuyển toàn bộ CSS liên quan vào thư mục `src/assets/css/productCSS/` (bao gồm `Product.css` và `ProductCategoryList.css`), loại bỏ hoàn toàn mã CSS inline hoặc CSS lộn xộn.
+- **Thanh tìm kiếm Autocomplete & SEO Slug cho Bài viết (Post)**:
+  - Loại bỏ hoàn toàn trang Tìm kiếm cũ (`Search/Index.jsx`). Thay vào đó là thanh Live Search dạng autocomplete tức thì tích hợp ngay chính giữa của `Header.jsx`. Khi gõ từ khóa, hệ thống hiển thị bảng kết quả phân loại song song: Sản phẩm và Bài viết một cách trực quan.
+  - Cập nhật các API lấy danh sách bài viết (`ApiPostController`) và sản phẩm (`ApiProductController`) để hỗ trợ lọc theo tham số `keyword`.
+  - Cập nhật thực thể bài viết `Post.cs` và CSDL bổ sung cột `Slug` (SEO URL) với ràng buộc Unique Index trong `ApplicationDbContext.cs`.
+  - Tích hợp tự động sinh Slug tiếng Việt không dấu từ tiêu đề khi tạo/sửa bài viết (`PostController.cs`) và nâng cấp trang chi tiết tin tức `Blog/Detail.jsx` nhận dạng tải theo cả ID hoặc SEO Slug.
+  - Tái thiết kế bố cục Header thành 2 hàng: Hàng trên chứa Logo, Thanh tìm kiếm, và Tiện ích cá nhân/Giỏ hàng; Hàng dưới chứa Menu điều hướng căn giữa. Hỗ trợ tự động co giãn thông minh, chuyển thanh tìm kiếm xuống hàng riêng biệt trên điện thoại để tối ưu trải nghiệm.
+
+### 13. Tối ưu hóa Cấu trúc CSS (CSS Modularization) - [MỚI]
+
+- **Giải nén tệp `main.css`**: Phân tách mã style thành các file CSS Module riêng biệt cho từng thành phần giao diện chính:
+  - `Header.css` cho Header và Live Search Autocomplete.
+  - `Footer.css` cho Footer chân trang.
+  - `Cart.css` cho trang Giỏ hàng.
+  - `ProductCard.css` cho thẻ Card sản phẩm.
+  - `ProductDetail.css` cho trang chi tiết sản phẩm.
+- **Hiệu quả**: Giúp tệp `main.css` chỉ còn chứa các biến toàn cục (colors, fonts), reset CSS và các styles dùng chung, tối ưu hóa kích thước tải CSS ban đầu, giúp code sạch sẽ và dễ bảo trì.
 
 ---
 
@@ -222,7 +242,7 @@ Mở file `CMS.Backend/appsettings.json` và điều chỉnh chuỗi kết nối
 | Buổi Học   | Nội Dung Thực Hiện                                                                       |    Trạng Thái     | Chi Tiết                                                                                                                                                    |
 | :--------- | :--------------------------------------------------------------------------------------- | :---------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Buổi 1** | Khởi tạo cấu trúc dự án 3 lớp, thiết lập cơ sở dữ liệu `ChinhCMS_DB`.                    | **Đã hoàn thành** | Tạo các thực thể và cấu hình kết nối database.                                                                                                              |
-| **Buổi 2** | Quản lý đơn hàng và chi tiết đơn hàng trực quan.                                         | **Đã hoàn thành** | Thiết kế bảng hiển thị danh sách hóa đơn theo trạng thái.                                                                                                   |
+| **Buổi 2** | Quản lý đơn hàng và chi tiết đơn hàng trực quan.                                         | **Đã hoàn thành** | Thiết kế bảng hiển thị danh sách hóa đơn theo trạng thái.                                                                                                  |
 | **Buổi 3** | Xây dựng chức năng CRUD Danh mục an toàn, lọc bài viết mới nhất lên Trang chủ.           | **Đã hoàn thành** | Khóa xóa danh mục chứa bài viết, dùng LINQ lấy 3 bài viết mới nhất.                                                                                         |
 | **Buổi 4** | Thiết kế giao diện quản trị Admin Panel, tích hợp tải ảnh và trình soạn thảo CKEditor 5. | **Đã hoàn thành** | Hoàn thiện các trang quản lý: Danh mục, Bài viết, Đơn hàng, Thành viên (User CRUD).                                                                         |
 | **Buổi 5** | Bảo mật Cookie nâng cao, Phân quyền chi tiết, Quản lý sản phẩm & Danh mục sản phẩm.      | **Đã hoàn thành** | **Xác thực Cookie, mã hóa BCrypt, dọn rác ảnh cũ, cố định ổ khóa Data Protection, phân trang, ẩn nút Xóa nếu chứa sản phẩm.**                               |
@@ -232,7 +252,8 @@ Mở file `CMS.Backend/appsettings.json` và điều chỉnh chuỗi kết nối
 | **Buổi 9** | Nâng cấp hệ thống SEO Slug và cấu trúc dữ liệu cho thực thể sản phẩm (Product). | **Đã hoàn thành** | **Tích hợp SlugHelper tự sinh URL thân thiện tiếng Việt không dấu, ràng buộc Unique Index trên database SQL Server. Xây dựng API và client service tải sản phẩm theo Slug, nâng cấp ProductCard và ProductDetailView sang định tuyến SEO.** |
 | **Buổi 10** | Tích hợp Banner Carousel động, khóa danh mục hệ thống & Sửa lỗi cuộn Sidebar. | **Đã hoàn thành** | **Tạo bảng Banner, ApiBannerController, CRUD Banner Admin Dashboard upload ảnh và xóa tệp vật lý cũ, slider động HeroBanner. Khóa cứng danh mục 7 & 13. Sửa lỗi Sidebar cuộn.** |
 | **Buổi 11** | Tái cấu trúc SPA với React Router DOM, sửa lỗi cập nhật bài viết & Căn giữa Header. | **Đã hoàn thành** | **Tích hợp BrowserRouter/Link thay thế custom navigate, sửa tham số IFormFile? cho PostController, cân bằng flex Header căn giữa menu.** |
-| **Buổi 12** | Tích hợp giỏ hàng nâng cao, ô nhập số lượng bàn phím, trì hoãn luồng đặt hàng & đổi nhanh trạng thái Banner. | **Đã hoàn thành** | **Thiết kế lại ProductCard với 2 nút Giỏ hàng/Mua ngay và điều hướng xem chi tiết khi click thẻ; tích hợp đệm localStorage tự thêm giỏ sau khi đăng nhập; cho phép gõ phím số lượng sản phẩm; chuyển trang Checkout thành 2 cột hiển thị tóm tắt đơn hàng và trì hoãn ghi database đến khi bấm thanh toán; thêm AJAX ToggleStatus đổi trạng thái hiển thị Banner.** |
+| **Buổi 12** | Tích hợp giỏ hàng nâng cao, ô nhập số lượng bàn phím, trì hoãn luồng đặt hàng, đổi nhanh trạng thái Banner & Live Search Autocomplete. | **Đã hoàn thành** | **Thiết kế lại ProductCard; đệm đăng nhập tự động; ô nhập số lượng bàn phím giỏ hàng; giao diện Checkout 2 cột; AJAX đổi nhanh trạng thái Banner; phân tách Component Sidebar; tích hợp live-search Autocomplete trung tâm Header và SEO Slug cho bài viết (Post).** |
+| **Buổi 13** | Tối ưu hóa cấu trúc CSS, phân tách main.css thành các Module Stylesheet theo component. | **Đã hoàn thành** | **Phân tách tệp main.css cồng kềnh thành các file CSS độc lập: Header.css, Footer.css, Cart.css, ProductCard.css, và ProductDetail.css đặt trong các folder tương ứng; tích hợp trực tiếp qua import tại mỗi component để tối ưu hóa hiệu năng tải trang.** |
 ---
 
 

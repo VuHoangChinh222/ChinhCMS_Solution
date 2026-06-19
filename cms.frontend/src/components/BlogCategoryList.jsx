@@ -20,11 +20,11 @@ const BlogCategoryList = ({ activeCategoryId, onSelectCategory, onCategoriesLoad
       try {
         setLoading(true);
         const data = await postService.getBlogCategories();
-        
+
         // Kiểm tra xem backend đã trả về "Tất cả bài viết" chưa
         const hasAll = (data || []).some(c => c.name === 'Tất cả bài viết');
         const dynamicCategories = hasAll ? (data || []) : [{ id: 'all', name: 'Tất cả bài viết' }, ...(data || [])];
-        
+
         setCategories(dynamicCategories);
         if (onCategoriesLoaded) {
           onCategoriesLoaded(dynamicCategories);

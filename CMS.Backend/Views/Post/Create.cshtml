@@ -42,6 +42,11 @@
                             <span asp-validation-for="Title" class="text-danger small"></span>
                         </div>
                         <div class="mb-3">
+                            <label class="form-label fw-bold">Đường dẫn thân thiện (Slug):</label>
+                            <input asp-for="Slug" class="form-control" placeholder="Để trống để tự động tạo từ tiêu đề..." />
+                            <span asp-validation-for="Slug" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label fw-bold">Nội dung chi tiết:</label>
                             <!-- Kích hoạt CKEditor 5 trên phần tử textarea này thông qua ID editor -->
                             <textarea asp-for="Content" id="editor" class="form-control" rows="10" placeholder="Viết nội dung tại đây..."></textarea>

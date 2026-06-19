@@ -8,8 +8,9 @@ import axiosClient from '../axiosClient';
 
 const postService = {
   // 1. API lấy danh sách bài viết mới nhất (Có phân trang)
-  getLatestPosts: (pageNumber = 1, pageSize = 5) => {
-    const url = `/post?pageNumber=${pageNumber}&pageSize=${pageSize}`;
+  // 1. API lấy danh sách bài viết mới nhất (Có phân trang)
+  getLatestPosts: (pageNumber = 1, pageSize = 5, keyword = '') => {
+    const url = `/post?pageNumber=${pageNumber}&pageSize=${pageSize}${keyword ? `&keyword=${encodeURIComponent(keyword)}` : ''}`;
     return axiosClient.get(url);
   },
 
@@ -28,6 +29,12 @@ const postService = {
   // 4. API lọc danh sách bài viết theo chuyên mục (Có phân trang)
   getPostsByCategory: (categoryId, pageNumber = 1, pageSize = 5) => {
     const url = `/post/category/${categoryId}?pageNumber=${pageNumber}&pageSize=${pageSize}`;
+    return axiosClient.get(url);
+  },
+
+  // 5. API lấy chi tiết bài viết theo slug (SEO)
+  getPostBySlug: (slug) => {
+    const url = `/post/slug/${slug}`;
     return axiosClient.get(url);
   }
 };

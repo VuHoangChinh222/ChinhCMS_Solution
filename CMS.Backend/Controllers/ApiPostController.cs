@@ -8,6 +8,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using CMS.Data;
+using CMS.Data.Entities;
 using System;
 using System.Linq;
 
@@ -38,7 +39,7 @@ namespace CMS.Backend.Controllers
         // 1. API lấy toàn bộ bài viết mới nhất (Có phân trang)
         // GET: api/post?pageNumber=1&pageSize=10
         [HttpGet]
-        public IActionResult GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public IActionResult GetAll([FromQuery] string? keyword = null, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             // Ràng buộc dữ liệu đầu vào tối thiểu để tránh lỗi hệ thống
             if (pageNumber < 1) pageNumber = 1;
@@ -46,17 +47,29 @@ namespace CMS.Backend.Controllers
 
             try
             {
-                // Bước 1: Đếm tổng số bài viết hiện có trong Database
-                var totalItems = _context.Posts.Count();
+                IQueryable<Post> query = _context.Posts;
+
+                // Thực hiện lọc theo từ khóa tìm kiếm nếu có
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    string kw = keyword.Trim().ToLower();
+                    query = query.Where(p => p.Title.ToLower().Contains(kw) 
+                                          || (p.Content != null && p.Content.ToLower().Contains(kw)) 
+                                          || (p.Category != null && p.Category.Name.ToLower().Contains(kw)));
+                }
+
+                // Bước 1: Đếm tổng số bài viết sau khi lọc
+                var totalItems = query.Count();
 
                 // Bước 2: Truy cập và phân trang dữ liệu
-                var posts = _context.Posts
+                var posts = query
                     .OrderByDescending(p => p.Id) // Sắp xếp bài mới nhất lên đầu (từ ID lớn đến bé)
                     .Skip((pageNumber - 1) * pageSize) // Bỏ qua các bài viết của các trang trước đó
                     .Take(pageSize) // Lấy số lượng bài viết đúng bằng kích thước trang hiện tại
                     .Select(p => new {
                         p.Id,
                         p.Title,
+                        p.Slug,
                         p.ImageUrl,
                         CreatedDate = p.CreatedDate,
                         CategoryName = p.Category != null ? p.Category.Name : "Không xác định"
@@ -128,6 +141,7 @@ namespace CMS.Backend.Controllers
                     .Select(p => new {
                         p.Id,
                         p.Title,
+                        p.Slug,
                         p.ImageUrl,
                         CreatedDate = p.CreatedDate,
                         CategoryName = p.Category != null ? p.Category.Name : "Không xác định"
@@ -169,6 +183,7 @@ namespace CMS.Backend.Controllers
                     .Select(p => new {
                         p.Id,
                         p.Title,
+                        p.Slug,
                         p.Content,
                         p.ImageUrl,
                         CreatedDate = p.CreatedDate,
@@ -189,6 +204,41 @@ namespace CMS.Backend.Controllers
             catch (System.Exception ex)
             {
                 return StatusCode(500, new { message = "Lỗi hệ thống khi tải chi tiết bài viết", error = ex.Message });
+            }
+        }
+
+        // ==========================================
+        // PHẦN 5: CHI TIẾT BÀI VIẾT THEO SLUG (SEO FRIENDLY)
+        // ==========================================
+        // GET: api/post/slug/{slug}
+        [HttpGet("slug/{slug}")]
+        public IActionResult GetDetailBySlug(string slug)
+        {
+            try
+            {
+                var post = _context.Posts
+                    .Select(p => new {
+                        p.Id,
+                        p.Title,
+                        p.Slug,
+                        p.Content,
+                        p.ImageUrl,
+                        CreatedDate = p.CreatedDate,
+                        p.CategoryId,
+                        CategoryName = p.Category != null ? p.Category.Name : "Không xác định"
+                    })
+                    .FirstOrDefault(p => p.Slug == slug);
+
+                if (post == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy bài viết này trong hệ thống dựa trên slug" });
+                }
+
+                return Ok(post);
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi hệ thống khi tải chi tiết bài viết theo slug", error = ex.Message });
             }
         }
     }

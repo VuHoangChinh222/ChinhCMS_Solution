@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering; // Thư viện cần thiết để sử dụng danh sách chọn SelectList
 using System.IO; // Thư viện để thao tác với file và đường dẫn thư mục
 using Microsoft.AspNetCore.Authorization;
+using CMS.Backend.Helpers;
 
 namespace CMS.Backend.Controllers
 {
@@ -151,6 +152,16 @@ namespace CMS.Backend.Controllers
 
             if (ModelState.IsValid)
             {
+                // Tự động sinh hoặc chuẩn hóa Slug
+                if (string.IsNullOrEmpty(model.Slug))
+                {
+                    model.Slug = SlugHelper.GenerateSlug(model.Title);
+                }
+                else
+                {
+                    model.Slug = SlugHelper.GenerateSlug(model.Slug);
+                }
+
                 // Thêm bài viết mới vào Database
                 _context.Posts.Add(model);
                 _context.SaveChanges();
@@ -260,6 +271,16 @@ namespace CMS.Backend.Controllers
 
             if (ModelState.IsValid)
             {
+                // Tự động sinh hoặc chuẩn hóa Slug
+                if (string.IsNullOrEmpty(model.Slug))
+                {
+                    model.Slug = SlugHelper.GenerateSlug(model.Title);
+                }
+                else
+                {
+                    model.Slug = SlugHelper.GenerateSlug(model.Slug);
+                }
+
                 // Cập nhật thông tin bài viết vào Database
                 _context.Posts.Update(model);
                 _context.SaveChanges();

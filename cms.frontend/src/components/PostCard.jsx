@@ -6,7 +6,7 @@ const PostCard = ({ post }) => {
 
     return (
         <Link
-            to={`/blog/${post.id}`}
+            to={`/blog/${post.slug || post.id}`}
             className="product-card post-card-sync"
             style={{ textDecoration: 'none', color: 'inherit' }}
         >

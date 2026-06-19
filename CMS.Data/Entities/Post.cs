@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Sinh viên : Vũ Hoàng Chính
  * Mã sinh viên: 2122110380
  * Lớp: CCQ2211J
@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,9 @@ namespace CMS.Data.Entities
         public string Content { get; set; } // Nội dung chi tiết
         public string ImageUrl { get; set; } // Hình ảnh đại diện
         public DateTime CreatedDate { get; set; } = DateTime.Now; // Ngày tạo bài viết, mặc định là ngày hiện tại
+
+        [StringLength(200, ErrorMessage = "Slug không được vượt quá 200 ký tự")]
+        public string? Slug { get; set; } = string.Empty; // Đường dẫn thân thiện phục vụ cho SEO URL.
 
         // Khóa ngoại liên kết tới Category
         public int CategoryId { get; set; }

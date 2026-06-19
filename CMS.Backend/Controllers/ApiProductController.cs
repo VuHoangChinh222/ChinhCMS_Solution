@@ -9,6 +9,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CMS.Data;
+using CMS.Data.Entities;
 using System;
 using System.Linq;
 
@@ -60,7 +61,7 @@ namespace CMS.Backend.Controllers
         // ==========================================
         // GET: api/product?pageNumber=1&pageSize=10
         [HttpGet]
-        public IActionResult GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public IActionResult GetAll([FromQuery] string? keyword = null, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             // Ràng buộc dữ liệu đầu vào tối thiểu
             if (pageNumber < 1) pageNumber = 1;
@@ -68,11 +69,22 @@ namespace CMS.Backend.Controllers
 
             try
             {
-                // 1. Tính tổng số sản phẩm hiện có
-                var totalItems = _context.Products.Count();
+                IQueryable<Product> query = _context.Products;
+
+                // Thực hiện lọc theo từ khóa tìm kiếm nếu có
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    string kw = keyword.Trim().ToLower();
+                    query = query.Where(p => p.Name.ToLower().Contains(kw) 
+                                          || (p.Description != null && p.Description.ToLower().Contains(kw)) 
+                                          || (p.CategoryProduct != null && p.CategoryProduct.Name.ToLower().Contains(kw)));
+                }
+
+                // 1. Tính tổng số sản phẩm sau khi lọc
+                var totalItems = query.Count();
 
                 // 2. Lấy dữ liệu đã phân trang
-                var products = _context.Products
+                var products = query
                     .OrderByDescending(p => p.Id) // Sản phẩm mới nhất lên đầu
                     .Skip((pageNumber - 1) * pageSize) // Bỏ qua các bản ghi của các trang trước
                     .Take(pageSize) // Lấy số lượng bản ghi tương ứng kích thước trang

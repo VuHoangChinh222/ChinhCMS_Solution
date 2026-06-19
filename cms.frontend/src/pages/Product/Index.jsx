@@ -1,21 +1,18 @@
-// export default HomeView;
+/* 
+ * PRODUCT VIEW COMPONENT - DEDICATED SHOP PORTAL WITH SIDEBAR CATEGORY FILTER & PAGINATION
+ * Sinh viên: Vũ Hoàng Chính
+ * Môn học: Chuyên đề ASP.NET Core & ReactJS
+ */
+
 import { useState, useEffect } from 'react';
 import ProductCard from '../../components/ProductCard';
 import HeroBanner from '../../components/HeroBanner';
-
-// IMPORT các file gọi API chuyên biệt của bạn (Hãy điều chỉnh lại đường dẫn ../ cho đúng thư mục dự án)
 import productService from '../../services/productService';
-import categoryProductService from '../../services/categoryProductService';
-
+import ProductCategoryList from './ProductCategoryList';
 import IsLoading from '../../components/IsLoading';
+import '../../assets/css/productCSS/Product.css';
 
-// Import css
-import '../../assets/css/ProductView.css';
-
-const BASE_URL = "https://localhost:7291"; // Cấu hình lấy ảnh từ wwwroot/uploads của Backend
-
-export const formatPrice = (price) =>
-    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+const BASE_URL = "https://localhost:7291";
 
 const ProductView = ({ params, navigate, addToCart }) => {
     // --- Khai báo các State quản lý dữ liệu ---
@@ -43,21 +40,7 @@ const ProductView = ({ params, navigate, addToCart }) => {
     const pageSize = 20; // Yêu cầu: Hiển thị tối đa 20 sản phẩm trên 1 trang
 
     // ==========================================
-    // 1. GỌI API LẤY DANH MỤC SẢN PHẨM (Chạy 1 lần duy nhất khi load trang)
-    // ==========================================
-    useEffect(() => {
-        categoryProductService.getAllCategoryProducts()
-            .then(data => {
-                // Kiểm tra xem backend đã trả về "Tất cả sản phẩm" chưa
-                const hasAll = (data || []).some(c => c.name === 'Tất cả sản phẩm');
-                const dynamicCategories = hasAll ? (data || []) : [{ id: 'all', name: 'Tất cả sản phẩm' }, ...(data || [])];
-                setCategories(dynamicCategories);
-            })
-            .catch(err => console.error("Lỗi khi tải danh mục từ API:", err));
-    }, []);
-
-    // ==========================================
-    // 2. GỌI API LẤY SẢN PHẨM (Chạy lại khi ĐỔI TRANG hoặc ĐỔI DANH MỤC)
+    // GỌI API LẤY SẢN PHẨM (Chạy lại khi ĐỔI TRANG hoặc ĐỔI DANH MỤC)
     // ==========================================
     useEffect(() => {
         setLoading(true);
@@ -80,7 +63,6 @@ const ProductView = ({ params, navigate, addToCart }) => {
         // Tiến hành xử lý dữ liệu nhận về sau khi bóc tách qua AxiosClient
         apiCall
             .then(result => {
-                // Do backend trả về cấu trúc phân trang: { totalItems, totalPages, pageNumber, pageSize, data: [...] }
                 setProducts(result.data || []);
                 setTotalPages(result.totalPages || 1);
                 setHasError(false);
@@ -89,45 +71,29 @@ const ProductView = ({ params, navigate, addToCart }) => {
             .catch(err => {
                 console.error("Lỗi khi tải danh sách sản phẩm:", err);
                 setProducts([]);
+                setTotalPages(1);
                 setHasError(true);
                 setLoading(false);
             });
     }, [pageNumber, activeCategoryId, categories]); // Lắng nghe sự thay đổi của cả số trang lẫn bộ lọc danh mục
 
     // ==========================================
-    // 3. CÁC HÀM XỬ LÝ SỰ KIỆN (EVENT HANDLERS)
+    // CÁC HÀM XỬ LÝ SỰ KIỆN (EVENT HANDLERS)
     // ==========================================
 
     // Hàm xử lý khi người dùng bấm chọn Danh mục
     const handleCategoryClick = (categoryId) => {
         setActiveCategoryId(categoryId);
-        setPageNumber(1); // QUAN TRỌNG: Phải reset số trang về 1 khi đổi danh mục để tránh lỗi tràn trang
+        setPageNumber(1); // Reset số trang về 1 khi đổi danh mục
     };
 
     // Hàm xử lý chuyển trang điều hướng
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
             setPageNumber(newPage);
-            // Cuộn trang mượt mà lên vị trí lưới sản phẩm để khách hàng tiện theo dõi
             document.getElementById('products-sec').scrollIntoView({ behavior: 'smooth' });
         }
     };
-
-    // Xử lý đường dẫn ảnh đại diện cho các danh mục sản phẩm (bao gồm ảnh 'Tất cả' mặc định)
-    const processedCategories = categories.map(cat => {
-        if (cat.id === 'all') {
-            return {
-                ...cat,
-                image: 'src/assets/images/hero_basketball_1778727871576.png'
-            };
-        }
-        return {
-            ...cat,
-            image: cat.imageUrl
-                ? (cat.imageUrl.startsWith('http') ? cat.imageUrl : `${BASE_URL}${cat.imageUrl}`)
-                : 'src/assets/images/shoe_product_1_1778727884422.png'
-        };
-    });
 
     return (
         <div className="page-transition">
@@ -142,7 +108,7 @@ const ProductView = ({ params, navigate, addToCart }) => {
             />
 
             {/* SECTION DANH SÁCH SẢN PHẨM */}
-            <section id="products-sec" className="products-section">
+            <section id="products-sec" className="products-section container py-5">
                 <div className="section-header-custom">
                     <h2 className="section-title">
                         {categories.find(c => c.id === activeCategoryId)?.name || 'Sản phẩm'}
@@ -150,89 +116,83 @@ const ProductView = ({ params, navigate, addToCart }) => {
                     <p className="section-subtitle">Khám phá các danh mục sản phẩm thể thao chuyên nghiệp chất lượng hàng đầu</p>
                 </div>
 
-                {/* Danh sách danh mục dạng thẻ tròn cao cấp có hình ảnh đại diện */}
-                <div className="category-cards-container">
-                    {processedCategories.map(cat => (
-                        <div
-                            key={cat.id}
-                            className={`category-card ${activeCategoryId === cat.id ? 'active' : ''}`}
-                            onClick={() => handleCategoryClick(cat.id)}
-                        >
-                            <div className="category-card-image-wrapper">
-                                <img src={cat.image} alt={cat.name} className="category-card-image" />
-                                <div className="category-card-overlay"></div>
+                <div className="product-layout">
+                    {/* CỘT TRÁI: DANH MỤC SẢN PHẨM */}
+                    <aside className="product-sidebar">
+                        <ProductCategoryList
+                            activeCategoryId={activeCategoryId}
+                            onSelectCategory={handleCategoryClick}
+                            onCategoriesLoaded={setCategories}
+                        />
+                    </aside>
+
+                    {/* CỘT PHẢI: LƯỚI SẢN PHẨM VÀ PHÂN TRANG */}
+                    <main className="product-main">
+                        {loading ? (
+                            <IsLoading message="Đang tải sản phẩm từ hệ thống..." />
+                        ) : hasError ? (
+                            <div className="loading-text" style={{ color: '#ef4444' }}>
+                                <i className="fa-solid fa-circle-exclamation"></i> Lỗi kết nối đến máy chủ. Vui lòng kiểm tra đường truyền!
                             </div>
-                            <span className="category-card-name">{cat.name}</span>
-                        </div>
-                    ))}
-                </div>
+                        ) : products.length === 0 ? (
+                            <div className="loading-text">Danh mục này hiện tại chưa có sản phẩm nào.</div>
+                        ) : (
+                            <>
+                                {/* LƯỚI HIỂN THỊ CHUẨN 4 SẢN PHẨM TRÊN 1 HÀNG KHI CÓ SIDEBAR */}
+                                <div className="products-grid-4-columns">
+                                    {products.map(product => {
+                                        const processedProduct = {
+                                            ...product,
+                                            image: product.imageUrl
+                                                ? (product.imageUrl.startsWith('http') ? product.imageUrl : `${BASE_URL}${product.imageUrl}`)
+                                                : 'src/assets/images/default_product.png'
+                                        };
 
-                {/* Khối hiển thị dữ liệu hoặc thông báo Loading */}
-                {loading ? (
-                    <IsLoading message="Đang tải sản phẩm từ hệ thống..." />
-                ) : hasError ? (
-                    <div className="loading-text" style={{ color: '#ef4444' }}>
-                        <i className="fa-solid fa-circle-exclamation"></i> Lỗi kết nối đến máy chủ. Vui lòng kiểm tra đường truyền!
-                    </div>
-                ) : products.length === 0 ? (
-                    <div className="loading-text">Danh mục này hiện tại chưa có sản phẩm nào.</div>
-                ) : (
-                    <>
-                        {/* LƯỚI HIỂN THỊ CHUẨN 5 SẢN PHẨM TRÊN 1 HÀNG */}
-                        <div className="products-grid-5-columns">
-                            {products.map(product => {
-                                // Xử lý gắn link domain Backend (https://localhost:7291) vào đường dẫn ảnh cục bộ (/uploads/xxx.png)
-                                const processedProduct = {
-                                    ...product,
-                                    image: product.imageUrl
-                                        ? (product.imageUrl.startsWith('http') ? product.imageUrl : `${BASE_URL}${product.imageUrl}`)
-                                        : 'src/assets/images/default_product.png'
-                                };
+                                        return (
+                                            <ProductCard
+                                                key={product.id}
+                                                product={processedProduct}
+                                                navigate={navigate}
+                                                addToCart={addToCart}
+                                            />
+                                        );
+                                    })}
+                                </div>
 
-                                return (
-                                    <ProductCard
-                                        key={product.id}
-                                        product={processedProduct}
-                                        navigate={navigate}
-                                        addToCart={addToCart}
-                                    />
-                                );
-                            })}
-                        </div>
+                                {/* THANH ĐIỀU HƯỚNG PHÂN TRANG */}
+                                {totalPages > 1 && (
+                                    <div className="pagination-container">
+                                        <button
+                                            className="page-btn"
+                                            disabled={pageNumber === 1}
+                                            onClick={() => handlePageChange(pageNumber - 1)}
+                                        >
+                                            ❮ Trước
+                                        </button>
 
-                        {/* THANH ĐIỀU HƯỚNG PHÂN TRANG (Chỉ hiển thị khi tổng số trang lớn hơn 1) */}
-                        {totalPages > 1 && (
-                            <div className="pagination-container">
-                                <button
-                                    className="page-btn"
-                                    disabled={pageNumber === 1}
-                                    onClick={() => handlePageChange(pageNumber - 1)}
-                                >
-                                    ❮ Trước
-                                </button>
+                                        {Array.from({ length: totalPages }, (_, index) => (
+                                            <button
+                                                key={index + 1}
+                                                className={`page-btn ${pageNumber === index + 1 ? 'active' : ''}`}
+                                                onClick={() => handlePageChange(index + 1)}
+                                            >
+                                                {index + 1}
+                                            </button>
+                                        ))}
 
-                                {/* Vòng lặp tự động render các số trang dựa trên totalPages */}
-                                {Array.from({ length: totalPages }, (_, index) => (
-                                    <button
-                                        key={index + 1}
-                                        className={`page-btn ${pageNumber === index + 1 ? 'active' : ''}`}
-                                        onClick={() => handlePageChange(index + 1)}
-                                    >
-                                        {index + 1}
-                                    </button>
-                                ))}
-
-                                <button
-                                    className="page-btn"
-                                    disabled={pageNumber === totalPages}
-                                    onClick={() => handlePageChange(pageNumber + 1)}
-                                >
-                                    Sau ❯
-                                </button>
-                            </div>
+                                        <button
+                                            className="page-btn"
+                                            disabled={pageNumber === totalPages}
+                                            onClick={() => handlePageChange(pageNumber + 1)}
+                                        >
+                                            Sau ❯
+                                        </button>
+                                    </div>
+                                )}
+                            </>
                         )}
-                    </>
-                )}
+                    </main>
+                </div>
             </section>
         </div>
     );

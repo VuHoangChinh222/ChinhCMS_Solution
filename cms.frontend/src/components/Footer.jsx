@@ -7,6 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import categoryProductService from '../services/categoryProductService';
+import '../assets/css/footerCSS/Footer.css';
 
 const Footer = () => {
   const [categories, setCategories] = useState([]);

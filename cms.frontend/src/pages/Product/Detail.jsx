@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import productService from '../../services/productService';
 import { getCookie } from '../../utils/cookieHelper';
 import IsLoading from '../../components/IsLoading';
-import '../../assets/css/ProductDetailView.css';
+import '../../assets/css/productCSS/ProductDetail.css';
 
 // Cấu hình URL Backend để lấy hình ảnh từ wwwroot/uploads
 const BASE_URL = "https://localhost:7291";

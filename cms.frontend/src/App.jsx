@@ -15,7 +15,6 @@ import ProductDetailView from './pages/Product/Detail';
 import CartView from './pages/Cart/Index';
 import CheckoutView from './pages/Checkout/Index';
 import PaymentView from './pages/Checkout/PaymentView';
-import SearchView from './pages/Search/Index';
 import LoginView from './pages/Login/Index';
 import RegisterView from './pages/Register/Index';
 import UserInfoView from './pages/User/Index';
@@ -146,7 +145,6 @@ const AppContent = ({ cart, addToCart, updateQty, removeFromCart, clearCart }) =
           <Route path="/checkout" element={<CheckoutView cart={cart} clearCart={clearCart} navigate={navigate} />} />
           <Route path="/payment" element={<PaymentView navigate={navigate} clearCart={clearCart} cart={cart} />} />
 
-          <Route path="/search" element={<SearchView navigate={navigate} addToCart={addToCart} />} />
           <Route path="/login" element={<LoginView />} />
           <Route path="/register" element={<RegisterView />} />
           <Route path="/user" element={<UserInfoView navigate={navigate} />} />
@@ -196,10 +194,7 @@ const ProductDetailRoute = ({ navigate, addToCart }) => {
 // Route wrapper cho trang chi tiết bài viết
 const PostDetailRoute = ({ navigate }) => {
   const { id } = useParams();
-  // Chuyển đổi ID bài viết sang định dạng số nguyên
-  const postId = id ? Number(id) : 0;
-
-  return <PostDetailView id={postId} navigate={navigate} />;
+  return <PostDetailView params={{ slug: id }} navigate={navigate} />;
 };
 
 // Component chính App bao bọc Router ngoài cùng

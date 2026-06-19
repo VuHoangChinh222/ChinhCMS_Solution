@@ -1,4 +1,5 @@
 import { getCookie } from '../utils/cookieHelper';
+import '../assets/css/productCSS/ProductCard.css';
 
 export const productsData = [
   { id: 1, name: 'Ignite Red X', category: 'Giày bóng rổ', price: 3500000, image: 'src/assets/images/shoe_product_1_1778727884422.png', badge: 'Mới', desc: 'Đôi giày bứt phá mọi giới hạn tốc độ. Thiết kế ôm sát cổ chân, đế đệm bật nảy cực cao, giúp bạn thực hiện những pha lên rổ hoàn hảo.' },

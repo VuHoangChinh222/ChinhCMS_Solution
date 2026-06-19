@@ -42,6 +42,12 @@ namespace CMS.Data
             modelBuilder.Entity<Product>()
                 .HasIndex(p => p.Slug)
                 .IsUnique();
+
+            // Cấu hình chỉ mục duy nhất (Unique Index) cho cột Slug trong bảng Posts.
+            // Đảm bảo không tồn tại hai bài viết trùng nhau về đường dẫn thân thiện (Slug).
+            modelBuilder.Entity<Post>()
+                .HasIndex(p => p.Slug)
+                .IsUnique();
         }
     }
 }

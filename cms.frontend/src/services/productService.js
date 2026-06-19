@@ -2,8 +2,8 @@ import axiosClient from '../axiosClient';
 
 const productService = {
     // API lấy tất cả sản phẩm có phân trang
-    getAllProducts: (pageNumber, pageSize) => {
-        const url = `/product?pageNumber=${pageNumber}&pageSize=${pageSize}`;
+    getAllProducts: (pageNumber, pageSize, keyword = '') => {
+        const url = `/product?pageNumber=${pageNumber}&pageSize=${pageSize}${keyword ? `&keyword=${encodeURIComponent(keyword)}` : ''}`;
         return axiosClient.get(url);
     },
 
