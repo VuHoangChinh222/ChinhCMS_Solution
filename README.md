@@ -232,6 +232,7 @@ Mở file `CMS.Backend/appsettings.json` và điều chỉnh chuỗi kết nối
 | **Buổi 9** | Nâng cấp hệ thống SEO Slug và cấu trúc dữ liệu cho thực thể sản phẩm (Product). | **Đã hoàn thành** | **Tích hợp SlugHelper tự sinh URL thân thiện tiếng Việt không dấu, ràng buộc Unique Index trên database SQL Server. Xây dựng API và client service tải sản phẩm theo Slug, nâng cấp ProductCard và ProductDetailView sang định tuyến SEO.** |
 | **Buổi 10** | Tích hợp Banner Carousel động, khóa danh mục hệ thống & Sửa lỗi cuộn Sidebar. | **Đã hoàn thành** | **Tạo bảng Banner, ApiBannerController, CRUD Banner Admin Dashboard upload ảnh và xóa tệp vật lý cũ, slider động HeroBanner. Khóa cứng danh mục 7 & 13. Sửa lỗi Sidebar cuộn.** |
 | **Buổi 11** | Tái cấu trúc SPA với React Router DOM, sửa lỗi cập nhật bài viết & Căn giữa Header. | **Đã hoàn thành** | **Tích hợp BrowserRouter/Link thay thế custom navigate, sửa tham số IFormFile? cho PostController, cân bằng flex Header căn giữa menu.** |
+| **Buổi 12** | Tích hợp giỏ hàng nâng cao, ô nhập số lượng bàn phím, trì hoãn luồng đặt hàng & đổi nhanh trạng thái Banner. | **Đã hoàn thành** | **Thiết kế lại ProductCard với 2 nút Giỏ hàng/Mua ngay và điều hướng xem chi tiết khi click thẻ; tích hợp đệm localStorage tự thêm giỏ sau khi đăng nhập; cho phép gõ phím số lượng sản phẩm; chuyển trang Checkout thành 2 cột hiển thị tóm tắt đơn hàng và trì hoãn ghi database đến khi bấm thanh toán; thêm AJAX ToggleStatus đổi trạng thái hiển thị Banner.** |
 ---
 
 _Dự án được thực hiện bởi sinh viên Vũ Hoàng Chính - CCQ2211J._
