@@ -195,16 +195,14 @@ Dự án `ChinhCMS_Solution` được chia làm 3 dự án nhỏ bên trong:
   - Cập nhật thực thể bài viết `Post.cs` và CSDL bổ sung cột `Slug` (SEO URL) với ràng buộc Unique Index trong `ApplicationDbContext.cs`.
   - Tích hợp tự động sinh Slug tiếng Việt không dấu từ tiêu đề khi tạo/sửa bài viết (`PostController.cs`) và nâng cấp trang chi tiết tin tức `Blog/Detail.jsx` nhận dạng tải theo cả ID hoặc SEO Slug.
   - Tái thiết kế bố cục Header thành 2 hàng: Hàng trên chứa Logo, Thanh tìm kiếm, và Tiện ích cá nhân/Giỏ hàng; Hàng dưới chứa Menu điều hướng căn giữa. Hỗ trợ tự động co giãn thông minh, chuyển thanh tìm kiếm xuống hàng riêng biệt trên điện thoại để tối ưu trải nghiệm.
-
-### 13. Tối ưu hóa Cấu trúc CSS (CSS Modularization) - [MỚI]
-
-- **Giải nén tệp `main.css`**: Phân tách mã style thành các file CSS Module riêng biệt cho từng thành phần giao diện chính:
-  - `Header.css` cho Header và Live Search Autocomplete.
-  - `Footer.css` cho Footer chân trang.
-  - `Cart.css` cho trang Giỏ hàng.
-  - `ProductCard.css` cho thẻ Card sản phẩm.
-  - `ProductDetail.css` cho trang chi tiết sản phẩm.
-- **Hiệu quả**: Giúp tệp `main.css` chỉ còn chứa các biến toàn cục (colors, fonts), reset CSS và các styles dùng chung, tối ưu hóa kích thước tải CSS ban đầu, giúp code sạch sẽ và dễ bảo trì.
+- **Tối ưu hóa Cấu trúc CSS (CSS Modularization)**:
+  - Phân tách tệp `main.css` cồng kềnh thành các file CSS Module riêng biệt cho từng thành phần giao diện chính để tối ưu hóa hiệu năng tải trang và khả năng bảo trì:
+    - `Header.css` cho Header và Live Search Autocomplete.
+    - `Footer.css` cho Footer chân trang.
+    - `Cart.css` cho trang Giỏ hàng.
+    - `ProductCard.css` cho thẻ Card sản phẩm.
+    - `ProductDetail.css` cho trang chi tiết sản phẩm.
+  - Tệp `main.css` giờ đây chỉ chứa các biến toàn cục (colors, fonts), reset CSS và các class biểu mẫu/nút bấm dùng chung.
 
 ---
 
@@ -252,8 +250,7 @@ Mở file `CMS.Backend/appsettings.json` và điều chỉnh chuỗi kết nối
 | **Buổi 9** | Nâng cấp hệ thống SEO Slug và cấu trúc dữ liệu cho thực thể sản phẩm (Product). | **Đã hoàn thành** | **Tích hợp SlugHelper tự sinh URL thân thiện tiếng Việt không dấu, ràng buộc Unique Index trên database SQL Server. Xây dựng API và client service tải sản phẩm theo Slug, nâng cấp ProductCard và ProductDetailView sang định tuyến SEO.** |
 | **Buổi 10** | Tích hợp Banner Carousel động, khóa danh mục hệ thống & Sửa lỗi cuộn Sidebar. | **Đã hoàn thành** | **Tạo bảng Banner, ApiBannerController, CRUD Banner Admin Dashboard upload ảnh và xóa tệp vật lý cũ, slider động HeroBanner. Khóa cứng danh mục 7 & 13. Sửa lỗi Sidebar cuộn.** |
 | **Buổi 11** | Tái cấu trúc SPA với React Router DOM, sửa lỗi cập nhật bài viết & Căn giữa Header. | **Đã hoàn thành** | **Tích hợp BrowserRouter/Link thay thế custom navigate, sửa tham số IFormFile? cho PostController, cân bằng flex Header căn giữa menu.** |
-| **Buổi 12** | Tích hợp giỏ hàng nâng cao, ô nhập số lượng bàn phím, trì hoãn luồng đặt hàng, đổi nhanh trạng thái Banner & Live Search Autocomplete. | **Đã hoàn thành** | **Thiết kế lại ProductCard; đệm đăng nhập tự động; ô nhập số lượng bàn phím giỏ hàng; giao diện Checkout 2 cột; AJAX đổi nhanh trạng thái Banner; phân tách Component Sidebar; tích hợp live-search Autocomplete trung tâm Header và SEO Slug cho bài viết (Post).** |
-| **Buổi 13** | Tối ưu hóa cấu trúc CSS, phân tách main.css thành các Module Stylesheet theo component. | **Đã hoàn thành** | **Phân tách tệp main.css cồng kềnh thành các file CSS độc lập: Header.css, Footer.css, Cart.css, ProductCard.css, và ProductDetail.css đặt trong các folder tương ứng; tích hợp trực tiếp qua import tại mỗi component để tối ưu hóa hiệu năng tải trang.** |
+| **Buổi 12** | Tích hợp giỏ hàng nâng cao, ô nhập số lượng bàn phím, trì hoãn luồng đặt hàng, đổi nhanh trạng thái Banner, Live Search Autocomplete & Tách nhỏ CSS. | **Đã hoàn thành** | **Thiết kế lại ProductCard; đệm đăng nhập tự động; ô nhập số lượng bàn phím giỏ hàng; giao diện Checkout 2 cột; AJAX đổi nhanh trạng thái Banner; phân tách Component Sidebar; tích hợp live-search Autocomplete trung tâm Header và SEO Slug cho bài viết (Post); phân rã main.css cồng kềnh thành các file CSS module riêng biệt (Header.css, Footer.css, Cart.css, ProductCard.css, ProductDetail.css) để tối ưu hóa khả năng bảo trì.** |
 ---
 
 
