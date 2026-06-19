@@ -73,7 +73,7 @@ const Footer = () => {
         </div>
       </div>
       <div className="footer-bottom">
-        <p>&copy; 2026 Astra Hoops. Tất cả quyền được bảo lưu.</p>
+        <p>&copy; 2026 Chinh Hoops. Tất cả quyền được bảo lưu.</p>
       </div>
     </footer>
   );

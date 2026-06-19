@@ -159,6 +159,33 @@ Dự án `ChinhCMS_Solution` được chia làm 3 dự án nhỏ bên trong:
   - Cập nhật thuộc tính xác thực Data Annotations tiếng Việt thân thiện tại lớp thực thể Banner.cs.
   - Cấu hình lại chiều cao `.admin-sidebar { height: 100vh; }` thay vì `min-height` để thanh menu Sidebar cố định bên trái của Admin Panel có thể cuộn dọc mượt mà khi màn hình có độ phân giải thấp, giúp quản trị viên click được mục "Quản lý thành viên".
 
+### 11. Tái cấu trúc Định tuyến React Router DOM & Cân bằng Header UI (Buổi 11) - [MỚI]
+
+- **React Router DOM SPA Integration**:
+  - Thay thế hệ thống định tuyến tự chế bằng thư viện định tuyến chuẩn `react-router-dom` (`BrowserRouter`, `Routes`, `Route`).
+  - Chuyển đổi toàn bộ các liên kết tĩnh và động (ở Header, Footer, thẻ sản phẩm `ProductCard`, thẻ bài viết `PostCard`, Slider Blog) sang thẻ `<Link>` chuẩn của React Router. Nhờ đó, ứng dụng hoạt động mượt mà dạng Single Page Application (SPA), hỗ trợ lịch sử duyệt web (Back/Forward) và mở liên kết trong tab mới.
+- **Căn giữa thanh Menu đầu trang**:
+  - Thiết lập CSS Flexbox thông minh (`flex: 1` cho Logo và Actions) trên Header giúp phần menu chính `.nav-links` tự động căn giữa cân đối chính xác 100% trên giao diện Desktop.
+- **Sửa lỗi lưu tiêu đề bài viết (Post Controller)**:
+  - Đổi kiểu dữ liệu tham số tải ảnh từ `IFormFile uploadImage` bắt buộc sang nullable `IFormFile? uploadImage`, giải quyết triệt để lỗi không lưu được tiêu đề khi quản trị viên cập nhật bài viết mà không tải lên ảnh mới.
+
+### 12. Tích hợp giỏ hàng nâng cao, ô nhập số lượng bàn phím, trì hoãn luồng đặt hàng & đổi nhanh trạng thái Banner (Buổi 12) - [MỚI]
+
+- **Nâng cấp thẻ ProductCard tiện lợi**:
+  - Tách biệt hành vi click thẻ: Click vào vùng trống của thẻ sản phẩm sẽ xem chi tiết; tích hợp 2 nút hành động trực tiếp "Giỏ hàng" và "Mua ngay" mà không gây xung đột định tuyến nhờ `e.stopPropagation()`.
+  - Bộ đệm đăng nhập tự động: Nếu khách hàng chưa đăng nhập, thao tác thêm giỏ/mua nhanh được lưu tạm trong `localStorage`. Sau khi đăng nhập thành công, hệ thống tự động hoàn tất tác vụ (thêm vào giỏ hoặc chuyển thẳng đến trang đặt hàng `/checkout`).
+- **Cập nhật thông tin khách hàng từ xa**:
+  - Bổ sung Endpoint PUT `api/customer/update/{id}` cho phép chỉnh sửa thông tin tài khoản (Họ tên, Điện thoại, Địa chỉ, Mật khẩu mới) từ giao diện frontend.
+- **Giới hạn kho và Nhập số lượng trực tiếp**:
+  - Ngăn chặn tuyệt đối việc đặt mua vượt quá hàng tồn kho trong chi tiết sản phẩm và giỏ hàng.
+  - Thay thế số lượng giỏ hàng tĩnh bằng ô nhập số (`input type="number"`), hỗ trợ gõ trực tiếp từ bàn phím kết hợp giữ nguyên hai nút tăng giảm `+`/`-`.
+- **Trang Đặt hàng 2 cột & Trì hoãn ghi CSDL**:
+  - Giao diện Checkout mới dạng 2 cột: Cột trái nhập thông tin giao nhận hàng; Cột phải tóm tắt chi tiết các sản phẩm kèm hình ảnh, số lượng và tổng thanh toán.
+  - Trì hoãn tạo đơn hàng ở database: Nhấp xác nhận giao hàng sẽ không ghi vào CSDL ngay, thông tin được lưu tạm trong `sessionStorage`. Đơn hàng chỉ thực sự được tạo và trừ kho khi khách hàng xác nhận & thanh toán thành công tại trang `/payment`.
+- **Thay đổi nhanh trạng thái hiển thị Banner**:
+  - Tích hợp thêm Action POST `ToggleStatus` trong `BannersController.cs` và Ajax Fetch trong `Banners/Index.cshtml`.
+  - Người điều hành chỉ cần click trực tiếp vào nhãn trạng thái "Hiển thị" hoặc "Ẩn" để bật tắt hiển thị slide mà không phải vào trang sửa.
+
 ---
 
 ## HƯỚNG DẪN CÀI ĐẶT VÀ KHỞI CHẠY
@@ -203,6 +230,8 @@ Mở file `CMS.Backend/appsettings.json` và điều chỉnh chuỗi kết nối
 | **Buổi 7** | Kết nối Frontend ReactJS với Backend ASP.NET Core Web API. | **Đã hoàn thành** | **Cấu hình CORS trên Backend, thiết lập Axios Client tập trung (`axiosClient.js`), xây dựng component hiển thị danh mục sản phẩm (`CategoryProductList.jsx`). Tự thực hiện bài tập mở rộng kết nối API danh sách sản phẩm (`ProductList.jsx` hiển thị Grid Card, định dạng VND) và tin tức (`PostList.jsx` hiển thị bài viết, định dạng ngày vi-VN).** |
 | **Buổi 8** | Hoàn thiện trang cá nhân, xếp hạng VIP động (chỉ mới làm ở frontend), luồng đặt hàng thật, tách CSS và tối ưu hóa UI/UX. | **Đã hoàn thành** | **Tách biệt trang danh sách sản phẩm độc lập (ProductView.jsx) và trang Bài viết chuyên biệt (BlogView.jsx) kèm bộ lọc chuyên mục bài viết (BlogCategoryList.jsx) có phân trang. Tải thông tin tài khoản và tính hạng VIP động ở Frontend. Ràng buộc bảo mật đăng nhập giỏ hàng/thanh toán. Gửi hóa đơn lên Backend thực hiện Database Transaction trừ tồn kho. Tách toàn bộ CSS nhúng sang thư mục `src/assets/css`.** |
 | **Buổi 9** | Nâng cấp hệ thống SEO Slug và cấu trúc dữ liệu cho thực thể sản phẩm (Product). | **Đã hoàn thành** | **Tích hợp SlugHelper tự sinh URL thân thiện tiếng Việt không dấu, ràng buộc Unique Index trên database SQL Server. Xây dựng API và client service tải sản phẩm theo Slug, nâng cấp ProductCard và ProductDetailView sang định tuyến SEO.** |
+| **Buổi 10** | Tích hợp Banner Carousel động, khóa danh mục hệ thống & Sửa lỗi cuộn Sidebar. | **Đã hoàn thành** | **Tạo bảng Banner, ApiBannerController, CRUD Banner Admin Dashboard upload ảnh và xóa tệp vật lý cũ, slider động HeroBanner. Khóa cứng danh mục 7 & 13. Sửa lỗi Sidebar cuộn.** |
+| **Buổi 11** | Tái cấu trúc SPA với React Router DOM, sửa lỗi cập nhật bài viết & Căn giữa Header. | **Đã hoàn thành** | **Tích hợp BrowserRouter/Link thay thế custom navigate, sửa tham số IFormFile? cho PostController, cân bằng flex Header căn giữa menu.** |
 ---
 
 _Dự án được thực hiện bởi sinh viên Vũ Hoàng Chính - CCQ2211J._

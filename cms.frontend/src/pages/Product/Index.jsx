@@ -7,6 +7,8 @@ import HeroBanner from '../../components/HeroBanner';
 import productService from '../../services/productService';
 import categoryProductService from '../../services/categoryProductService';
 
+import IsLoading from '../../components/IsLoading';
+
 // Import css
 import '../../assets/css/ProductView.css';
 
@@ -15,7 +17,7 @@ const BASE_URL = "https://localhost:7291"; // Cấu hình lấy ảnh từ wwwro
 export const formatPrice = (price) =>
     new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
 
-const ProductView = ({ params, navigate }) => {
+const ProductView = ({ params, navigate, addToCart }) => {
     // --- Khai báo các State quản lý dữ liệu ---
     const [products, setProducts] = useState([]);          // Mảng chứa danh sách sản phẩm hiển thị
     const [categories, setCategories] = useState([]);      // Mảng chứa danh mục [{id: 'all', name: 'Tất cả'}, {id: 1, name: 'Giày'}, ...]
@@ -35,7 +37,8 @@ const ProductView = ({ params, navigate }) => {
     // State quản lý phân trang
     const [pageNumber, setPageNumber] = useState(1);       // Trang hiện tại
     const [totalPages, setTotalPages] = useState(1);       // Tổng số trang do API tính toán trả về
-    const [loading, setLoading] = useState(false);         // Trạng thái chờ tải dữ liệu
+    const [loading, setLoading] = useState(true);          // Trạng thái chờ tải dữ liệu
+    const [hasError, setHasError] = useState(false);       // Trạng thái lỗi kết nối API
 
     const pageSize = 20; // Yêu cầu: Hiển thị tối đa 20 sản phẩm trên 1 trang
 
@@ -80,11 +83,13 @@ const ProductView = ({ params, navigate }) => {
                 // Do backend trả về cấu trúc phân trang: { totalItems, totalPages, pageNumber, pageSize, data: [...] }
                 setProducts(result.data || []);
                 setTotalPages(result.totalPages || 1);
+                setHasError(false);
                 setLoading(false);
             })
             .catch(err => {
                 console.error("Lỗi khi tải danh sách sản phẩm:", err);
                 setProducts([]);
+                setHasError(true);
                 setLoading(false);
             });
     }, [pageNumber, activeCategoryId, categories]); // Lắng nghe sự thay đổi của cả số trang lẫn bộ lọc danh mục
@@ -130,7 +135,7 @@ const ProductView = ({ params, navigate }) => {
             <HeroBanner
                 tag="Bộ sưu tập mới 2026"
                 title={<>ELEVATE YOUR <span>GAME</span></>}
-                desc="Trang bị những sản phẩm bóng rổ đỉnh cao nhất. Từ đôi giày hiệu năng cao đến trang phục chuyên nghiệp, Astra Hoops đồng hành cùng bạn trên mọi mặt sân."
+                desc="Trang bị những sản phẩm bóng rổ đỉnh cao nhất. Từ đôi giày hiệu năng cao đến trang phục chuyên nghiệp, Chinh Hoops đồng hành cùng bạn trên mọi mặt sân."
                 image="src/assets/images/hero_basketball_1778727871576.png"
                 buttonText="Mua Sắm Ngay"
                 onButtonClick={() => document.getElementById('products-sec').scrollIntoView({ behavior: 'smooth' })}
@@ -164,7 +169,11 @@ const ProductView = ({ params, navigate }) => {
 
                 {/* Khối hiển thị dữ liệu hoặc thông báo Loading */}
                 {loading ? (
-                    <div className="loading-text">Đang tải sản phẩm từ hệ thống...</div>
+                    <IsLoading message="Đang tải sản phẩm từ hệ thống..." />
+                ) : hasError ? (
+                    <div className="loading-text" style={{ color: '#ef4444' }}>
+                        <i className="fa-solid fa-circle-exclamation"></i> Lỗi kết nối đến máy chủ. Vui lòng kiểm tra đường truyền!
+                    </div>
                 ) : products.length === 0 ? (
                     <div className="loading-text">Danh mục này hiện tại chưa có sản phẩm nào.</div>
                 ) : (
@@ -185,6 +194,7 @@ const ProductView = ({ params, navigate }) => {
                                         key={product.id}
                                         product={processedProduct}
                                         navigate={navigate}
+                                        addToCart={addToCart}
                                     />
                                 );
                             })}

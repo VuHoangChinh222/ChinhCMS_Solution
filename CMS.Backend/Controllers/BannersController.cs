@@ -228,5 +228,24 @@ namespace CMS.Backend.Controllers
             }
             return RedirectToAction("Index");
         }
+
+        // POST: Banners/ToggleStatus/id
+        [HttpPost]
+        public IActionResult ToggleStatus(int id)
+        {
+            var banner = _context.Banners.Find(id);
+            if (banner == null)
+            {
+                return NotFound(new { message = "Không tìm thấy banner này." });
+            }
+
+            // Đổi trạng thái: 1 -> 0 hoặc 0 -> 1
+            banner.Status = banner.Status == 1 ? 0 : 1;
+
+            _context.Banners.Update(banner);
+            _context.SaveChanges();
+
+            return Json(new { success = true, newStatus = banner.Status });
+        }
     }
 }

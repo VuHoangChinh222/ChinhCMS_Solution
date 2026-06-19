@@ -129,7 +129,8 @@ namespace CMS.Backend.Controllers
                         p.Id,
                         p.Title,
                         p.ImageUrl,
-                        CreatedDate = p.CreatedDate
+                        CreatedDate = p.CreatedDate,
+                        CategoryName = p.Category != null ? p.Category.Name : "Không xác định"
                     })
                     .ToList();
 

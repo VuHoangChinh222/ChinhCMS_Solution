@@ -10,18 +10,18 @@ import '../../assets/css/AboutView.css';
 
 const AboutView = () => (
   <div className="page-container page-transition">
-    <h2 className="page-title">Về <span>Astra Hoops & Tác Giả</span></h2>
+    <h2 className="page-title">Về <span>Chinh Hoops & Tác Giả</span></h2>
     <div className="about-content-wrapper">
       {/* Introduction text */}
       <div className="about-text-column">
         <p className="about-text-lead">
-          Được thành lập vào năm 2026, <strong>Astra Hoops</strong> ra đời với sứ mệnh mang đến cho những người yêu bóng rổ tại Việt Nam những trang bị thi đấu chất lượng nhất, phong cách nhất và hiện đại nhất.
+          Được thành lập vào năm 2026, <strong>Chinh Hoops</strong> ra đời với sứ mệnh mang đến cho những người yêu bóng rổ tại Việt Nam những trang bị thi đấu chất lượng nhất, phong cách nhất và hiện đại nhất.
         </p>
         <p className="about-text-para">
           Chúng tôi không chỉ là một cửa hàng bán lẻ, chúng tôi là một phần của cộng đồng bóng rổ. Từ những đôi giày mang công nghệ bứt phá, những bộ quần áo tối ưu hiệu năng đến những phụ kiện nhỏ nhất, tất cả đều được chúng tôi tuyển chọn kỹ lưỡng.
         </p>
         <p className="about-text-para-last">
-          Với tầm nhìn trở thành thương hiệu đồ thể thao bóng rổ số 1 Đông Nam Á, Astra Hoops cam kết 100% hàng chính hãng, dịch vụ chăm sóc khách hàng chuyên nghiệp và luôn đồng hành cùng đam mê của bạn trên mọi mặt sân.
+          Với tầm nhìn trở thành thương hiệu đồ thể thao bóng rổ số 1 Đông Nam Á, Chinh Hoops cam kết 100% hàng chính hãng, dịch vụ chăm sóc khách hàng chuyên nghiệp và luôn đồng hành cùng đam mê của bạn trên mọi mặt sân.
         </p>
 
         <div className="project-info-box">

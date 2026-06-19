@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react';
 import { getCookie, eraseCookie } from '../../utils/cookieHelper';
 import orderService from '../../services/orderService';
+import IsLoading from '../../components/IsLoading';
 import '../../assets/css/UserInfoView.css';
 
 export const formatPrice = (price) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
@@ -15,6 +16,7 @@ const UserInfoView = ({ navigate }) => {
   const [customer, setCustomer] = useState(null);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
   const [totalSpent, setTotalSpent] = useState(0);
 
   // 1. Kiểm tra trạng thái đăng nhập từ Cookie và nạp lịch sử giao dịch
@@ -33,14 +35,16 @@ const UserInfoView = ({ navigate }) => {
         if (data && Array.isArray(data)) {
           setOrders(data);
 
-          // Tính tổng tích lũy từ các đơn hàng để làm cơ sở phân hạng VIP động
-          const sum = data.reduce((acc, order) => acc + (order.totalAmount || 0), 0);
+          // Tính tổng tích lũy từ các đơn hàng để làm cơ sở phân hạng VIP động (chỉ nhưng đơn hàng đã hoàn thành thì mới tính)
+          const sum = data.reduce((acc, order) => acc + (order.status === 2 ? order.totalAmount : 0), 0);
           setTotalSpent(sum);
         }
+        setHasError(false);
         setLoading(false);
       })
       .catch(err => {
         console.error("Lỗi khi tải lịch sử đơn hàng:", err);
+        setHasError(true);
         setLoading(false);
       });
   }, [navigate]);
@@ -134,8 +138,11 @@ const UserInfoView = ({ navigate }) => {
           </h3>
 
           {loading ? (
-            <div className="user-profile-loading">
-              <i className="fa-solid fa-spinner fa-spin user-profile-loading-icon"></i> Đang tải dữ liệu đơn hàng...
+            <IsLoading message="Đang tải dữ liệu đơn hàng..." />
+          ) : hasError ? (
+            <div className="empty-state user-profile-empty" style={{ color: '#ef4444' }}>
+              <i className="fa-solid fa-circle-exclamation" style={{ fontSize: '2rem', marginBottom: '0.5rem' }}></i>
+              <p>Lỗi kết nối đến máy chủ. Vui lòng kiểm tra đường truyền!</p>
             </div>
           ) : orders.length === 0 ? (
             <div className="empty-state user-profile-empty">

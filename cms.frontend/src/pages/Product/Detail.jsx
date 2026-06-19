@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react';
 import productService from '../../services/productService';
 import { getCookie } from '../../utils/cookieHelper';
+import IsLoading from '../../components/IsLoading';
 import '../../assets/css/ProductDetailView.css';
 
 // Cấu hình URL Backend để lấy hình ảnh từ wwwroot/uploads
@@ -20,6 +21,7 @@ const ProductDetailView = ({ params, addToCart, navigate }) => {
   const [product, setProduct] = useState(null);
   const [size, setSize] = useState('');
   const [qty, setQty] = useState(1);
+  const [stockWarning, setStockWarning] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -35,6 +37,8 @@ const ProductDetailView = ({ params, addToCart, navigate }) => {
     fetchPromise
       .then(data => {
         setProduct(data);
+        setQty(1);
+        setStockWarning(false);
         setLoading(false);
         // Chọn size mặc định
         const category = data.categoryName || '';
@@ -54,12 +58,7 @@ const ProductDetailView = ({ params, addToCart, navigate }) => {
   }, [productSlug, productId]);
 
   if (loading) {
-    return (
-      <div className="detail-loading-container">
-        <i className="fa-solid fa-spinner fa-spin detail-loading-spinner"></i>
-        <p>Đang tải chi tiết sản phẩm...</p>
-      </div>
-    );
+    return <IsLoading message="Đang tải chi tiết sản phẩm..." />;
   }
 
   if (error || !product) {
@@ -170,12 +169,23 @@ const ProductDetailView = ({ params, addToCart, navigate }) => {
               max={product.stockQuantity || 1}
               disabled={product.stockQuantity <= 0}
               onChange={(e) => {
-                const val = parseInt(e.target.value) || 1;
-                // Không cho nhập quá số lượng trong kho
+                const val = parseInt(e.target.value);
+                if (isNaN(val)) {
+                  setQty('');
+                  setStockWarning(false);
+                  return;
+                }
                 if (val > product.stockQuantity) {
                   setQty(product.stockQuantity);
+                  setStockWarning(true);
                 } else {
                   setQty(Math.max(1, val));
+                  setStockWarning(false);
+                }
+              }}
+              onBlur={() => {
+                if (qty === '' || qty < 1) {
+                  setQty(1);
                 }
               }}
             />
@@ -189,6 +199,11 @@ const ProductDetailView = ({ params, addToCart, navigate }) => {
               </button>
             )}
           </div>
+          {stockWarning && (
+            <div className="stock-warning-text" style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '0.5rem', fontWeight: '500' }}>
+              <i className="fa-solid fa-circle-exclamation"></i> Số lượng đặt mua đã được tự động giới hạn ở mức tối đa tồn kho ({product.stockQuantity} sản phẩm).
+            </div>
+          )}
         </div>
       </div>
     </div>

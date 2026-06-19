@@ -7,7 +7,7 @@ const Header = ({ currentView, cartCount }) => {
   return (
     <header className="header">
       <Link to="/" className="logo" onClick={() => setIsMobileMenuOpen(false)} style={{ textDecoration: 'none', color: 'inherit' }}>
-        <i className="fa-solid fa-basketball"></i> ASTRA <span>HOOPS</span>
+        <i className="fa-solid fa-basketball"></i> CHINH <span>HOOPS</span>
       </Link>
       <ul className={`nav-links ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
         <li><Link className={currentView.name === 'home' ? 'active' : ''} to="/" onClick={() => setIsMobileMenuOpen(false)}>Trang chủ</Link></li>

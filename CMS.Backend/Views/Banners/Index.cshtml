@@ -77,11 +77,15 @@
                                     <td class="py-3 text-center">
                                         @if (item.Status == 1)
                                         {
-                                            <span class="badge bg-success rounded-pill px-3 py-2"><i class="bi bi-eye-fill me-1"></i> Hiển thị</span>
+                                            <span class="badge bg-success rounded-pill px-3 py-2 toggle-status" data-id="@item.Id" style="cursor: pointer;" title="Nhấn để chuyển sang Ẩn">
+                                                <i class="bi bi-eye-fill me-1"></i> Hiển thị
+                                            </span>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-secondary rounded-pill px-3 py-2"><i class="bi bi-eye-slash-fill me-1"></i> Ẩn</span>
+                                            <span class="badge bg-secondary rounded-pill px-3 py-2 toggle-status" data-id="@item.Id" style="cursor: pointer;" title="Nhấn để chuyển sang Hiển thị">
+                                                <i class="bi bi-eye-slash-fill me-1"></i> Ẩn
+                                            </span>
                                         }
                                     </td>
                                     <td class="pe-4 py-3 text-end">
@@ -131,3 +135,60 @@
         }
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleButtons = document.querySelectorAll(".toggle-status");
+            
+            toggleButtons.forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const id = this.getAttribute("data-id");
+                    const currentBtn = this;
+                    
+                    // Hiển thị hiệu ứng mờ và tắt click tạm thời
+                    currentBtn.style.opacity = "0.5";
+                    currentBtn.style.pointerEvents = "none";
+                    
+                    // Gửi request POST đến action ToggleStatus
+                    fetch(`/Banners/ToggleStatus/${id}`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Không thể kết nối hoặc cập nhật trạng thái.");
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // Cập nhật DOM trực quan ngay lập tức mà không cần tải lại trang
+                            if (data.newStatus === 1) {
+                                currentBtn.className = "badge bg-success rounded-pill px-3 py-2 toggle-status";
+                                currentBtn.innerHTML = '<i class="bi bi-eye-fill me-1"></i> Hiển thị';
+                                currentBtn.setAttribute("title", "Nhấn để chuyển sang Ẩn");
+                            } else {
+                                currentBtn.className = "badge bg-secondary rounded-pill px-3 py-2 toggle-status";
+                                currentBtn.innerHTML = '<i class="bi bi-eye-slash-fill me-1"></i> Ẩn';
+                                currentBtn.setAttribute("title", "Nhấn để chuyển sang Hiển thị");
+                            }
+                        } else {
+                            alert("Có lỗi xảy ra, vui lòng thử lại.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Lỗi:", error);
+                        alert("Có lỗi xảy ra khi cập nhật trạng thái.");
+                    })
+                    .finally(() => {
+                        currentBtn.style.opacity = "1";
+                        currentBtn.style.pointerEvents = "auto";
+                    });
+                });
+            });
+        });
+    </script>
+}

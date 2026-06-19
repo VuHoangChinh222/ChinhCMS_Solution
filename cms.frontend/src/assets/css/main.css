@@ -96,6 +96,7 @@ button {
     background-color: rgba(15, 23, 42, 0.95);
     backdrop-filter: blur(10px);
     position: sticky;
+    /* => Nó sẽ dính chặt trên đầu khi cuộn chuột lên */
     top: 0;
     z-index: 100;
     border-bottom: 1px solid var(--border-color);
@@ -403,7 +404,7 @@ button {
 
 .product-action {
     position: absolute;
-    bottom: -50px;
+    bottom: -70px;
     left: 0;
     width: 100%;
     background-color: rgba(15, 23, 42, 0.9);

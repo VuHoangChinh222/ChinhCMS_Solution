@@ -55,7 +55,7 @@ namespace CMS.Backend.Controllers
             int totalOrders = _context.Orders.Count();
             
             // Tính tổng doanh thu tích lũy bằng cách cộng dồn (Sum) tích của: Số lượng * Đơn giá của từng chi tiết hóa đơn
-            decimal totalRevenueDecimal = _context.OrderDetails.Sum(od => od.Quantity * od.UnitPrice);
+            decimal totalRevenueDecimal = _context.OrderDetails.Where(od => od.Order.Status == 2).Sum(od => od.Quantity * od.UnitPrice);
 
             // Đưa các dữ liệu thống kê cơ bản này vào ViewBag để View bên ngoài có thể lấy ra hiển thị
             ViewBag.TotalCustomers = totalCustomers;
@@ -66,10 +66,10 @@ namespace CMS.Backend.Controllers
             // Mốc bắt đầu: Lấy ngày hôm nay lùi lại 6 ngày (tổng cộng 7 ngày bao gồm cả hôm nay)
             var startDateDaily = DateTime.Today.AddDays(-6);
             
-            // Truy vấn lấy dữ liệu thô: Tải trước bảng Orders liên kết bằng Include, lọc các đơn hàng từ ngày mốc trở lại đây
+            // Truy vấn lấy dữ liệu thô: Tải trước bảng Orders liên kết bằng Include, lọc các đơn hàng có trạng thái đã hoàn thành (2) trong vòng 7 ngày qua
             var dailyRaw = _context.OrderDetails
                 .Include(od => od.Order)
-                .Where(od => od.Order.OrderDate >= startDateDaily)
+                .Where(od => od.Order.Status == 2)
                 .Select(od => new { od.Order.OrderDate, od.Quantity, od.UnitPrice })
                 .ToList(); // Tải dữ liệu về RAM để tránh các lỗi dịch cú pháp ngày tháng phức tạp của SQL Server
 
@@ -95,10 +95,10 @@ namespace CMS.Backend.Controllers
             // Mốc bắt đầu: Lấy ngày hôm nay lùi lại 27 ngày
             var startDateWeekly = DateTime.Today.AddDays(-27);
             
-            // Lọc dữ liệu thô hóa đơn trong vòng 28 ngày qua
+            // Lọc dữ liệu thô hóa đơn trong vòng 28 ngày qua có trạng thái đã hoàn thành (2)
             var weeklyRaw = _context.OrderDetails
             .Include(od => od.Order)
-            .Where(od => od.Order.OrderDate >= startDateWeekly)
+            .Where(od => od.Order.OrderDate >= startDateWeekly && od.Order.Status == 2)
             .Select(od => new { od.Order.OrderDate, od.Quantity, od.UnitPrice })
             .ToList();
 
@@ -129,7 +129,7 @@ namespace CMS.Backend.Controllers
             // Lọc toàn bộ hóa đơn phát sinh trong 6 tháng qua
             var monthlyRaw = _context.OrderDetails
                 .Include(od => od.Order)
-                .Where(od => od.Order.OrderDate >= startDateMonthly)
+                .Where(od => od.Order.OrderDate >= startDateMonthly && od.Order.Status == 2)
                 .Select(od => new { od.Order.OrderDate, od.Quantity, od.UnitPrice })
                 .ToList();
 
@@ -149,9 +149,10 @@ namespace CMS.Backend.Controllers
             ViewBag.MonthlyLabels = string.Join(",", monthlyRevenue.Select(m => $"\"{m.Label}\""));
             ViewBag.MonthlyValues = string.Join(",", monthlyRevenue.Select(m => m.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)));
 
-            // 5. TÌM TOP 4 SẢN PHẨM BÁN CHẠY NHẤT HỆ THỐNG
+            // 5. TÌM TOP 4 SẢN PHẨM BÁN CHẠY NHẤT HỆ THỐNG (chỉ tính theo đơn hàng đã hoàn thành)
             // Gom nhóm (GroupBy) bảng chi tiết đơn hàng theo các thuộc tính của Sản phẩm (ID, Tên, Giá, Ảnh minh họa)
             var topProducts = _context.OrderDetails
+            .Where(od => od.Order.Status == 2)
             .GroupBy(od => new { od.ProductId, od.Product.Name, od.Product.Price, od.Product.ImageUrl })
             .Select(g => new TopProductViewModel
             {

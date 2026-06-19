@@ -8,14 +8,16 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import { getCookie } from './utils/cookieHelper';
 import HomeView from './pages/Home/Index';
 import ProductView from './pages/Product/Index';
 import ProductDetailView from './pages/Product/Detail';
 import CartView from './pages/Cart/Index';
-import CheckoutView from './pages/Checkout/CheckoutView';
+import CheckoutView from './pages/Checkout/Index';
 import PaymentView from './pages/Checkout/PaymentView';
-import SearchView from './pages/SearchView';
-import LoginView from './pages/Login/LoginView';
+import SearchView from './pages/Search/Index';
+import LoginView from './pages/Login/Index';
+import RegisterView from './pages/Register/Index';
 import UserInfoView from './pages/User/Index';
 import AboutView from './pages/About/Index';
 import PostDetailView from './pages/Blog/Detail';
@@ -30,6 +32,46 @@ const AppContent = ({ cart, addToCart, updateQty, removeFromCart, clearCart }) =
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
+
+  // Xử lý các sản phẩm chờ mua/thêm vào giỏ sau khi đăng nhập thành công
+  useEffect(() => {
+    const customer = getCookie('customer');
+    if (!customer) return;
+
+    // 1. Kiểm tra sản phẩm chờ thêm vào giỏ hàng
+    const pendingCart = localStorage.getItem('pending_cart_item');
+    if (pendingCart) {
+      try {
+        const item = JSON.parse(pendingCart);
+        if (item && item.product) {
+          addToCart(item.product, item.size, item.qty);
+          localStorage.removeItem('pending_cart_item');
+          alert(`Đã tự động thêm sản phẩm "${item.product.name}" vào giỏ hàng của bạn!`);
+          routerNavigate('/cart');
+        }
+      } catch (e) {
+        console.error("Lỗi parse pending_cart_item:", e);
+        localStorage.removeItem('pending_cart_item');
+      }
+      return;
+    }
+
+    // 2. Kiểm tra sản phẩm chờ "Mua ngay"
+    const pendingBuy = localStorage.getItem('pending_buy_now');
+    if (pendingBuy) {
+      try {
+        const item = JSON.parse(pendingBuy);
+        if (item && item.product) {
+          addToCart(item.product, item.size, item.qty);
+          localStorage.removeItem('pending_buy_now');
+          routerNavigate('/checkout');
+        }
+      } catch (e) {
+        console.error("Lỗi parse pending_buy_now:", e);
+        localStorage.removeItem('pending_buy_now');
+      }
+    }
+  }, [routerNavigate]);
 
   // Bộ chuyển đổi điều hướng tương thích ngược với thiết kế `navigate('viewName', params)` cũ của dự án
   const navigate = (name, params = {}) => {
@@ -91,10 +133,10 @@ const AppContent = ({ cart, addToCart, updateQty, removeFromCart, clearCart }) =
       {/* Khu vực phân phối nội dung động dựa vào URL */}
       <main>
         <Routes>
-          <Route path="/" element={<HomeView navigate={navigate} />} />
-          <Route path="/home" element={<HomeView navigate={navigate} />} />
+          <Route path="/" element={<HomeView navigate={navigate} addToCart={addToCart} />} />
+          <Route path="/home" element={<HomeView navigate={navigate} addToCart={addToCart} />} />
 
-          <Route path="/products" element={<ProductsRoute navigate={navigate} />} />
+          <Route path="/products" element={<ProductsRoute navigate={navigate} addToCart={addToCart} />} />
           <Route path="/product/:id" element={<ProductDetailRoute navigate={navigate} addToCart={addToCart} />} />
 
           <Route path="/blog" element={<BlogView navigate={navigate} />} />
@@ -102,10 +144,11 @@ const AppContent = ({ cart, addToCart, updateQty, removeFromCart, clearCart }) =
 
           <Route path="/cart" element={<CartView cart={cart} updateQty={updateQty} removeFromCart={removeFromCart} navigate={navigate} />} />
           <Route path="/checkout" element={<CheckoutView cart={cart} clearCart={clearCart} navigate={navigate} />} />
-          <Route path="/payment" element={<PaymentView navigate={navigate} clearCart={clearCart} />} />
+          <Route path="/payment" element={<PaymentView navigate={navigate} clearCart={clearCart} cart={cart} />} />
 
-          <Route path="/search" element={<SearchView navigate={navigate} />} />
-          <Route path="/login" element={<LoginView navigate={navigate} />} />
+          <Route path="/search" element={<SearchView navigate={navigate} addToCart={addToCart} />} />
+          <Route path="/login" element={<LoginView />} />
+          <Route path="/register" element={<RegisterView />} />
           <Route path="/user" element={<UserInfoView navigate={navigate} />} />
           <Route path="/about" element={<AboutView />} />
 
@@ -135,13 +178,13 @@ const AppContent = ({ cart, addToCart, updateQty, removeFromCart, clearCart }) =
 };
 
 // Route wrapper cho trang danh sách sản phẩm để trích xuất CategoryId từ Query String
-const ProductsRoute = ({ navigate }) => {
+const ProductsRoute = ({ navigate, addToCart }) => {
   const [searchParams] = useSearchParams();
   const categoryIdVal = searchParams.get('categoryId');
   // Chuyển đổi định dạng ID sang số nguyên nếu hợp lệ
   const categoryId = categoryIdVal ? (isNaN(Number(categoryIdVal)) ? categoryIdVal : Number(categoryIdVal)) : undefined;
 
-  return <ProductView params={{ categoryId }} navigate={navigate} />;
+  return <ProductView params={{ categoryId }} navigate={navigate} addToCart={addToCart} />;
 };
 
 // Route wrapper cho trang chi tiết sản phẩm
@@ -166,15 +209,37 @@ const App = () => {
   const addToCart = (product, size, qty) => {
     const existing = cart.find(item => item.id === product.id && item.size === size);
     if (existing) {
-      setCart(cart.map(item => item.cartId === existing.cartId ? { ...item, qty: item.qty + qty } : item));
+      const newQty = existing.qty + qty;
+      if (newQty > product.stockQuantity) {
+        alert(`Số lượng đặt mua vượt quá số lượng hàng tồn kho của sản phẩm (${product.stockQuantity} sản phẩm)!`);
+        setCart(cart.map(item => item.cartId === existing.cartId ? { ...item, qty: product.stockQuantity } : item));
+      } else {
+        setCart(cart.map(item => item.cartId === existing.cartId ? { ...item, qty: newQty } : item));
+      }
     } else {
       setCart([...cart, { ...product, size, qty, cartId: Date.now() + Math.random() }]);
     }
   };
 
   const updateQty = (cartId, newQty) => {
-    if (newQty < 1) removeFromCart(cartId);
-    else setCart(cart.map(item => item.cartId === cartId ? { ...item, qty: newQty } : item));
+    if (newQty === '') {
+      setCart(cart.map(item => item.cartId === cartId ? { ...item, qty: '' } : item));
+      return;
+    }
+    if (newQty < 1) {
+      removeFromCart(cartId);
+      return;
+    }
+    setCart(cart.map(item => {
+      if (item.cartId === cartId) {
+        if (newQty > item.stockQuantity) {
+          alert(`Số lượng đặt mua vượt quá số lượng hàng tồn kho của sản phẩm (${item.stockQuantity} sản phẩm)!`);
+          return { ...item, qty: item.stockQuantity };
+        }
+        return { ...item, qty: newQty };
+      }
+      return item;
+    }));
   };
 
   const removeFromCart = (cartId) => setCart(cart.filter(item => item.cartId !== cartId));

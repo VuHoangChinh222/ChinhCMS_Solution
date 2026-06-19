@@ -5,24 +5,28 @@
  */
 
 import { useState, useEffect } from 'react';
-import ProductCard from '../components/ProductCard';
-import productService from '../services/productService';
-import '../assets/css/SearchView.css';
+import ProductCard from '../../components/ProductCard';
+import productService from '../../services/productService';
+import IsLoading from '../../components/IsLoading';
+import '../../assets/css/SearchView.css';
 
-const SearchView = ({ navigate }) => {
+const SearchView = ({ navigate, addToCart }) => {
   const [query, setQuery] = useState('');
   const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
   // 1. Tải toàn bộ sản phẩm từ Database để chuẩn bị cho việc tìm kiếm tức thì (Instant Search)
   useEffect(() => {
     productService.getAllProducts(1, 100)
       .then(res => {
         setAllProducts(res.data || []);
+        setHasError(false);
         setLoading(false);
       })
       .catch(err => {
         console.error("Lỗi tải danh sách sản phẩm để tìm kiếm:", err);
+        setHasError(true);
         setLoading(false);
       });
   }, []);
@@ -37,7 +41,7 @@ const SearchView = ({ navigate }) => {
   return (
     <div className="page-container page-transition">
       <h2 className="page-title">Tìm kiếm <span>Sản phẩm</span></h2>
-      
+
       <div className="search-bar-container">
         <input
           type="text"
@@ -51,8 +55,11 @@ const SearchView = ({ navigate }) => {
       </div>
 
       {loading ? (
-        <div className="search-loading-box">
-          <i className="fa-solid fa-spinner fa-spin search-spinner"></i> Đang nạp cơ sở dữ liệu tìm kiếm...
+        <IsLoading message="Đang nạp cơ sở dữ liệu tìm kiếm..." />
+      ) : hasError ? (
+        <div className="search-empty-state" style={{ color: '#ef4444' }}>
+          <i className="fa-solid fa-circle-exclamation" style={{ fontSize: '2.5rem', marginBottom: '1rem' }}></i>
+          <p className="search-result-stats">Lỗi kết nối đến máy chủ. Vui lòng kiểm tra đường truyền!</p>
         </div>
       ) : (
         <>
@@ -64,7 +71,7 @@ const SearchView = ({ navigate }) => {
               </p>
               <div className="products-grid-5-columns">
                 {results.map(product => (
-                  <ProductCard key={product.id} product={product} navigate={navigate} />
+                  <ProductCard key={product.id} product={product} navigate={navigate} addToCart={addToCart} />
                 ))}
               </div>
             </div>

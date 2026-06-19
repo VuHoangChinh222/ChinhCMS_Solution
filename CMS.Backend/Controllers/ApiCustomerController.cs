@@ -171,5 +171,83 @@ namespace CMS.Backend.Controllers
                 return StatusCode(500, new { message = "Lỗi hệ thống khi đăng nhập", error = ex.Message });
             }
         }
+
+        // DTO đại diện cho dữ liệu gửi lên khi cập nhật thông tin
+        public class UpdateRequest
+        {
+            public string FullName { get; set; }
+            public string? Phone { get; set; }
+            public string? Address { get; set; }
+            public string? Password { get; set; }
+        }
+
+        // ==========================================
+        // 3. API CẬP NHẬT THÔNG TIN KHÁCH HÀNG
+        // ==========================================
+        // PUT: api/customer/update/{id}
+        [HttpPut("update/{id}")]
+        public IActionResult Update(int id, [FromBody] UpdateRequest request)
+        {
+            if (request == null)
+            {
+                return BadRequest(new { message = "Dữ liệu yêu cầu không hợp lệ" });
+            }
+
+            try
+            {
+                // Tìm kiếm khách hàng theo ID
+                var customer = _context.Customers.Find(id);
+                if (customer == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy thông tin khách hàng" });
+                }
+
+                // Kiểm tra họ tên không để trống
+                if (string.IsNullOrWhiteSpace(request.FullName))
+                {
+                    return BadRequest(new { message = "Họ và tên không được để trống" });
+                }
+
+                // Kiểm tra định dạng số điện thoại nếu được cung cấp
+                if (!string.IsNullOrWhiteSpace(request.Phone) && 
+                    !System.Text.RegularExpressions.Regex.IsMatch(request.Phone, @"^(0[3|5|7|8|9])+([0-9]{8})$"))
+                {
+                    return BadRequest(new { message = "Số điện thoại Việt Nam không hợp lệ" });
+                }
+
+                // Cập nhật thông tin cơ bản
+                customer.FullName = request.FullName.Trim();
+                customer.Phone = request.Phone?.Trim();
+                customer.Address = request.Address?.Trim();
+
+                // Cập nhật mật khẩu mới nếu được cung cấp
+                if (!string.IsNullOrWhiteSpace(request.Password))
+                {
+                    if (request.Password.Length < 6)
+                    {
+                        return BadRequest(new { message = "Mật khẩu mới phải chứa ít nhất 6 ký tự" });
+                    }
+                    customer.Password = PasswordHelper.HashPassword(request.Password);
+                }
+
+                _context.Entry(customer).State = EntityState.Modified;
+                _context.SaveChanges();
+
+                return Ok(new {
+                    message = "Cập nhật thông tin tài khoản thành công",
+                    customer = new {
+                        customer.Id,
+                        customer.FullName,
+                        customer.Email,
+                        customer.Phone,
+                        customer.Address
+                    }
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi hệ thống khi cập nhật thông tin khách hàng", error = ex.Message });
+            }
+        }
     }
 }

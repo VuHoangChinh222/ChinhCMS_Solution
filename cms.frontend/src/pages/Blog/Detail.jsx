@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import postService from '../../services/postService';
+import IsLoading from '../../components/IsLoading';
 
 // Import css
 import '../../assets/css/PostDetailView.css';
@@ -44,12 +45,7 @@ const PostDetailView = ({ id, navigate }) => {
 
     // 1. Trạng thái đang tải dữ liệu
     if (loading) {
-        return (
-            <div style={{ textAlign: 'center', padding: '10rem 2rem', color: 'var(--text-muted)' }}>
-                <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: '2rem', color: 'var(--accent)', marginBottom: '1rem' }}></i>
-                <p>Đang tải nội dung bài viết chi tiết...</p>
-            </div>
-        );
+        return <IsLoading message="Đang tải nội dung bài viết chi tiết..." />;
     }
 
     // 2. Trạng thái xảy ra lỗi (Không tìm thấy ID)
