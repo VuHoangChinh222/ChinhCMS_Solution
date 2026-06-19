@@ -235,4 +235,5 @@ Mở file `CMS.Backend/appsettings.json` và điều chỉnh chuỗi kết nối
 | **Buổi 12** | Tích hợp giỏ hàng nâng cao, ô nhập số lượng bàn phím, trì hoãn luồng đặt hàng & đổi nhanh trạng thái Banner. | **Đã hoàn thành** | **Thiết kế lại ProductCard với 2 nút Giỏ hàng/Mua ngay và điều hướng xem chi tiết khi click thẻ; tích hợp đệm localStorage tự thêm giỏ sau khi đăng nhập; cho phép gõ phím số lượng sản phẩm; chuyển trang Checkout thành 2 cột hiển thị tóm tắt đơn hàng và trì hoãn ghi database đến khi bấm thanh toán; thêm AJAX ToggleStatus đổi trạng thái hiển thị Banner.** |
 ---
 
+
 _Dự án được thực hiện bởi sinh viên Vũ Hoàng Chính - CCQ2211J._
