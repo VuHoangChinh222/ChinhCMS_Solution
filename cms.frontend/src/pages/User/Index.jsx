@@ -126,9 +126,14 @@ const UserInfoView = ({ navigate }) => {
               </span>
             </div>
           </div>
-          <button className="btn btn-outline user-profile-logout-btn" onClick={handleLogout}>
-            <i className="fa-solid fa-right-from-bracket"></i> Đăng xuất
-          </button>
+          <div className="user-profile-actions-wrapper">
+            <button className="user-profile-edit-btn" onClick={() => navigate('user-info')}>
+              <i className="fa-solid fa-user-pen"></i> Sửa thông tin
+            </button>
+            <button className="btn btn-outline user-profile-logout-btn" onClick={handleLogout}>
+              <i className="fa-solid fa-right-from-bracket"></i> Đăng xuất
+            </button>
+          </div>
         </div>
 
         {/* LỊCH SỬ MUA SẮM */}
@@ -177,7 +182,7 @@ const UserInfoView = ({ navigate }) => {
 
                     return (
                       <tr key={order.id}>
-                        <td><strong>#{order.id}</strong></td>
+                        <td><strong>{order.id}</strong></td>
                         <td>{new Date(order.orderDate).toLocaleString('vi-VN')}</td>
                         <td><strong className="user-profile-spent-val">{formatPrice(order.totalAmount)}</strong></td>
                         <td>{order.totalItems} sản phẩm</td>

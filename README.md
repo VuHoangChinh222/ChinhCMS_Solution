@@ -217,6 +217,19 @@ Dự án `ChinhCMS_Solution` được chia làm 3 dự án nhỏ bên trong:
   - Trang **Chính sách bảo mật** (`pages/PrivacyPolicy/Index.jsx`): Cam kết bảo mật, mã hóa dữ liệu BCrypt và cách thu thập/sử dụng thông tin khách hàng.
   - Trang **Hướng dẫn chọn size** (`pages/SizeGuide/Index.jsx`): Tích hợp bảng so sánh size giày (US, UK, EU, CM) và quần áo (S, M, L, XL, XXL) với các tab chuyển đổi mượt mà cùng hướng dẫn tự đo kích cỡ chi tiết.
   - Cập nhật định tuyến chuẩn React Router và liên kết đầy đủ ở chân trang `Footer.jsx`.
+- **Trang Cập nhật thông tin Khách hàng (UserInfo)**:
+  - Tạo trang chỉnh sửa thông tin cá nhân (`pages/User/UserInfo.jsx`): cho phép khách hàng tự cập nhật Họ tên, Địa chỉ Email (với kiểm tra định dạng regex), Số điện thoại, Địa chỉ nhận hàng và thay đổi Mật khẩu mới (tối thiểu 6 ký tự).
+  - Cập nhật DTO `UpdateRequest` và hành vi logic của PUT API `api/customer/update/{id}` trên C# Backend (`ApiCustomerController.cs`): Thêm trường Email, kiểm tra trùng lặp email với các tài khoản khác trên Database và định dạng hợp lệ trước khi lưu.
+  - Tự động lưu trữ thông tin mới vào Cookie `'customer'` để đồng bộ hóa lời chào/avatar ngay trên Header mà không cần đăng nhập lại.
+  - Thiết kế nút bấm "Sửa thông tin" tinh tế bên cạnh nút "Đăng xuất" trên trang tổng quan tài khoản (`User/Index.jsx`).
+- **Tối ưu hóa Quy trình trừ Kho hàng theo Trạng thái Đơn hàng (Inventory Stock Control)**:
+  - Loại bỏ việc trừ hàng tồn kho tự động ngay khi vừa đặt hàng (khi đơn hàng đang ở trạng thái `Status = 0` (Chờ duyệt)).
+  - Trong `OrdersController.cs` phía admin, bổ sung cơ chế kiểm soát tồn kho chặt chẽ:
+    - Trừ kho sản phẩm **chỉ khi** đơn hàng chuyển từ trạng thái `0` (Chờ duyệt) hoặc `3` (Đã hủy) sang trạng thái `1` (Đang giao) hoặc `2` (Đã hoàn thành). Kiểm tra và từ chối duyệt (bằng ModelState error) nếu có bất kỳ mặt hàng nào không đủ tồn kho.
+    - Tự động hoàn lại (cộng thêm) số lượng vào kho nếu đơn hàng bị chuyển ngược về trạng thái `0` (Chờ duyệt) hoặc `3` (Đã hủy).
+    - Hoàn trả lại số lượng tồn kho của các sản phẩm tương ứng nếu đơn hàng đang giao hoặc đã hoàn thành bị xóa trực tiếp khỏi hệ thống.
+- **Chuẩn hóa thống kê Sản phẩm Bán Chạy Nhất (Best Sellers)**:
+  - Cập nhật API `GetBestSellers` tại `ApiProductController.cs` để chỉ tính toán doanh số `TotalSold` từ các đơn hàng có trạng thái **Đã hoàn thành** (`Status == 2`), đồng bộ chính xác với logic của trang dashboard Admin (`HomeController.cs`).
 
 ---
 

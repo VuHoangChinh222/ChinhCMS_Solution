@@ -357,6 +357,7 @@
     .desktop-actions-only {
         display: none !important;
     }
+
     /* Hiển thị các thành phần dành riêng cho mobile khi màn hình nhỏ */
     .mobile-only-item {
         display: block !important;
@@ -384,7 +385,8 @@
         gap: 0.8rem;
         padding: 0.5rem 0;
         margin-bottom: 0.5rem;
-        border-bottom: 1px solid var(--border-color); /* Vạch chia dưới ngăn cách */
+        border-bottom: 1px solid var(--border-color);
+        /* Vạch chia dưới ngăn cách */
         text-decoration: none;
     }
 
@@ -393,7 +395,8 @@
         font-size: 1.1rem;
         color: var(--text-main);
         font-weight: 600;
-        text-transform: none; /* Giữ nguyên chữ hoa/thường nguyên bản */
+        text-transform: none;
+        /* Giữ nguyên chữ hoa/thường nguyên bản */
     }
 
     /* Ảnh đại diện (avatar) hình tròn chứa chữ cái đầu tiên trên mobile */
@@ -401,7 +404,8 @@
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #6366f1, #a855f7); /* Màu chuyển sắc từ xanh tím sang hồng tím */
+        background: linear-gradient(135deg, #6366f1, #a855f7);
+        /* Màu chuyển sắc từ xanh tím sang hồng tím */
         color: #ffffff;
         display: flex;
         align-items: center;
@@ -426,7 +430,8 @@
     /* Định hình riêng cho mục Giỏ hàng ở cuối cùng của Menu mobile */
     .mobile-cart-item .mobile-nav-action-link {
         border-bottom: none;
-        border-top: 1px solid var(--border-color); /* Vạch kẻ ngăn cách phía trên tạo điểm nhấn */
+        border-top: 1px solid var(--border-color);
+        /* Vạch kẻ ngăn cách phía trên tạo điểm nhấn */
         margin-top: 0.5rem;
         padding-top: 1rem;
     }
@@ -472,10 +477,13 @@
     color: var(--text-muted);
     font-weight: 500;
     max-width: 120px;
-    white-space: nowrap; /* Tránh xuống dòng */
-    overflow: hidden; /* Ẩn phần thừa */
+    white-space: nowrap;
+    /* Tránh xuống dòng */
+    overflow: hidden;
+    /* Ẩn phần thừa */
     text-transform: none;
-    text-overflow: ellipsis; /* Tạo dấu ba chấm (...) nếu tên quá dài */
+    text-overflow: ellipsis;
+    /* Tạo dấu ba chấm (...) nếu tên quá dài */
 }
 
 /* Ảnh đại diện hình tròn phiên bản nhỏ (32px) cho Header */
@@ -490,8 +498,10 @@
     justify-content: center;
     font-size: 0.9rem;
     font-weight: 800;
-    box-shadow: 0 3px 8px rgba(99, 102, 241, 0.3); /* Bóng đổ chuyển sắc tím nhẹ */
-    border: 1px solid rgba(255, 255, 255, 0.15); /* Viền mờ bao quanh */
+    box-shadow: 0 3px 8px rgba(99, 102, 241, 0.3);
+    /* Bóng đổ chuyển sắc tím nhẹ */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    /* Viền mờ bao quanh */
 }
 
 /* Tự động ẩn dòng chữ chào mừng khi thu màn hình quá nhỏ để nhường không gian cho logo */

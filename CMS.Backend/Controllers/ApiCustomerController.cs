@@ -176,6 +176,7 @@ namespace CMS.Backend.Controllers
         public class UpdateRequest
         {
             public string FullName { get; set; }
+            public string? Email { get; set; }
             public string? Phone { get; set; }
             public string? Address { get; set; }
             public string? Password { get; set; }
@@ -206,6 +207,23 @@ namespace CMS.Backend.Controllers
                 if (string.IsNullOrWhiteSpace(request.FullName))
                 {
                     return BadRequest(new { message = "Họ và tên không được để trống" });
+                }
+
+                // Kiểm tra và cập nhật email nếu có thay đổi
+                if (!string.IsNullOrWhiteSpace(request.Email))
+                {
+                    var emailTrim = request.Email.Trim();
+                    if (!System.Text.RegularExpressions.Regex.IsMatch(emailTrim, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                    {
+                        return BadRequest(new { message = "Định dạng email không hợp lệ" });
+                    }
+
+                    var isDuplicate = _context.Customers.Any(c => c.Email == emailTrim && c.Id != id);
+                    if (isDuplicate)
+                    {
+                        return BadRequest(new { message = "Địa chỉ email này đã được sử dụng bởi một tài khoản khác" });
+                    }
+                    customer.Email = emailTrim;
                 }
 
                 // Kiểm tra định dạng số điện thoại nếu được cung cấp

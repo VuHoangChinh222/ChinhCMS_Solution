@@ -225,8 +225,8 @@ namespace CMS.Backend.Controllers
                         p.ImageUrl,
                         p.CategoryProductId,
                         CategoryName = p.CategoryProduct != null ? p.CategoryProduct.Name : "Chưa phân loại",
-                        // Tính tổng số lượng Quantity trong bảng OrderDetails tương ứng với ProductId này
-                        TotalSold = _context.OrderDetails.Where(od => od.ProductId == p.Id).Sum(od => od.Quantity)
+                        // Tính tổng số lượng Quantity trong bảng OrderDetails tương ứng với ProductId này (chỉ những đơn hàng đã hoàn thành - Status == 2)
+                        TotalSold = _context.OrderDetails.Where(od => od.ProductId == p.Id && od.Order.Status == 2).Sum(od => (int?)od.Quantity) ?? 0
                     })
                     .OrderByDescending(p => p.TotalSold) // Ưu tiên số lượng bán nhiều nhất xếp lên đầu
                     .ThenByDescending(p => p.Id) // Nếu lượt bán bằng nhau (ví dụ đều bằng 0), ưu tiên sản phẩm mới hơn

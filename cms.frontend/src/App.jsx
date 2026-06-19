@@ -18,6 +18,7 @@ import PaymentView from './pages/Checkout/PaymentView';
 import LoginView from './pages/Login/Index';
 import RegisterView from './pages/Register/Index';
 import UserInfoView from './pages/User/Index';
+import UserInfo from './pages/User/UserInfo';
 import AboutView from './pages/About/Index';
 import PostDetailView from './pages/Blog/Detail';
 import BlogView from './pages/Blog/Index';
@@ -151,6 +152,7 @@ const AppContent = ({ cart, addToCart, updateQty, removeFromCart, clearCart }) =
           <Route path="/login" element={<LoginView />} />
           <Route path="/register" element={<RegisterView />} />
           <Route path="/user" element={<UserInfoView navigate={navigate} />} />
+          <Route path="/user-info" element={<UserInfo navigate={navigate} />} />
           <Route path="/about" element={<AboutView />} />
           <Route path="/return-policy" element={<ReturnPolicyView />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyView />} />

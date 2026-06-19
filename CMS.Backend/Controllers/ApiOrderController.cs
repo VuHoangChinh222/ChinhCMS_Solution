@@ -114,9 +114,6 @@ namespace CMS.Backend.Controllers
 
                         totalOrderAmount += (product.Price * item.Quantity);
 
-                        // Trừ trực tiếp số lượng tồn kho của sản phẩm
-                        product.StockQuantity -= item.Quantity;
-
                         _context.OrderDetails.Add(orderDetail);
                     }
 
