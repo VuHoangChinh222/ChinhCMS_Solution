@@ -104,16 +104,46 @@
     </div>
 </div>
 
-@* Khu vực nạp các Script bổ sung cuối Layout *@
 @section Scripts {
     <!-- Nạp thư viện trình soạn thảo CKEditor 5 từ CDN -->
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
     
     <script>
+        // Định nghĩa Custom Upload Adapter để xử lý chuyển ảnh thành Base64 inline
+        class Base64UploadAdapter {
+            constructor(loader) {
+                this.loader = loader;
+            }
+
+            upload() {
+                return this.loader.file
+                    .then(file => new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            resolve({ default: reader.result });
+                        };
+                        reader.onerror = error => reject(error);
+                        reader.readAsDataURL(file);
+                    }));
+            }
+
+            abort() {
+                // Hủy bỏ tác vụ nếu cần
+            }
+        }
+
+        // Đăng ký Plugin vào Editor
+        function MyCustomUploadAdapterPlugin(editor) {
+            editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+                return new Base64UploadAdapter(loader);
+            };
+        }
+
         // Kích hoạt khởi tạo trình soạn thảo giàu nội dung CKEditor 5
         ClassicEditor
             .create(document.querySelector('#editor'), {
-                placeholder: 'Hãy viết nội dung bài viết phong phú và chuyên nghiệp tại đây...'
+                placeholder: 'Hãy viết nội dung bài viết phong phú và chuyên nghiệp tại đây...',
+                extraPlugins: [MyCustomUploadAdapterPlugin]
             })
             .catch(error => {
                 console.error('Lỗi khi khởi tạo CKEditor 5: ', error);

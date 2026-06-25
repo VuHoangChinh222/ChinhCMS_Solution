@@ -11,8 +11,9 @@ import productService from '../../services/productService';
 import ProductCategoryList from './ProductCategoryList';
 import IsLoading from '../../components/IsLoading';
 import '../../assets/css/productCSS/Product.css';
+import { IMAGE_BASE_URL } from '../../config';
 
-const BASE_URL = "https://localhost:7291";
+const BASE_URL = IMAGE_BASE_URL;
 
 const ProductView = ({ params, navigate, addToCart }) => {
     // --- Khai báo các State quản lý dữ liệu ---

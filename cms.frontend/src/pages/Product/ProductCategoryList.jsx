@@ -8,7 +8,9 @@ import React, { useState, useEffect } from 'react';
 import categoryProductService from '../../services/categoryProductService';
 import '../../assets/css/productCSS/ProductCategoryList.css';
 
-const BASE_URL = "https://localhost:7291";
+import { IMAGE_BASE_URL } from '../../config';
+
+const BASE_URL = IMAGE_BASE_URL;
 
 const ProductCategoryList = ({ activeCategoryId, onSelectCategory, onCategoriesLoaded }) => {
   const [categories, setCategories] = useState([]);

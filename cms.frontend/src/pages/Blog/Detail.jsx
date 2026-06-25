@@ -5,8 +5,10 @@ import IsLoading from '../../components/IsLoading';
 // Import css
 import '../../assets/css/PostDetailView.css';
 
+import { IMAGE_BASE_URL } from '../../config';
+
 // Cấu hình URL Backend để lấy hình ảnh từ wwwroot/uploads
-const BASE_URL = "https://localhost:7291";
+const BASE_URL = IMAGE_BASE_URL;
 
 
 

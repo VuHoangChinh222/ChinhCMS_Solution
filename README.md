@@ -228,8 +228,15 @@ Dự án `ChinhCMS_Solution` được chia làm 3 dự án nhỏ bên trong:
     - Trừ kho sản phẩm **chỉ khi** đơn hàng chuyển từ trạng thái `0` (Chờ duyệt) hoặc `3` (Đã hủy) sang trạng thái `1` (Đang giao) hoặc `2` (Đã hoàn thành). Kiểm tra và từ chối duyệt (bằng ModelState error) nếu có bất kỳ mặt hàng nào không đủ tồn kho.
     - Tự động hoàn lại (cộng thêm) số lượng vào kho nếu đơn hàng bị chuyển ngược về trạng thái `0` (Chờ duyệt) hoặc `3` (Đã hủy).
     - Hoàn trả lại số lượng tồn kho của các sản phẩm tương ứng nếu đơn hàng đang giao hoặc đã hoàn thành bị xóa trực tiếp khỏi hệ thống.
-- **Chuẩn hóa thống kê Sản phẩm Bán Chạy Nhất (Best Sellers)**:
-  - Cập nhật API `GetBestSellers` tại `ApiProductController.cs` để chỉ tính toán doanh số `TotalSold` từ các đơn hàng có trạng thái **Đã hoàn thành** (`Status == 2`), đồng bộ chính xác với logic của trang dashboard Admin (`HomeController.cs`).
+- **Cấu hình biến môi trường chuẩn doanh nghiệp (.env)**:
+  - Cấu hình file `vite.config.js` hỗ trợ tiền tố biến môi trường `REACT_APP_` chuẩn theo yêu cầu (`envPrefix: ['VITE_', 'REACT_APP_']`).
+  - Tạo tệp tin cấu hình môi trường `.env` tại thư mục gốc của front-end để quản lý tập trung hai hằng số: `REACT_APP_API_URL` (cho API) và `REACT_APP_IMAGE_BASE_URL` (cho hình ảnh tĩnh của backend).
+  - Triển khai tệp cấu hình trung gian `src/config.js` để đọc các giá trị biến môi trường này kèm giá trị fallback mặc định.
+  - Loại bỏ hoàn toàn tất cả các chuỗi domain backend viết cứng (`https://localhost:7291`) trong các component (`Header`, `HeroBanner`, `ProductCard`, `PostCard`, `ProductCategoryList`, `BlogCategoryList`) và các trang (`Product/Index`, `Product/Detail`, `Blog/Index`, `Blog/Detail`), thay thế bằng các hằng số `API_BASE_URL` và `IMAGE_BASE_URL`.
+- **Đồng bộ hóa Trình soạn thảo CKEditor 5 hỗ trợ Upload ảnh trực tiếp**:
+  - Triển khai thành công Class `Base64UploadAdapter` tùy biến bên trong file `Create.cshtml` và `Edit.cshtml` của Post quản trị.
+  - Gắn sự kiện `createUploadAdapter` vào dịch vụ `FileRepository` thông qua thuộc tính `extraPlugins` của CKEditor 5.
+  - Nhờ đó, trình soạn thảo hỗ trợ kéo-thả, dán ảnh, hoặc chọn tệp tin ảnh từ máy tính cá nhân để tự động mã hóa sang định dạng Base64 và chèn trực tiếp dạng thẻ `<img>` nội tuyến vào bài viết mà không gặp lỗi kết nối server hay cần endpoint upload lưu trữ tạm.
 
 ---
 

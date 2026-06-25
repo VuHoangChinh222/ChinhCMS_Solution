@@ -5,7 +5,9 @@ import postService from '../services/postService';
 import { getCookie } from '../utils/cookieHelper';
 import '../assets/css/headerCSS/Header.css';
 
-const BASE_URL = "https://localhost:7291";
+import { IMAGE_BASE_URL } from '../config';
+
+const BASE_URL = IMAGE_BASE_URL;
 
 const Header = ({ currentView, cartCount }) => {
   const location = useLocation();

@@ -13,6 +13,7 @@ import IsLoading from '../../components/IsLoading';
 
 // Import CSS
 import '../../assets/css/BlogView.css';
+import { IMAGE_BASE_URL } from '../../config';
 
 const BlogView = ({ navigate }) => {
   const [activeCategoryId, setActiveCategoryId] = useState('all');
@@ -114,7 +115,7 @@ const BlogView = ({ navigate }) => {
         <div className="blog-hero-slider">
           {featuredPosts.map((post, index) => {
             const imageSrc = post.image || (post.imageUrl
-              ? (post.imageUrl.startsWith('http') ? post.imageUrl : `https://localhost:7291${post.imageUrl}`)
+              ? (post.imageUrl.startsWith('http') ? post.imageUrl : `${IMAGE_BASE_URL}${post.imageUrl}`)
               : 'src/assets/images/default_post.png');
 
             return (

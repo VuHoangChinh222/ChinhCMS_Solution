@@ -116,62 +116,91 @@ namespace CMS.Backend.Controllers
         [HttpPost]
         public IActionResult Edit(Order model)
         {
-            // Loại bỏ các xác thực không cần thiết đối với liên kết ảo
+            // BƯỚC 1: Loại bỏ xác thực model tự động của ASP.NET Core cho các đối tượng Customer và OrderDetails 
+            // vì các thuộc tính này không được gửi lên từ form chỉnh sửa trạng thái đơn hàng (tránh ModelState.IsValid trả về false vô cớ)
             ModelState.Remove("Customer");
             ModelState.Remove("OrderDetails");
 
+            // BƯỚC 2: Kiểm tra dữ liệu đầu vào có hợp lệ theo các điều kiện Data Annotation không
             if (ModelState.IsValid)
             {
+                // BƯỚC 3: Tìm đơn hàng hiện tại trong cơ sở dữ liệu để đối chiếu trạng thái cũ và mới
                 var existingOrder = _context.Orders.Find(model.Id);
                 if (existingOrder != null)
                 {
+                    // Lấy ra trạng thái cũ lưu trong CSDL và trạng thái mới người dùng chọn trên giao diện
                     int oldStatus = existingOrder.Status;
                     int newStatus = model.Status;
 
-                    // 1. Chuyển từ Chờ duyệt (0) hoặc Hủy (3) sang Đang giao (1) hoặc Đã xong (2) -> Tiến hành trừ kho
+                    // ========================================================================================
+                    // KỊCH BẢN 1: Duyệt Đơn Hàng (Chuyển trạng thái từ Chờ duyệt (0) hoặc Hủy (3) sang Đang giao (1) hoặc Đã xong (2))
+                    // HÀNH ĐỘNG: Kiểm tra tồn kho và trừ số lượng sản phẩm tương ứng trong CSDL.
+                    // ========================================================================================
                     if ((oldStatus == 0 || oldStatus == 3) && (newStatus == 1 || newStatus == 2))
                     {
+                        // Truy vấn toàn bộ danh sách sản phẩm nằm trong đơn hàng hiện tại kèm thực thể sản phẩm (Product) liên kết
                         var details = _context.OrderDetails.Include(d => d.Product).Where(d => d.OrderId == model.Id).ToList();
+                        
+                        // VÒNG LẶP KIỂM TRA: Duyệt qua tất cả mặt hàng trong đơn xem có sản phẩm nào bị thiếu hụt tồn kho không
                         foreach (var detail in details)
                         {
                             if (detail.Product != null && detail.Product.StockQuantity < detail.Quantity)
                             {
+                                // Nếu số lượng tồn trong kho nhỏ hơn số lượng khách đặt mua, báo lỗi lên giao diện và dừng duyệt đơn
                                 ModelState.AddModelError("", $"Sản phẩm '{detail.Product.Name}' không đủ số lượng tồn kho để duyệt đơn hàng (Tồn kho hiện tại: {detail.Product.StockQuantity}, Cần: {detail.Quantity}).");
                                 return View(model);
                             }
                         }
 
-                        // Trừ số lượng tồn kho của các sản phẩm trong đơn hàng
+                        // VÒNG LẶP THỰC THI: Nếu tất cả sản phẩm đều đủ hàng, tiến hành trừ kho thực tế
                         foreach (var detail in details)
                         {
                             if (detail.Product != null)
                             {
+                                // Trừ bớt số lượng tồn kho theo số lượng mua trong hóa đơn chi tiết
                                 detail.Product.StockQuantity -= detail.Quantity;
+                                // Đánh dấu thực thể sản phẩm đã bị thay đổi để Entity Framework sinh câu lệnh UPDATE SQL
                                 _context.Entry(detail.Product).State = EntityState.Modified;
                             }
                         }
                     }
-                    // 2. Chuyển từ Đang giao (1) hoặc Đã xong (2) sang Chờ duyệt (0) hoặc Hủy (3) -> Hoàn trả lại kho hàng
+                    // ========================================================================================
+                    // KỊCH BẢN 2: Hủy Đơn hoặc Trả Lại Chờ Duyệt (Chuyển từ Đang giao (1) hoặc Đã xong (2) sang Chờ duyệt (0) hoặc Hủy (3))
+                    // HÀNH ĐỘNG: Hoàn trả lại số lượng tồn kho đã trừ trước đó vào kho hàng.
+                    // ========================================================================================
                     else if ((oldStatus == 1 || oldStatus == 2) && (newStatus == 0 || newStatus == 3))
                     {
+                        // Lấy danh sách sản phẩm trong hóa đơn chi tiết
                         var details = _context.OrderDetails.Include(d => d.Product).Where(d => d.OrderId == model.Id).ToList();
+                        
+                        // Duyệt qua từng chi tiết để cộng trả lại kho hàng
                         foreach (var detail in details)
                         {
                             if (detail.Product != null)
                             {
+                                // Cộng trả lại kho lượng hàng tương ứng đã đặt mua trước đây
                                 detail.Product.StockQuantity += detail.Quantity;
+                                // Đánh dấu thực thể sản phẩm đã sửa đổi
                                 _context.Entry(detail.Product).State = EntityState.Modified;
                             }
                         }
                     }
 
+                    // BƯỚC 4: Cập nhật trạng thái và ghi chú mới của đơn hàng
                     existingOrder.Status = model.Status;
                     existingOrder.Notes = model.Notes;
+                    
+                    // Thực hiện cập nhật bản ghi Đơn hàng
                     _context.Orders.Update(existingOrder);
+                    
+                    // Ghi nhận tất cả các thay đổi (cập nhật tồn kho sản phẩm + cập nhật trạng thái đơn hàng) xuống SQL Server
                     _context.SaveChanges();
+                    
+                    // Chuyển hướng người dùng về trang danh sách đơn hàng sau khi lưu thành công
                     return RedirectToAction("Index");
                 }
             }
+            // Trả về View kèm model chứa các lỗi ModelState để người dùng biết nguyên nhân thất bại
             return View(model);
         }
 

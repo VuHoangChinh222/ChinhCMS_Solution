@@ -9,9 +9,10 @@ import productService from '../../services/productService';
 import { getCookie } from '../../utils/cookieHelper';
 import IsLoading from '../../components/IsLoading';
 import '../../assets/css/productCSS/ProductDetail.css';
+import { IMAGE_BASE_URL } from '../../config';
 
 // Cấu hình URL Backend để lấy hình ảnh từ wwwroot/uploads
-const BASE_URL = "https://localhost:7291";
+const BASE_URL = IMAGE_BASE_URL;
 
 export const formatPrice = (price) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
 
@@ -46,6 +47,8 @@ const ProductDetailView = ({ params, addToCart, navigate }) => {
           setSize('US 8');
         } else if (category.toLowerCase().includes('vớ') || category.toLowerCase().includes('tất')) {
           setSize('Free');
+        } else if (category.toLowerCase().includes('quả') || category.toLowerCase().includes('bóng')) {
+          setSize('7');
         } else {
           setSize('M');
         }
@@ -78,7 +81,9 @@ const ProductDetailView = ({ params, addToCart, navigate }) => {
     ? ['US 7', 'US 8', 'US 9', 'US 10', 'US 11']
     : (category.toLowerCase().includes('vớ') || category.toLowerCase().includes('tất'))
       ? ['Free']
-      : ['S', 'M', 'L', 'XL'];
+      : (category.toLowerCase().includes('quả') || category.toLowerCase().includes('bóng'))
+        ? ['5', '6', '7']
+        : ['S', 'M', 'L', 'XL'];
 
   // Xử lý thêm vào giỏ hàng
   const handleAdd = () => {
