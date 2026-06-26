@@ -25,7 +25,9 @@ const RegisterView = () => {
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Trạng thái xử lý
   const [loading, setLoading] = useState(false);
@@ -39,6 +41,12 @@ const RegisterView = () => {
     // Validate mật khẩu tối thiểu 6 ký tự
     if (password.length < 6) {
       setErrorMessage("Mật khẩu phải chứa ít nhất 6 ký tự.");
+      return;
+    }
+
+    // Validate mật khẩu nhập lại phải khớp
+    if (password !== confirmPassword) {
+      setErrorMessage("Mật khẩu nhập lại không khớp.");
       return;
     }
 
@@ -155,6 +163,42 @@ const RegisterView = () => {
                 }}
               >
                 <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+              </button>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Nhập lại mật khẩu <span style={{ color: 'red' }}>*</span></label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                className="form-input"
+                placeholder="Nhập lại mật khẩu"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                style={{ paddingRight: '45px' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '15px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  fontSize: '1.1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 0
+                }}
+              >
+                <i className={`fa-solid ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
               </button>
             </div>
           </div>

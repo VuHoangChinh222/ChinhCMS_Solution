@@ -153,7 +153,7 @@ const ProductDetailView = ({ params, addToCart, navigate }) => {
     }
 
     if (qty > product.stockQuantity) {
-      alert(`Số lượng đặt mua vượt quá số lượng hàng tồn kho (${product.stockQuantity} sản phẩm)!`);
+      alert("Số lượng sản phẩm trong kho không đủ!");
       return;
     }
 

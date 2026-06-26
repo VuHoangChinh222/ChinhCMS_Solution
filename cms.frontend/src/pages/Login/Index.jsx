@@ -13,7 +13,7 @@ const LoginView = () => {
     }
   }, [navigate]);
 
-  // States cho Form
+  // States cho Form Đăng nhập
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -105,6 +105,20 @@ const LoginView = () => {
               >
                 <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
               </button>
+            </div>
+            {/* Đặt dưới ô nhập mật khẩu */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+              <Link
+                to="/forgot-password"
+                style={{
+                  color: 'var(--accent)',
+                  fontWeight: '600',
+                  textDecoration: 'none',
+                  fontSize: '0.85rem'
+                }}
+              >
+                Quên mật khẩu?
+              </Link>
             </div>
           </div>
 

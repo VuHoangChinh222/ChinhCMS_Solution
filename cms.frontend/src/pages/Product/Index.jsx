@@ -21,16 +21,24 @@ const ProductView = ({ params, navigate, addToCart }) => {
     const [categories, setCategories] = useState([]);      // Mảng chứa danh mục [{id: 'all', name: 'Tất cả'}, {id: 1, name: 'Giày'}, ...]
     const [activeCategoryId, setActiveCategoryId] = useState(params?.categoryId || 'all'); // Lưu ID danh mục đang chọn
 
-    // Lắng nghe sự thay đổi của danh mục truyền qua route params (ví dụ từ Footer)
+    // Lắng nghe sự thay đổi của danh mục và từ khóa truyền qua route params (ví dụ từ Footer hoặc Header Search)
     useEffect(() => {
         if (params?.categoryId) {
             setActiveCategoryId(params.categoryId);
-            setPageNumber(1);
         } else {
             setActiveCategoryId('all');
-            setPageNumber(1);
         }
-    }, [params?.categoryId]);
+
+        if (params?.keyword) {
+            setKeyword(params.keyword);
+            setTempKeyword(params.keyword);
+        } else {
+            setKeyword('');
+            setTempKeyword('');
+        }
+
+        setPageNumber(1);
+    }, [params?.categoryId, params?.keyword]);
 
     // State quản lý tìm kiếm từ khóa
     const [keyword, setKeyword] = useState('');
@@ -252,7 +260,38 @@ const ProductView = ({ params, navigate, addToCart }) => {
                                 <i className="fa-solid fa-circle-exclamation"></i> Lỗi kết nối đến máy chủ. Vui lòng kiểm tra đường truyền!
                             </div>
                         ) : products.length === 0 ? (
-                            <div className="loading-text">Không tìm thấy sản phẩm nào phù hợp với bộ lọc hiện tại.</div>
+                            <div className="no-products-found-container" style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                padding: '4rem 2rem',
+                                textAlign: 'center',
+                                background: '#f8fafc',
+                                borderRadius: '12px',
+                                border: '1px dashed #cbd5e1',
+                                margin: '2rem 0'
+                            }}>
+                                <div style={{
+                                    width: '120px',
+                                    height: '120px',
+                                    borderRadius: '50%',
+                                    background: '#f1f5f9',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    marginBottom: '1.5rem',
+                                    boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.06)'
+                                }}>
+                                    <i className="fa-solid fa-magnifying-glass" style={{ fontSize: '3rem', color: '#94a3b8' }}></i>
+                                </div>
+                                <h4 style={{ color: '#1e293b', fontWeight: '700', marginBottom: '0.5rem' }}>
+                                    Không tìm thấy sản phẩm nào phù hợp với tiêu chí của bạn
+                                </h4>
+                                <p style={{ color: '#64748b', fontSize: '0.9rem', maxWidth: '400px' }}>
+                                    Vui lòng thử lại với từ khóa khác hoặc xóa bớt các bộ lọc khoảng giá của bạn.
+                                </p>
+                            </div>
                         ) : (
                             <>
                                 {/* LƯỚI HIỂN THỊ CHUẨN 4 SẢN PHẨM TRÊN 1 HÀNG KHI CÓ SIDEBAR */}

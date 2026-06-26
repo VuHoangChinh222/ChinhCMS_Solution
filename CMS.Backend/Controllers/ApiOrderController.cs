@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CMS.Data;
 using CMS.Data.Entities;
+using Microsoft.Extensions.Configuration;
 
 namespace CMS.Backend.Controllers
 {
@@ -20,11 +21,13 @@ namespace CMS.Backend.Controllers
     public class ApiOrderController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        // Hàm khởi tạo (Constructor): Tiêm ApplicationDbContext vào
-        public ApiOrderController(ApplicationDbContext context)
+        // Hàm khởi tạo (Constructor): Tiêm ApplicationDbContext và IConfiguration vào
+        public ApiOrderController(ApplicationDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         // DTO nhận dữ liệu chi tiết giỏ hàng khi checkout
@@ -120,6 +123,14 @@ namespace CMS.Backend.Controllers
                     _context.SaveChanges();
                     transaction.Commit(); // Hoàn tất giao dịch thành công
 
+                    // Gửi email xác nhận đơn hàng cho khách hàng
+                    var customer = _context.Customers.Find(request.CustomerId);
+                    if (customer != null && !string.IsNullOrEmpty(customer.Email))
+                    {
+                        var detailsList = _context.OrderDetails.Where(od => od.OrderId == order.Id).ToList();
+                        SendOrderConfirmationEmail(customer, order, detailsList, totalOrderAmount);
+                    }
+
                     return StatusCode(201, new {
                         message = "Đặt hàng thành công",
                         orderId = order.Id,
@@ -133,6 +144,115 @@ namespace CMS.Backend.Controllers
                     transaction.Rollback(); // Thu hồi lại toàn bộ thay đổi nếu xảy ra lỗi bất kỳ
                     return StatusCode(500, new { message = "Lỗi hệ thống trong quá trình đặt hàng", error = ex.Message });
                 }
+            }
+        }
+
+        // Phương thức phụ để gửi email xác nhận đơn hàng qua SMTP Gmail thực tế (Đáp ứng tiêu chí 31)
+        private void SendOrderConfirmationEmail(Customer customer, Order order, List<OrderDetail> details, decimal totalAmount)
+        {
+            try
+            {
+                // Xây dựng nội dung email dạng HTML chuyên nghiệp
+                string body = $@"
+                    <html>
+                    <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
+                        <div style='max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);'>
+                            <h2 style='color: #4f46e5; border-bottom: 2px solid #4f46e5; padding-bottom: 10px; margin-top: 0;'>XÁC NHẬN ĐƠN HÀNG # {order.Id}</h2>
+                            <p>Xin chào <strong>{customer.FullName}</strong>,</p>
+                            <p>Cảm ơn bạn đã mua sắm tại <strong>Chinh Hoops</strong>. Đơn hàng của bạn đã được tiếp nhận thành công!</p>
+                            
+                            <div style='background-color: #f8fafc; border-radius: 6px; padding: 15px; margin: 20px 0;'>
+                                <h4 style='margin-top: 0; margin-bottom: 10px; color: #1e293b;'>Thông tin giao nhận hàng:</h4>
+                                <p style='margin: 4px 0;'><strong>Khách hàng:</strong> {customer.FullName}</p>
+                                <p style='margin: 4px 0;'><strong>Số điện thoại:</strong> {customer.Phone}</p>
+                                <p style='margin: 4px 0;'><strong>Địa chỉ:</strong> {customer.Address}</p>
+                                <p style='margin: 4px 0;'><strong>Ngày đặt:</strong> {order.OrderDate.ToString("dd/MM/yyyy HH:mm:ss")}</p>
+                            </div>
+                            
+                            <h4 style='color: #1e293b; margin-bottom: 10px;'>Chi tiết sản phẩm đã mua:</h4>
+                            <table style='width: 100%; border-collapse: collapse;'>
+                                <thead>
+                                    <tr style='background-color: #e2e8f0; text-align: left;'>
+                                        <th style='padding: 8px; border: 1px solid #cbd5e1; text-align: center; width: 80px;'>Hình ảnh</th>
+                                        <th style='padding: 8px; border: 1px solid #cbd5e1;'>Sản phẩm</th>
+                                        <th style='padding: 8px; border: 1px solid #cbd5e1; text-align: center;'>SL</th>
+                                        <th style='padding: 8px; border: 1px solid #cbd5e1; text-align: right;'>Đơn giá</th>
+                                        <th style='padding: 8px; border: 1px solid #cbd5e1; text-align: right;'>Thành tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody>";
+
+                foreach (var detail in details)
+                {
+                    var product = _context.Products.Find(detail.ProductId);
+                    var productName = product != null ? product.Name : "Sản phẩm";
+                    var imgUrl = product?.ImageUrl ?? "";
+                    if (!string.IsNullOrEmpty(imgUrl) && !imgUrl.StartsWith("http", System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        imgUrl = "https://localhost:7291" + (imgUrl.StartsWith("/") ? imgUrl : "/" + imgUrl);
+                    }
+
+                    body += $@"
+                                    <tr>
+                                        <td style='padding: 8px; border: 1px solid #cbd5e1; text-align: center; vertical-align: middle;'>
+                                            {(string.IsNullOrEmpty(imgUrl) ? "" : $"<img src='{imgUrl}' alt='{productName}' style='width: 60px; height: auto; border-radius: 4px;' />")}
+                                        </td>
+                                        <td style='padding: 8px; border: 1px solid #cbd5e1; vertical-align: middle;'>{productName}</td>
+                                        <td style='padding: 8px; border: 1px solid #cbd5e1; text-align: center; vertical-align: middle;'>{detail.Quantity}</td>
+                                        <td style='padding: 8px; border: 1px solid #cbd5e1; text-align: right; vertical-align: middle;'>{detail.UnitPrice.ToString("N0")} đ</td>
+                                        <td style='padding: 8px; border: 1px solid #cbd5e1; text-align: right; vertical-align: middle;'>{(detail.UnitPrice * detail.Quantity).ToString("N0")} đ</td>
+                                    </tr>";
+                }
+
+                body += $@"
+                                </tbody>
+                            </table>
+                            
+                            <div style='text-align: right; margin-top: 15px; font-size: 16px; font-weight: bold; color: #1e293b;'>
+                                Tổng cộng: <span style='color: #ef4444;'>{totalAmount.ToString("N0")} đ</span>
+                            </div>
+                            
+                            <hr style='border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;'/>
+                            <p style='font-size: 13px; color: #64748b; margin-bottom: 0;'>Chúng tôi sẽ sớm kiểm duyệt đơn hàng và tiến hành vận chuyển. Mọi thắc mắc vui lòng liên hệ hotline Chinh Hoops.</p>
+                        </div>
+                    </body>
+                    </html>";
+
+                var smtpServer = _configuration["EmailSettings:SmtpServer"] ?? "smtp.gmail.com";
+                var portStr = _configuration["EmailSettings:Port"] ?? "587";
+                int port = int.TryParse(portStr, out int p) ? p : 587;
+                var senderName = _configuration["EmailSettings:SenderName"] ?? "Chinh Hoops Support";
+                var senderEmail = _configuration["EmailSettings:SenderEmail"] ?? "vuhoangchinh222@gmail.com";
+                var senderPassword = _configuration["EmailSettings:SenderPassword"] ?? "";
+
+                if (string.IsNullOrWhiteSpace(senderPassword))
+                {
+                    System.Console.WriteLine("Bỏ qua gửi email đặt hàng: Chưa cấu hình SenderPassword trong appsettings.json.");
+                    return;
+                }
+
+                using (var mail = new System.Net.Mail.MailMessage())
+                {
+                    mail.From = new System.Net.Mail.MailAddress(senderEmail, senderName);
+                    mail.To.Add(customer.Email);
+                    mail.Subject = $"[Chinh Hoops] Xác nhận đặt hàng thành công đơn # {order.Id}";
+                    mail.Body = body;
+                    mail.IsBodyHtml = true;
+
+                    using (var smtp = new System.Net.Mail.SmtpClient(smtpServer))
+                    {
+                        smtp.Port = port;
+                        smtp.EnableSsl = true;
+                        smtp.UseDefaultCredentials = false;
+                        smtp.Credentials = new System.Net.NetworkCredential(senderEmail, senderPassword);
+                        smtp.Send(mail);
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                // Bỏ qua lỗi gửi email để tránh treo luồng mua hàng của khách nhưng vẫn log ra console để theo dõi
+                System.Console.WriteLine("Lỗi gửi email xác nhận đơn hàng: " + ex.ToString());
             }
         }
 

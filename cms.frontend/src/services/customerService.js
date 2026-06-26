@@ -17,6 +17,12 @@ const customerService = {
     updateCustomer: (id, customerData) => {
         const url = `/customer/update/${id}`;
         return axiosClient.put(url, customerData);
+    },
+
+    // API Quên mật khẩu khách hàng
+    forgotPassword: (email) => {
+        const url = '/customer/forgot-password';
+        return axiosClient.post(url, { email });
     }
 };
 
