@@ -11,12 +11,11 @@ import { getCookie } from '../../utils/cookieHelper';
 
 const RegisterView = () => {
   const navigate = useNavigate();
-
-  // Kiểm tra nếu đã đăng nhập thì tự động điều hướng sang trang User
+  // Kiểm tra nếu đã đăng nhập thì tự động điều hướng sang trang sản phẩm
   useEffect(() => {
     const customer = getCookie('customer');
     if (customer) {
-      navigate('/user');
+      navigate('/products');
     }
   }, [navigate]);
 

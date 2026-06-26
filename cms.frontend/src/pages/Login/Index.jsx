@@ -5,12 +5,11 @@ import { setCookie, getCookie } from '../../utils/cookieHelper';
 
 const LoginView = () => {
   const navigate = useNavigate();
-
-  // Kiểm tra nếu đã đăng nhập thì tự động điều hướng sang trang User
+  // Kiểm tra nếu đã đăng nhập thì tự động điều hướng sang trang sản phẩm
   useEffect(() => {
     const customer = getCookie('customer');
     if (customer) {
-      navigate('/user');
+      navigate('/products');
     }
   }, [navigate]);
 
@@ -35,7 +34,7 @@ const LoginView = () => {
         // Bảo mật phiên làm việc bằng Cookie lưu trữ 2 ngày (48 tiếng)
         setCookie('customer', response.customer, 2);
         alert("Đăng nhập tài khoản thành công!");
-        navigate('/user');
+        navigate('/products');
         window.location.reload(); // Reload để đồng bộ lại trạng thái header
       } else {
         setErrorMessage("Đăng nhập không thành công, vui lòng kiểm tra lại.");

@@ -30,27 +30,40 @@ namespace CMS.Backend.Controllers
         }
 
         // ==========================================
-        // 1. TRANG DANH SÁCH BANNER (INDEX)
+        // 1. TRANG DANH SÁCH BANNER (INDEX) - PHÂN TRANG (10 PHẦN TỬ / TRANG)
         // ==========================================
         public IActionResult Index(int page = 1)
         {
+            // Bước 1: Ràng buộc trang hiện tại không được nhỏ hơn 1
             if (page < 1) page = 1;
+            
+            // Bước 2: Định nghĩa kích thước trang (yêu cầu hiển thị tối đa 10 phần tử trên một trang)
             int pageSize = 10;
 
+            // Bước 3: Lấy đối tượng truy vấn bảng Banners trong Database
             var query = _context.Banners;
+            
+            // Bước 4: Đếm tổng số lượng bản ghi Banner có trong CSDL
             int totalItems = query.Count();
+            
+            // Bước 5: Tính toán tổng số trang dựa trên kích thước trang (Làm tròn lên bằng Math.Ceiling)
             int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            
+            // Bước 6: Đảm bảo số trang yêu cầu không vượt quá tổng số trang hợp lệ
             if (page > totalPages && totalPages > 0) page = totalPages;
 
-            var data = query.OrderByDescending(b => b.Id)
-                            .Skip((page - 1) * pageSize)
-                            .Take(pageSize)
-                            .ToList();
+            // Bước 7: Thực hiện phân trang và truy vấn dữ liệu thực tế từ Database
+            var data = query.OrderByDescending(b => b.Id) // Sắp xếp theo ID giảm dần (mới nhất lên trên)
+                            .Skip((page - 1) * pageSize)  // Bỏ qua các bản ghi của các trang trước
+                            .Take(pageSize)               // Lấy số lượng bản ghi tương ứng kích thước trang
+                            .ToList();                    // Chuyển đổi kết quả truy vấn thành danh sách List thực tế
 
+            // Bước 8: Gửi các thông số phân trang sang giao diện hiển thị (Razor View) bằng ViewBag
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
             ViewBag.TotalItems = totalItems;
 
+            // Trả về giao diện cùng danh sách dữ liệu banner đã được phân trang
             return View(data);
         }
 
