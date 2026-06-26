@@ -65,6 +65,7 @@ namespace CMS.Backend.Controllers
             [FromQuery] string? keyword = null, 
             [FromQuery] decimal? minPrice = null, 
             [FromQuery] decimal? maxPrice = null, 
+            [FromQuery] int? categoryId = null,
             [FromQuery] int pageNumber = 1, 
             [FromQuery] int pageSize = 10)
         {
@@ -92,6 +93,12 @@ namespace CMS.Backend.Controllers
                 if (maxPrice.HasValue)
                 {
                     query = query.Where(p => p.Price <= maxPrice.Value);
+                }
+
+                // Lọc theo Category ID nếu có (loại trừ ID = 7 là Tất cả sản phẩm)
+                if (categoryId.HasValue && categoryId.Value > 0 && categoryId.Value != 7)
+                {
+                    query = query.Where(p => p.CategoryProductId == categoryId.Value);
                 }
 
                 // Thực hiện lọc theo từ khóa tìm kiếm nếu có

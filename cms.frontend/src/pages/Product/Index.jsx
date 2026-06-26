@@ -32,6 +32,17 @@ const ProductView = ({ params, navigate, addToCart }) => {
         }
     }, [params?.categoryId]);
 
+    // State quản lý tìm kiếm từ khóa
+    const [keyword, setKeyword] = useState('');
+    const [tempKeyword, setTempKeyword] = useState('');
+
+    // State quản lý bộ lọc khoảng giá
+    const [minPrice, setMinPrice] = useState('');
+    const [maxPrice, setMaxPrice] = useState('');
+    const [tempMinPrice, setTempMinPrice] = useState('');
+    const [tempMaxPrice, setTempMaxPrice] = useState('');
+    const [priceError, setPriceError] = useState('');
+
     // State quản lý phân trang
     const [pageNumber, setPageNumber] = useState(1);       // Trang hiện tại
     const [totalPages, setTotalPages] = useState(1);       // Tổng số trang do API tính toán trả về
@@ -40,29 +51,25 @@ const ProductView = ({ params, navigate, addToCart }) => {
 
     const pageSize = 8; // Yêu cầu: Hiển thị tối đa 8 sản phẩm trên 1 trang
 
+    // Kiểm tra tính hợp lệ của khoảng giá nhập vào
+    useEffect(() => {
+        const minVal = parseFloat(tempMinPrice);
+        const maxVal = parseFloat(tempMaxPrice);
+        if (!isNaN(minVal) && !isNaN(maxVal) && minVal > maxVal) {
+            setPriceError('Giá tối thiểu không được lớn hơn giá tối đa.');
+        } else {
+            setPriceError('');
+        }
+    }, [tempMinPrice, tempMaxPrice]);
+
     // ==========================================
-    // GỌI API LẤY SẢN PHẨM (Chạy lại khi ĐỔI TRANG hoặc ĐỔI DANH MỤC)
+    // GỌI API LẤY SẢN PHẨM (Chạy lại khi có bất kỳ thay đổi nào từ bộ lọc hoặc phân trang)
     // ==========================================
     useEffect(() => {
         setLoading(true);
 
-        // Khai báo biến hứng dữ liệu phản hồi chung
-        let apiCall;
-
-        // Tìm ID của danh mục "Tất cả sản phẩm" từ DB nếu có
-        const allCat = categories.find(c => c.name === 'Tất cả sản phẩm');
-        const allCatId = allCat ? allCat.id : 'all';
-
-        if (activeCategoryId === 'all' || activeCategoryId === allCatId) {
-            // Nếu đang chọn danh mục "Tất cả sản phẩm" -> Gọi API lấy toàn bộ sản phẩm (có phân trang)
-            apiCall = productService.getAllProducts(pageNumber, pageSize);
-        } else {
-            // Nếu chọn danh mục cụ thể (Giày, Áo, Quần...) -> Gọi API lọc theo Category ID (có phân trang)
-            apiCall = productService.getProductsByCategory(activeCategoryId, pageNumber, pageSize);
-        }
-
-        // Tiến hành xử lý dữ liệu nhận về sau khi bóc tách qua AxiosClient
-        apiCall
+        // Gọi API getAllProducts với đầy đủ các tham số lọc nâng cao
+        productService.getAllProducts(pageNumber, pageSize, keyword, minPrice, maxPrice, activeCategoryId)
             .then(result => {
                 setProducts(result.data || []);
                 setTotalPages(result.totalPages || 1);
@@ -76,7 +83,7 @@ const ProductView = ({ params, navigate, addToCart }) => {
                 setHasError(true);
                 setLoading(false);
             });
-    }, [pageNumber, activeCategoryId, categories]); // Lắng nghe sự thay đổi của cả số trang lẫn bộ lọc danh mục
+    }, [pageNumber, activeCategoryId, keyword, minPrice, maxPrice]);
 
     // ==========================================
     // CÁC HÀM XỬ LÝ SỰ KIỆN (EVENT HANDLERS)
@@ -94,6 +101,39 @@ const ProductView = ({ params, navigate, addToCart }) => {
             setPageNumber(newPage);
             document.getElementById('products-sec').scrollIntoView({ behavior: 'smooth' });
         }
+    };
+
+    // Hàm áp dụng khoảng giá lọc
+    const handleApplyFilters = () => {
+        if (priceError) return;
+        setMinPrice(tempMinPrice);
+        setMaxPrice(tempMaxPrice);
+        setPageNumber(1);
+    };
+
+    // Hàm xóa toàn bộ bộ lọc hiện tại
+    const handleClearAllFilters = () => {
+        setTempMinPrice('');
+        setTempMaxPrice('');
+        setMinPrice('');
+        setMaxPrice('');
+        setTempKeyword('');
+        setKeyword('');
+        setActiveCategoryId('all');
+        setPageNumber(1);
+    };
+
+    // Hàm thực hiện tìm kiếm từ khóa
+    const handleSearchSubmit = () => {
+        setKeyword(tempKeyword);
+        setPageNumber(1);
+    };
+
+    // Hàm xóa từ khóa tìm kiếm
+    const handleClearSearch = () => {
+        setTempKeyword('');
+        setKeyword('');
+        setPageNumber(1);
     };
 
     return (
@@ -118,17 +158,93 @@ const ProductView = ({ params, navigate, addToCart }) => {
                 </div>
 
                 <div className="product-layout">
-                    {/* CỘT TRÁI: DANH MỤC SẢN PHẨM */}
+                    {/* CỘT TRÁI: DANH MỤC SẢN PHẨM & LỌC GIÁ */}
                     <aside className="product-sidebar">
                         <ProductCategoryList
                             activeCategoryId={activeCategoryId}
                             onSelectCategory={handleCategoryClick}
                             onCategoriesLoaded={setCategories}
                         />
+
+                        {/* BỘ LỌC GIÁ NÂNG CAO */}
+                        <div className="product-price-filter-card">
+                            <h5 className="product-price-filter-title">
+                                <i className="fa-solid fa-sliders"></i> Khoảng giá (VNĐ)
+                            </h5>
+
+                            <div className="price-inputs">
+                                <div className="price-input-group">
+                                    <label>Từ</label>
+                                    <input
+                                        type="number"
+                                        placeholder="Min..."
+                                        value={tempMinPrice}
+                                        onChange={(e) => setTempMinPrice(e.target.value)}
+                                        min="0"
+                                    />
+                                </div>
+                                <div className="price-input-group">
+                                    <label>Đến</label>
+                                    <input
+                                        type="number"
+                                        placeholder="Max..."
+                                        value={tempMaxPrice}
+                                        onChange={(e) => setTempMaxPrice(e.target.value)}
+                                        min="0"
+                                    />
+                                </div>
+                            </div>
+
+                            {priceError && (
+                                <div className="price-filter-error">
+                                    <i className="fa-solid fa-triangle-exclamation"></i> {priceError}
+                                </div>
+                            )}
+
+                            <div className="price-filter-actions">
+                                <button
+                                    className="btn-apply-filter"
+                                    onClick={handleApplyFilters}
+                                    disabled={!!priceError}
+                                >
+                                    Áp dụng
+                                </button>
+                                {(minPrice || maxPrice || keyword || activeCategoryId !== 'all') && (
+                                    <button className="btn-clear-filter" onClick={handleClearAllFilters}>
+                                        Xóa lọc
+                                    </button>
+                                )}
+                            </div>
+                        </div>
                     </aside>
 
                     {/* CỘT PHẢI: LƯỚI SẢN PHẨM VÀ PHÂN TRANG */}
                     <main className="product-main">
+                        {/* THANH TÌM KIẾM VÀ TỔNG HỢP Ở ĐẦU LƯỚI SẢN PHẨM */}
+                        <div className="product-main-header">
+                            <div className="product-count-summary">
+                                Hiển thị <strong>{products.length}</strong> sản phẩm
+                            </div>
+                            <div className="product-search-box">
+                                <i className="fa-solid fa-magnifying-glass search-icon"></i>
+                                <input
+                                    type="text"
+                                    placeholder="Tìm sản phẩm..."
+                                    value={tempKeyword}
+                                    onChange={(e) => setTempKeyword(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') handleSearchSubmit();
+                                    }}
+                                />
+                                {tempKeyword && (
+                                    <button className="search-clear-btn" onClick={handleClearSearch}>
+                                        <i className="fa-solid fa-xmark"></i>
+                                    </button>
+                                )}
+                                <button className="search-btn" onClick={handleSearchSubmit}>Tìm</button>
+                            </div>
+                        </div>
+
                         {loading ? (
                             <IsLoading message="Đang tải sản phẩm từ hệ thống..." />
                         ) : hasError ? (
@@ -136,7 +252,7 @@ const ProductView = ({ params, navigate, addToCart }) => {
                                 <i className="fa-solid fa-circle-exclamation"></i> Lỗi kết nối đến máy chủ. Vui lòng kiểm tra đường truyền!
                             </div>
                         ) : products.length === 0 ? (
-                            <div className="loading-text">Danh mục này hiện tại chưa có sản phẩm nào.</div>
+                            <div className="loading-text">Không tìm thấy sản phẩm nào phù hợp với bộ lọc hiện tại.</div>
                         ) : (
                             <>
                                 {/* LƯỚI HIỂN THỊ CHUẨN 4 SẢN PHẨM TRÊN 1 HÀNG KHI CÓ SIDEBAR */}

@@ -20,7 +20,7 @@ Hệ thống quản lý nội dung (CMS) và bán hàng được xây dựng tr�
 Dự án `ChinhCMS_Solution` được chia làm 3 dự án nhỏ bên trong:
 
 1.  **`CMS.Data` (Lớp dữ liệu)**:
-    - Chứa các bảng dữ liệu: `User` (Thành viên), `Category` (Danh mục bài viết), `Post` (Bài viết), `Customer` (Khách hàng), `Product` (Sản phẩm), `CategoryProduct` (Danh mục sản phẩm), `Order` (Đơn hàng), `OrderDetail` (Chi tiết đơn hàng).
+    - Chứa các bảng dữ liệu: `User` (Thành viên), `Category` (Danh mục bài viết), `Post` (Bài viết), `Customer` (Khách hàng), `Product` (Sản phẩm), `CategoryProduct` (Danh mục sản phẩm), `Order` (Đơn hàng), `OrderDetail` (Chi tiết đơn hàng), `Banner` (Quảng cáo/Trình chiếu).
     - Sử dụng `ApplicationDbContext` để kết nối và cấu hình quan hệ giữa các bảng.
 2.  **`CMS.Backend` (Trang quản trị)**:
     - Xây dựng bằng ASP.NET Core 8.0 MVC để làm trang quản trị (Admin Panel) cho người điều hành.
@@ -108,6 +108,15 @@ erDiagram
         int ProductId FK
         decimal Price
         int Quantity
+    }
+
+    BANNER {
+        int Id PK
+        string Name
+        string Description
+        string ImageUrl
+        int Status
+        DateTime CreatedDate
     }
 
     CATEGORY ||--o{ POST : "chứa"

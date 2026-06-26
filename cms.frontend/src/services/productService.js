@@ -1,9 +1,21 @@
 import axiosClient from '../axiosClient';
 
 const productService = {
-    // API lấy tất cả sản phẩm có phân trang
-    getAllProducts: (pageNumber, pageSize, keyword = '') => {
-        const url = `/product?pageNumber=${pageNumber}&pageSize=${pageSize}${keyword ? `&keyword=${encodeURIComponent(keyword)}` : ''}`;
+    // API lấy tất cả sản phẩm có phân trang và bộ lọc nâng cao
+    getAllProducts: (pageNumber, pageSize, keyword = '', minPrice = null, maxPrice = null, categoryId = null) => {
+        let url = `/product?pageNumber=${pageNumber}&pageSize=${pageSize}`;
+        if (keyword) {
+            url += `&keyword=${encodeURIComponent(keyword)}`;
+        }
+        if (minPrice !== null && minPrice !== undefined && minPrice !== '') {
+            url += `&minPrice=${minPrice}`;
+        }
+        if (maxPrice !== null && maxPrice !== undefined && maxPrice !== '') {
+            url += `&maxPrice=${maxPrice}`;
+        }
+        if (categoryId !== null && categoryId !== undefined && categoryId !== 'all') {
+            url += `&categoryId=${categoryId}`;
+        }
         return axiosClient.get(url);
     },
 
