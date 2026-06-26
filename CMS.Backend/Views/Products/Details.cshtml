@@ -1,0 +1,242 @@
+@model CMS.Data.Entities.Product
+
+@{
+    ViewData["Title"] = Model?.Name ?? "Chi tiết sản phẩm";
+    Layout = "_LayoutAdmin";
+}
+
+@* 
+   Thông tin sinh viên thực hiện dự án:
+   Sinh viên : Vũ Hoàng Chính
+   Mã sinh viên: 2122110380
+   Lớp: CCQ2211J
+   Ngày tạo: 26/06/2026
+   Phiên bản: 1.0 (Thêm màn hình xem chi tiết sản phẩm và xử lý CKEditor 5)
+*@
+
+<div class="container-fluid mt-4">
+    <!-- Thanh điều hướng liên kết nhanh -->
+    <nav aria-label="Đường dẫn liên kết" class="mb-4">
+        <ol class="breadcrumb bg-light p-3 rounded-3 shadow-sm border border-light">
+            <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-primary"><i class="bi bi-box-seam"></i> Quản lý sản phẩm</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Chi tiết sản phẩm</li>
+        </ol>
+    </nav>
+
+    @if (Model != null)
+    {
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <!-- Tiêu đề thẻ -->
+                    <div class="card-header bg-white border-0 pt-4 px-4 pb-2">
+                        <h3 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                            <span class="p-2 rounded bg-info bg-opacity-10 text-info">
+                                <i class="bi bi-eye-fill"></i>
+                            </span>
+                            CHI TIẾT SẢN PHẨM
+                        </h3>
+                        <p class="text-muted small mb-0">Xem toàn bộ thông số chi tiết và mô tả quảng cáo của sản phẩm.</p>
+                        <hr class="mt-3 mb-0 border-light" />
+                    </div>
+
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <!-- Cột bên trái: Hình ảnh sản phẩm -->
+                            <div class="col-md-5 text-center border-end border-light pe-md-4 mb-4 mb-md-0">
+                                <h5 class="fw-bold text-secondary mb-3 text-start"><i class="bi bi-image"></i> HÌNH ẢNH SẢN PHẨM</h5>
+                                <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-3 overflow-hidden border p-3 shadow-sm" style="width: 100%; max-width: 320px; min-height: 320px;">
+                                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                                    {
+                                        <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid" style="max-height: 300px; object-fit: contain; border-radius: 8px;" />
+                                    }
+                                    else
+                                    {
+                                        <div class="text-center py-5">
+                                            <i class="bi bi-image text-secondary display-1 d-block mb-2"></i>
+                                            <span class="text-muted small">Không có hình ảnh</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Cột bên phải: Thuộc tính cơ bản -->
+                            <div class="col-md-7 ps-md-4">
+                                <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-info-circle-fill"></i> THÔNG TIN CƠ BẢN</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-borderless align-middle">
+                                        <tbody>
+                                            <tr>
+                                                <td class="fw-bold text-dark" style="width: 35%;">Tên sản phẩm:</td>
+                                                <td class="text-primary fw-bold fs-5">@Model.Name</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-bold text-dark">Đường dẫn thân thiện (Slug):</td>
+                                                <td><span class="badge bg-light text-dark border">@Model.Slug</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-bold text-dark">Danh mục sản phẩm:</td>
+                                                <td>
+                                                    <span class="badge bg-primary text-white">
+                                                        @(Model.CategoryProduct?.Name ?? "Chưa phân loại")
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-bold text-dark">Giá bán (VNĐ):</td>
+                                                <td><strong class="text-success fs-5">@Model.Price.ToString("N0") VNĐ</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-bold text-dark">Số lượng tồn kho:</td>
+                                                <td>
+                                                    @if (Model.StockQuantity > 0)
+                                                    {
+                                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fw-semibold">
+                                                            Còn hàng: @Model.StockQuantity sản phẩm
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 fw-semibold">
+                                                            Hết hàng
+                                                        </span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hàng dưới: Mô tả chi tiết (Render HTML từ CKEditor) -->
+                        <div class="row mt-4 pt-4 border-top">
+                            <div class="col-12">
+                                <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-body-text"></i> MÔ TẢ CHI TIẾT SẢN PHẨM</h5>
+                                <div class="product-description-content border rounded-3 p-4 bg-light shadow-sm fs-6 lh-lg">
+                                    @if (!string.IsNullOrEmpty(Model.Description))
+                                    {
+                                        @Html.Raw(Model.Description)
+                                    }
+                                    else
+                                    {
+                                        <p class="text-muted italic mb-0">Chưa có thông tin mô tả chi tiết cho sản phẩm này.</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Các nút điều khiển -->
+                        <div class="d-flex gap-2 justify-content-end mt-4 border-top pt-4">
+                            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 py-2 d-inline-flex align-items-center gap-1">
+                                <i class="bi bi-arrow-left"></i> Quay lại
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning rounded-pill px-4 py-2 shadow-sm d-inline-flex align-items-center gap-1 text-dark" style="font-weight: 500;">
+                                <i class="bi bi-pencil-square"></i> Cập nhật sản phẩm
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Chân trang hiển thị thông tin tác giả -->
+                    <div class="card-footer bg-white border-0 py-3 text-center text-muted small border-top border-light">
+                        Sinh viên thực hiện: <strong>Vũ Hoàng Chính - 2122110380</strong> | Lớp: CCQ2211J
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger text-center shadow-sm">
+            <i class="bi bi-exclamation-triangle-fill"></i> Không tìm thấy thông tin sản phẩm này trong hệ thống.
+        </div>
+    }
+</div>
+
+<style>
+    /* Định dạng bảng biểu sinh ra từ CKEditor 5 tương thích giao diện quản trị */
+    .product-description-content table {
+        width: 100% !important;
+        margin: 1.5rem 0;
+        border-collapse: collapse;
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+    }
+    .product-description-content table th, 
+    .product-description-content table td {
+        padding: 12px 16px;
+        border: 1px solid #dee2e6;
+        vertical-align: middle;
+    }
+    .product-description-content table th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+        color: #0d6efd;
+    }
+    .product-description-content figure.table {
+        margin: 1.5rem 0;
+        width: 100%;
+        overflow-x: auto;
+    }
+    /* Định dạng hình ảnh và video nhúng */
+    .product-description-content figure.media {
+        margin: 1.5rem auto;
+        max-width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+    .product-description-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var container = document.querySelector('.product-description-content');
+        if (!container) return;
+
+        // Chuyển đổi thẻ oembed của CKEditor 5 thành iframe phát được video
+        var oembeds = container.querySelectorAll('oembed');
+        oembeds.forEach(function (oembed) {
+            var url = oembed.getAttribute('url');
+            if (url) {
+                var embedUrl = '';
+                
+                // Trích xuất ID youtube
+                var ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+                var ytMatch = url.match(ytRegex);
+                if (ytMatch && ytMatch[1]) {
+                    embedUrl = 'https://www.youtube.com/embed/' + ytMatch[1];
+                }
+
+                // Trích xuất ID vimeo
+                var vimeoRegex = /vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]+)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:$|\/|\?)/i;
+                var vimeoMatch = url.match(vimeoRegex);
+                if (vimeoMatch && vimeoMatch[1]) {
+                    embedUrl = 'https://player.vimeo.com/video/' + vimeoMatch[1];
+                }
+
+                if (embedUrl) {
+                    var iframe = document.createElement('iframe');
+                    iframe.src = embedUrl;
+                    iframe.width = "100%";
+                    iframe.height = "450";
+                    iframe.setAttribute('frameborder', '0');
+                    iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+                    iframe.setAttribute('allowfullscreen', 'true');
+                    iframe.style.borderRadius = "8px";
+                    iframe.style.marginTop = "10px";
+                    iframe.style.marginBottom = "10px";
+                    iframe.style.boxShadow = "0 4px 15px rgba(0,0,0,0.1)";
+                    
+                    if (oembed.parentNode) {
+                        oembed.parentNode.replaceChild(iframe, oembed);
+                    }
+                }
+            }
+        });
+    });
+</script>

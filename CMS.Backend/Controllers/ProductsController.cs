@@ -376,5 +376,22 @@ namespace CMS.Backend.Controllers
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
+
+        // ==========================================
+        // 5. XEM CHI TIẾT SẢN PHẨM (DETAILS)
+        // ==========================================
+        [HttpGet]
+        public IActionResult Details(int id)
+        {
+            var product = _context.Products
+                                  .Include(p => p.CategoryProduct)
+                                  .FirstOrDefault(p => p.Id == id);
+            if (product == null)
+            {
+                return NotFound("Không tìm thấy sản phẩm này trong hệ thống.");
+            }
+
+            return View(product);
+        }
     }
 }

@@ -113,7 +113,8 @@
                                     <td class="text-muted text-truncate" style="max-width: 250px;">
                                         @if (!string.IsNullOrEmpty(item.Description))
                                         {
-                                            @item.Description
+                                            var plainText = System.Text.RegularExpressions.Regex.Replace(item.Description, "<.*?>", string.Empty);
+                                            @plainText
                                         }
                                         else
                                         {
@@ -122,6 +123,9 @@
                                     </td>
                                     <td class="pe-4 text-end">
                                         <div class="d-inline-flex gap-2">
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info rounded-pill px-3 d-inline-flex align-items-center gap-1">
+                                                <i class="bi bi-eye-fill"></i> Xem
+                                            </a>
                                             <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning rounded-pill px-3 d-inline-flex align-items-center gap-1">
                                                 <i class="bi bi-pencil-square"></i> Sửa
                                             </a>
