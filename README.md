@@ -252,6 +252,17 @@ Dự án `ChinhCMS_Solution` được chia làm 3 dự án nhỏ bên trong:
   - Gọi API `/api/order/orderDetail/{id}` trên C# Backend để lấy thông tin chi tiết hóa đơn (ngày đặt, trạng thái, ghi chú), thông tin giao nhận hàng và bảng kê chi tiết mặt hàng (hình ảnh, tên, đơn giá, số lượng, thành tiền, tổng cộng).
 - **Tách riêng CSS của Modal (`OrderDetail.css`)**:
   - Tạo mới file CSS độc lập [OrderDetail.css](file:///e:/asp/Bailam/ChinhCMS_Solution/cms.frontend/src/assets/css/OrderDetail.css) để lưu trữ định dạng, màu sắc và hiệu ứng chuyển động riêng cho modal, giúp loại bỏ hoàn toàn CSS trùng lặp trong tệp tin chính.
+- **Quy tắc trừ tồn kho nâng cao (Inventory Deduction Policy)**:
+  - Loại bỏ hoàn toàn cơ chế tự động trừ tồn kho ngay khi đặt hàng thành công (khi đơn hàng ở trạng thái mặc định "Chờ duyệt").
+  - Số lượng tồn kho sản phẩm chỉ thực tế bị trừ đi khi Admin thực hiện phê duyệt đơn hàng sang trạng thái "Đang giao hàng" hoặc "Đã hoàn thành". Nếu hủy đơn hoặc chuyển ngược lại trạng thái cũ, tồn kho sẽ tự động hoàn trả.
+- **Chức năng xóa từng sản phẩm trong đơn hàng tại trang quản trị**:
+  - Tích hợp danh sách mặt hàng đã đặt trực tiếp vào màn hình **Cập nhật đơn hàng (Edit)**.
+  - Cho phép Admin xóa bớt sản phẩm lỗi/hết hàng khỏi hóa đơn của khách hàng thông qua nút hành động **Xóa** (POST form an toàn qua `DeleteDetail` trong `OrdersController`).
+  - Ràng buộc bảo mật chặt chẽ: Chỉ cho phép xóa sản phẩm khi đơn hàng ở trạng thái **Chờ duyệt** và đơn hàng phải chứa nhiều hơn 1 sản phẩm (nếu chỉ còn 1 sản phẩm cuối cùng, hệ thống sẽ ngăn chặn xóa để tránh đơn hàng trống rỗng, gợi ý Admin nên Đổi trạng thái sang Hủy bỏ hoặc Xóa cả đơn hàng); nếu đơn hàng đã ở trạng thái Đang giao hoặc Đã hoàn thành, nút xóa sẽ được tự động khóa lại thành nhãn "Khóa sửa" để tránh sai lệch dữ liệu kho.
+- **Trình soạn thảo CKEditor cho Sản phẩm**:
+  - Tích hợp CKEditor 5 vào giao diện Thêm mới sản phẩm (`Products/Create.cshtml`) và Cập nhật sản phẩm (`Products/Edit.cshtml`).
+  - Hỗ trợ đầy đủ định dạng văn bản nâng cao, chèn bảng (table), liên kết video (iframe/youtube) và tự động chuyển đổi hình ảnh tải lên thành mã Base64 inline thông qua Custom Upload Adapter.
+  - Cập nhật trang chi tiết sản phẩm ở React Frontend (`Detail.jsx`) hiển thị mô tả bằng cơ chế `dangerouslySetInnerHTML` để render chính xác tất cả các mã HTML của CKEditor.
 
 ---
 
@@ -323,7 +334,7 @@ Dự án `ChinhCMS_Solution` được chia làm 3 dự án nhỏ bên trong:
 | **Buổi 10** | Tích hợp Banner Carousel động, khóa danh mục hệ thống & Sửa lỗi cuộn Sidebar. | **Đã hoàn thành** | **Tạo bảng Banner, ApiBannerController, CRUD Banner Admin Dashboard upload ảnh và xóa tệp vật lý cũ, slider động HeroBanner. Khóa cứng danh mục 7 & 13. Sửa lỗi Sidebar cuộn.** |
 | **Buổi 11** | Tái cấu trúc SPA với React Router DOM, sửa lỗi cập nhật bài viết & Căn giữa Header. | **Đã hoàn thành** | **Tích hợp BrowserRouter/Link thay thế custom navigate, sửa tham số IFormFile? cho PostController, cân bằng flex Header căn giữa menu.** |
 | **Buổi 12** | Tích hợp giỏ hàng nâng cao, ô nhập số lượng bàn phím, trì hoãn luồng đặt hàng, đổi nhanh trạng thái Banner, Live Search Autocomplete, Tách nhỏ CSS, Phân trang 8 & Ẩn danh mục hệ thống. | **Đã hoàn thành** | **Thiết kế lại ProductCard; đệm đăng nhập tự động; ô nhập số lượng bàn phím giỏ hàng; giao diện Checkout 2 cột; AJAX đổi nhanh trạng thái Banner; phân tách Component Sidebar; tích hợp live-search Autocomplete trung tâm Header và SEO Slug cho bài viết (Post); phân rã main.css cồng kềnh thành các file CSS module riêng biệt (Header.css, Footer.css, Cart.css, ProductCard.css, ProductDetail.css); cấu hình phân trang hiển thị tối đa 8 thành phần mỗi trang cho cả sản phẩm và bài viết; loại bỏ danh mục mặc định "Tất cả" (ID: 7 và 13) khỏi dropdown list trong màn hình Thêm mới/Chỉnh sửa ở Admin; đồng nhất CSS phân trang toàn cục; thiết kế lại Header thông minh trên Mobile (tích hợp profile, search, và text giỏ hàng vào menu trượt); viết hệ thống chú thích tiếng Việt cho toàn bộ mã nguồn.** |
-| **Buổi 13** | Tái cấu trúc modular giao diện tài khoản, tách các subcomponents và CSS độc lập, hoàn thiện trang xem chi tiết đơn hàng (OrderDetail). | **Đã hoàn thành** | **Phân tách thành UserProfileHeader, OrderHistoryTable, OrderDetailModal; cấu hình liên kết API lấy chi tiết đơn hàng; tách riêng tệp CSS OrderDetail.css.** |
+| **Buổi 13** | Tái cấu trúc modular giao diện tài khoản, tách các subcomponents và CSS độc lập, hoàn thiện trang xem chi tiết đơn hàng (OrderDetail), tối ưu hóa quy tắc trừ tồn kho và xóa sản phẩm trong đơn hàng tại trang quản trị, tích hợp trình soạn thảo giàu nội dung CKEditor 5 cho thuộc tính mô tả sản phẩm (Description). | **Đã hoàn thành** | **Phân tách thành UserProfileHeader, OrderHistoryTable, OrderDetailModal; cấu hình liên kết API lấy chi tiết đơn hàng; tách riêng tệp CSS OrderDetail.css; thiết lập cơ chế trừ tồn kho khi phê duyệt đơn hàng; tích hợp danh sách sản phẩm và hành động xóa sản phẩm khi ở trạng thái Chờ duyệt vào trang cập nhật đơn hàng (Edit.cshtml); tích hợp CKEditor 5 cho mô tả sản phẩm ở backend và render HTML ở frontend.** |
 ---
 
 

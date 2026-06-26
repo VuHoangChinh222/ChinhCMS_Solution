@@ -105,6 +105,8 @@ namespace CMS.Backend.Controllers
         {
             var order = _context.Orders
                                 .Include(o => o.Customer)
+                                .Include(o => o.OrderDetails)
+                                    .ThenInclude(od => od.Product)
                                 .FirstOrDefault(o => o.Id == id);
             if (order == null)
             {
@@ -148,6 +150,8 @@ namespace CMS.Backend.Controllers
                             {
                                 // Nếu số lượng tồn trong kho nhỏ hơn số lượng khách đặt mua, báo lỗi lên giao diện và dừng duyệt đơn
                                 ModelState.AddModelError("", $"Sản phẩm '{detail.Product.Name}' không đủ số lượng tồn kho để duyệt đơn hàng (Tồn kho hiện tại: {detail.Product.StockQuantity}, Cần: {detail.Quantity}).");
+                                model.Customer = _context.Customers.Find(model.CustomerId);
+                                model.OrderDetails = _context.OrderDetails.Include(d => d.Product).Where(d => d.OrderId == model.Id).ToList();
                                 return View(model);
                             }
                         }
@@ -201,6 +205,8 @@ namespace CMS.Backend.Controllers
                 }
             }
             // Trả về View kèm model chứa các lỗi ModelState để người dùng biết nguyên nhân thất bại
+            model.Customer = _context.Customers.Find(model.CustomerId);
+            model.OrderDetails = _context.OrderDetails.Include(d => d.Product).Where(d => d.OrderId == model.Id).ToList();
             return View(model);
         }
 
@@ -248,6 +254,46 @@ namespace CMS.Backend.Controllers
                 _context.SaveChanges();
             }
             return RedirectToAction("Index");
+        }
+
+        // ==========================================
+        // 5. XÓA SẢN PHẨM KHỎI ĐƠN HÀNG (DELETE DETAIL)
+        // ==========================================
+        [HttpPost]
+        public IActionResult DeleteDetail(int id)
+        {
+            var orderDetail = _context.OrderDetails
+                                       .Include(od => od.Order)
+                                       .Include(od => od.Product)
+                                       .FirstOrDefault(od => od.Id == id);
+            
+            if (orderDetail == null)
+            {
+                return NotFound("Không tìm thấy chi tiết đơn hàng này.");
+            }
+
+            int orderId = orderDetail.OrderId;
+
+            // Kiểm tra trạng thái đơn hàng: Chỉ cho phép xóa khi đơn hàng ở trạng thái Chờ duyệt (0)
+            if (orderDetail.Order == null || orderDetail.Order.Status != 0)
+            {
+                TempData["ErrorMessage"] = "Không thể xóa sản phẩm! Chỉ được phép xóa sản phẩm khỏi đơn hàng khi đơn hàng đang ở trạng thái 'Chờ duyệt'.";
+                return RedirectToAction("Edit", new { id = orderId });
+            }
+
+            // Kiểm tra số lượng sản phẩm còn lại trong đơn hàng
+            int totalItemsInOrder = _context.OrderDetails.Count(od => od.OrderId == orderId);
+            if (totalItemsInOrder <= 1)
+            {
+                TempData["ErrorMessage"] = "Không thể xóa sản phẩm cuối cùng khỏi đơn hàng! Nếu muốn loại bỏ sản phẩm này, vui lòng cập nhật trạng thái đơn hàng thành 'Đã hủy bỏ' hoặc xóa hoàn toàn đơn hàng.";
+                return RedirectToAction("Edit", new { id = orderId });
+            }
+
+            _context.OrderDetails.Remove(orderDetail);
+            _context.SaveChanges();
+
+            TempData["SuccessMessage"] = "Đã xóa sản phẩm khỏi đơn hàng thành công!";
+            return RedirectToAction("Edit", new { id = orderId });
         }
     }
 }

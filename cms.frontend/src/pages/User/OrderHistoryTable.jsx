@@ -58,7 +58,11 @@ const OrderHistoryTable = ({ orders, loading, hasError, onViewDetail }) => {
                 }
 
                 return (
-                  <tr key={order.id}>
+                  <tr
+                    key={order.id}
+                    onClick={() => onViewDetail(order.id)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <td><strong>#{order.id}</strong></td>
                     <td>{new Date(order.orderDate).toLocaleString('vi-VN')}</td>
                     <td><strong className="user-profile-spent-val">{formatPrice(order.totalAmount)}</strong></td>
@@ -68,10 +72,13 @@ const OrderHistoryTable = ({ orders, loading, hasError, onViewDetail }) => {
                     </td>
                     <td className="orders-table-notes">{order.notes || 'Không có ghi chú'}</td>
                     <td>
-                      <button 
+                      <button
                         className="btn btn-primary btn-sm user-profile-edit-btn"
                         style={{ padding: '6px 12px', fontSize: '0.8rem', height: 'auto' }}
-                        onClick={() => onViewDetail(order.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onViewDetail(order.id);
+                        }}
                       >
                         <i className="fa-solid fa-eye"></i> Xem chi tiết
                       </button>

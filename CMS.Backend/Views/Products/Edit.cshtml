@@ -105,7 +105,7 @@
                                 <!-- Mô tả chi tiết -->
                                 <div class="mb-4">
                                     <label asp-for="Description" class="form-label fw-bold text-dark">Mô tả sản phẩm</label>
-                                    <textarea asp-for="Description" class="form-control" rows="5" placeholder="Nhập cấu hình, đặc điểm nổi bật..."></textarea>
+                                    <textarea asp-for="Description" id="editor" class="form-control" rows="5" placeholder="Nhập cấu hình, đặc điểm nổi bật..."></textarea>
                                     <span asp-validation-for="Description" class="text-danger small mt-1 d-block"></span>
                                 </div>
                             </div>
@@ -163,4 +163,48 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <!-- Nạp thư viện trình soạn thảo CKEditor 5 từ CDN -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+    
+    <script>
+        // Định nghĩa Custom Upload Adapter để xử lý chuyển ảnh thành Base64 inline
+        class Base64UploadAdapter {
+            constructor(loader) {
+                this.loader = loader;
+            }
+
+            upload() {
+                return this.loader.file
+                    .then(file => new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            resolve({ default: reader.result });
+                        };
+                        reader.onerror = error => reject(error);
+                        reader.readAsDataURL(file);
+                    }));
+            }
+
+            abort() {
+                // Hủy bỏ tác vụ nếu cần
+            }
+        }
+
+        // Đăng ký Plugin vào Editor
+        function MyCustomUploadAdapterPlugin(editor) {
+            editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+                return new Base64UploadAdapter(loader);
+            };
+        }
+
+        // Kích hoạt khởi tạo trình soạn thảo giàu nội dung CKEditor 5
+        ClassicEditor
+            .create(document.querySelector('#editor'), {
+                placeholder: 'Nhập cấu hình, đặc điểm nổi bật, thông số kỹ thuật chi tiết của sản phẩm...',
+                extraPlugins: [MyCustomUploadAdapterPlugin]
+            })
+            .catch(error => {
+                console.error('Lỗi khi khởi tạo CKEditor 5: ', error);
+            });
+    </script>
 }
