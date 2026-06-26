@@ -165,6 +165,71 @@ graph TD
   * Đồng thời mở cổng giao tiếp Web API (JSON RESTful) và thiết lập CORS để ReactJS có thể truy cập từ xa.
 * **Giao diện Client (`cms.frontend`)**: Hoạt động hoàn toàn độc lập ở máy khách (ReactJS), kết nối lấy dữ liệu thông tin, sản phẩm, bài viết và đẩy đơn hàng về server qua Axios.
 
+### 3. Sơ đồ luồng gửi Email hệ thống (Email Communication Flow)
+
+Dưới đây là sơ đồ mô tả luồng gửi email tự động từ ứng dụng Client thông qua hệ thống Backend API kết nối với máy chủ SMTP của Google:
+
+```mermaid
+graph TD
+    subgraph Client ["Ứng dụng Khách hàng (ReactJS Client)"]
+        forgot["Yêu cầu Quên mật khẩu<br/>(ForgotPassword.jsx)"]
+        checkout["Xác nhận Đặt hàng & Thanh toán<br/>(PaymentView.jsx)"]
+    end
+
+    subgraph Backend ["Hệ thống Máy chủ (ASP.NET Backend API)"]
+        ctrlCustomer["ApiCustomerController.cs<br/>[forgot-password]"]
+        ctrlOrder["ApiOrderController.cs<br/>[checkout]"]
+        dbContext["ApplicationDbContext<br/>(SQL Server Database)"]
+        smtp["System.Net.Mail.SmtpClient<br/>(Cổng 587 - SSL)"]
+    end
+
+    subgraph MailService ["Dịch vụ Mail (Google SMTP Server)"]
+        gmail["Google Mail Gateway<br/>(Xác thực App Password)"]
+    end
+
+    subgraph Recipient ["Hộp thư Khách hàng"]
+        inbox["Hộp thư Gmail nhận<br/>(Inbox / Spam)"]
+    end
+
+    %% Luồng Quên mật khẩu
+    forgot -- "1. POST api/customer/forgot-password" --> ctrlCustomer
+    ctrlCustomer -- "2. Tra cứu email khách hàng" --> dbContext
+    ctrlCustomer -- "3. Sinh ngẫu nhiên MK 16 ký tự<br/>& băm mật khẩu bằng BCrypt" --> dbContext
+    ctrlCustomer -- "4. Dựng email HTML khôi phục mật khẩu" --> smtp
+
+    %% Luồng Xác nhận Đơn hàng
+    checkout -- "1. POST api/order/checkout" --> ctrlOrder
+    ctrlOrder -- "2. Lưu hóa đơn & Trừ kho (khi duyệt)" --> dbContext
+    ctrlOrder -- "3. Lấy thông tin & Ảnh sản phẩm<br/>& Tạo bảng HTML kèm ảnh tuyệt đối" --> smtp
+
+    %% SMTP kết nối chuyển tiếp
+    smtp -- "5. Gửi thư qua smtp.gmail.com" --> gmail
+    gmail -- "6. Gửi tới hòm thư người nhận" --> inbox
+
+    style Client fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#fff
+    style Backend fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff
+    style MailService fill:#b91c1c,stroke:#f87171,stroke-width:2px,color:#fff
+    style Recipient fill:#14532d,stroke:#4ade80,stroke-width:2px,color:#fff
+```
+
+#### Chi tiết Luồng xử lý gửi Email:
+1. **Luồng Khôi phục Mật khẩu (Forgot Password)**:
+   - **Bước 1 (Client)**: Khách hàng nhập email tại trang `/forgot-password` (được tách thành trang riêng độc lập) và nhấn nút gửi yêu cầu.
+   - **Bước 2 (API - Nhận Request)**: Endpoint `POST api/customer/forgot-password` trong `ApiCustomerController.cs` tiếp nhận email, tiến hành tra cứu tài khoản trong cơ sở dữ liệu SQL Server.
+   - **Bước 3 (API - Sinh thông tin bảo mật)**: Hệ thống sinh ngẫu nhiên mật khẩu tạm thời mới dài **16 ký tự** (bao gồm ký tự viết hoa, viết thường, chữ số và ký tự đặc biệt). Sau đó, mật khẩu tạm này được băm bằng thuật toán BCrypt thông qua helper `PasswordHelper.HashPassword` rồi lưu đè vào CSDL.
+   - **Bước 4 (API - Khởi tạo Email)**: Dựng template nội dung email dạng HTML hiển thị thông tin tài khoản và mật khẩu tạm một cách an toàn và chuyên nghiệp.
+   - **Bước 5 (API - Gửi SMTP)**: API đọc thông số cấu hình SMTP từ file `appsettings.json` (bao gồm địa chỉ máy chủ `smtp.gmail.com`, cổng `587`, email gửi `vuhoangchinh222@gmail.com` và Mật khẩu ứng dụng Gmail (App Password)). Sau đó sử dụng lớp `System.Net.Mail` thiết lập kết nối SSL để gửi đi.
+   - **Bước 6 (Nhận Email)**: Khách hàng nhận được email thật, đăng nhập bằng mật khẩu tạm 16 ký tự này và tiến hành đổi mật khẩu mới trong trang cá nhân.
+
+2. **Luồng Xác nhận Đơn hàng (Order Confirmation)**:
+   - **Bước 1 (Client)**: Sau khi hoàn tất lựa chọn sản phẩm và thanh toán tại trang `/payment`, client gửi yêu cầu hoàn tất đơn hàng về API.
+   - **Bước 2 (API - Xử lý DB)**: `ApiOrderController.cs` tiếp nhận đơn hàng, ghi nhận chi tiết đơn hàng vào CSDL thông qua Database Transaction đảm bảo tính toàn vẹn dữ liệu.
+   - **Bước 3 (API - Thiết lập Email đính kèm ảnh sản phẩm)**:
+     - Duyệt danh sách các sản phẩm khách hàng đã đặt. Truy vấn đường dẫn ảnh đại diện (`ImageUrl`) của từng sản phẩm.
+     - Hệ thống kiểm tra: Nếu đường dẫn ảnh đang lưu trữ ở dạng tương đối (`/images/...`), hệ thống tự động nối với domain API gốc `https://localhost:7291` để tạo thành một URL hình ảnh tuyệt đối.
+     - Lắp ráp tóm tắt đơn hàng thành một bảng HTML gồm các cột: **Hình ảnh sản phẩm (ảnh hiển thị trực quan ở size 60px)**, Tên sản phẩm, Số lượng, Đơn giá và Thành tiền.
+     - Gửi email xác nhận kèm bảng thống kê hóa đơn qua SMTP Gmail cho khách hàng.
+
 ---
 
 ## CÁC TÍNH NĂNG ĐÃ HOÀN THÀNH
@@ -401,6 +466,13 @@ graph TD
   - Hỗ trợ đầy đủ định dạng văn bản nâng cao, chèn bảng (table), liên kết video (iframe/youtube) và tự động chuyển đổi hình ảnh tải lên thành mã Base64 inline thông qua Custom Upload Adapter.
   - Cập nhật trang chi tiết sản phẩm ở React Frontend (`Detail.jsx`) hiển thị mô tả bằng cơ chế `dangerouslySetInnerHTML` để render chính xác tất cả các mã HTML của CKEditor.
 
+### 14. Nâng cấp bảo mật, xác thực & chi tiết gửi mail (Khôi phục mật khẩu & Xác nhận đơn hàng) - [MỚI]
+- **Trang Quên mật khẩu độc lập (`ForgotPassword.jsx`)**: Tách biệt luồng lấy lại mật khẩu khỏi trang Đăng nhập để tăng tính rõ ràng cho người dùng, sử dụng tệp CSS định dạng riêng biệt.
+- **Nút Quên mật khẩu tối ưu**: Đặt nút "Quên mật khẩu?" ngay bên dưới trường mật khẩu trong form đăng nhập, trỏ đường dẫn điều hướng chuẩn Router DOM.
+- **Thuật toán sinh mật khẩu tạm phức tạp**: Thay thế mật khẩu tạm ngắn cố định bằng chuỗi ngẫu nhiên dài 16 ký tự bao gồm đầy đủ tập ký tự (chữ hoa, chữ thường, số, ký tự đặc biệt) bảo mật tuyệt đối.
+- **Email đính kèm ảnh sản phẩm sinh động**: Bảng danh sách hàng hóa trong thư xác nhận đơn hàng giờ đây đính kèm thêm cột Hình ảnh sản phẩm (định dạng gọn gàng 60px). Hệ thống tự động phân tích và chuẩn hóa các đường dẫn ảnh tương đối trên DB thành địa chỉ URL tuyệt đối dựa trên domain host Backend API để email client hiển thị chuẩn.
+- **Trang Đăng ký xác thực hai lớp (Confirm Password)**: Tích hợp thêm trường "Nhập lại mật khẩu" tại trang Register với mắt toggle ẩn hiện riêng biệt. Ngăn chặn việc gửi thông tin nếu hai ô mật khẩu không trùng khớp hoặc mật khẩu có độ dài dưới 6 ký tự.
+
 ---
 
 ## HƯỚNG DẪN CÀI ĐẶT VÀ KHỞI CHẠY DỰ ÁN
@@ -472,6 +544,7 @@ graph TD
 | **Buổi 11** | Tái cấu trúc SPA với React Router DOM, sửa lỗi cập nhật bài viết & Căn giữa Header. | **Đã hoàn thành** | **Tích hợp BrowserRouter/Link thay thế custom navigate, sửa tham số IFormFile? cho PostController, cân bằng flex Header căn giữa menu.** |
 | **Buổi 12** | Tích hợp giỏ hàng nâng cao, ô nhập số lượng bàn phím, trì hoãn luồng đặt hàng, đổi nhanh trạng thái Banner, Live Search Autocomplete, Tách nhỏ CSS, Phân trang 8 & Ẩn danh mục hệ thống. | **Đã hoàn thành** | **Thiết kế lại ProductCard; đệm đăng nhập tự động; ô nhập số lượng bàn phím giỏ hàng; giao diện Checkout 2 cột; AJAX đổi nhanh trạng thái Banner; phân tách Component Sidebar; tích hợp live-search Autocomplete trung tâm Header và SEO Slug cho bài viết (Post); phân rã main.css cồng kềnh thành các file CSS module riêng biệt (Header.css, Footer.css, Cart.css, ProductCard.css, ProductDetail.css); cấu hình phân trang hiển thị tối đa 8 thành phần mỗi trang cho cả sản phẩm và bài viết; loại bỏ danh mục mặc định "Tất cả" (ID: 7 và 13) khỏi dropdown list trong màn hình Thêm mới/Chỉnh sửa ở Admin; đồng nhất CSS phân trang toàn cục; thiết kế lại Header thông minh trên Mobile (tích hợp profile, search, và text giỏ hàng vào menu trượt); viết hệ thống chú thích tiếng Việt cho toàn bộ mã nguồn.** |
 | **Buổi 13** | Tái cấu trúc modular giao diện tài khoản, tách các subcomponents và CSS độc lập, hoàn thiện trang xem chi tiết đơn hàng (OrderDetail), tối ưu hóa quy tắc trừ tồn kho và xóa sản phẩm trong đơn hàng tại trang quản trị, tích hợp trình soạn thảo giàu nội dung CKEditor 5 cho thuộc tính mô tả sản phẩm (Description), bổ sung bộ lọc giá API sản phẩm, và xây dựng giao diện xem chi tiết sản phẩm cho Admin. | **Đã hoàn thành** | **Phân tách thành UserProfileHeader, OrderHistoryTable, OrderDetailModal; cấu hình liên kết API lấy chi tiết đơn hàng; tách riêng tệp CSS OrderDetail.css; thiết lập cơ chế trừ tồn kho khi phê duyệt đơn hàng; tích hợp danh sách sản phẩm và hành động xóa sản phẩm khi ở trạng thái Chờ duyệt vào trang cập nhật đơn hàng (Edit.cshtml); tích hợp CKEditor 5 cho mô tả sản phẩm ở backend và render HTML ở frontend; thêm tham số `minPrice`, `maxPrice` cho API sản phẩm; xây dựng trang Details sản phẩm cho Admin và vẽ sơ đồ ERD & giao tiếp hệ thống.** |
+| **Buổi 14** | Tách riêng biệt trang Quên mật khẩu, nâng cấp độ phức tạp mật khẩu khôi phục, bổ sung ảnh sản phẩm vào email xác nhận đơn hàng, hoàn thiện form đăng ký kiểm tra xác thực mật khẩu trùng khớp và tối thiểu 6 ký tự. | **Đã hoàn thành** | **Tạo trang mới ForgotPassword.jsx và file CSS riêng biệt; thay đổi mật khẩu tạm sang độ dài 16 ký tự ngẫu nhiên đầy đủ tập ký tự; tự động ghép đầu domain API để gửi ảnh tuyệt đối đính kèm trong thư HTML hóa đơn; tích hợp ô "Nhập lại mật khẩu" tại trang Register cùng các validation logic.** |
 ---
 
 
