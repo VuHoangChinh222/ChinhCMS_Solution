@@ -239,34 +239,71 @@ Dự án `ChinhCMS_Solution` được chia làm 3 dự án nhỏ bên trong:
   - Gắn sự kiện `createUploadAdapter` vào dịch vụ `FileRepository` thông qua thuộc tính `extraPlugins` của CKEditor 5.
   - Nhờ đó, trình soạn thảo hỗ trợ kéo-thả, dán ảnh, hoặc chọn tệp tin ảnh từ máy tính cá nhân để tự động mã hóa sang định dạng Base64 và chèn trực tiếp dạng thẻ `<img>` nội tuyến vào bài viết mà không gặp lỗi kết nối server hay cần endpoint upload lưu trữ tạm.
 
+### 13. Tái cấu trúc Modular trang cá nhân & Trang xem chi tiết đơn hàng (OrderDetail) - [MỚI]
+
+- **Tách cấu trúc Modular ở Giao diện Tài khoản (`pages/User/`)**:
+  - Phân rã trang chính `Index.jsx` cồng kềnh thành 3 component con độc lập:
+    1. `UserProfileHeader.jsx`: Quản lý thông tin tài khoản và Hạng VIP động.
+    2. `OrderHistoryTable.jsx`: Quản lý bảng hiển thị lịch sử các đơn hàng đã đặt.
+    3. `OrderDetailModal.jsx`: Quản lý hiển thị chi tiết hóa đơn (tự import css từ `OrderDetail.css`).
+  - Trang `Index.jsx` giữ vai trò làm container nạp dữ liệu khách hàng từ cookie và kết nối/phân phối props cho các component con.
+- **Tích hợp Modal chi tiết đơn hàng (Order Detail Modal)**:
+  - Cho phép người dùng bấm xem chi tiết đơn hàng trực quan thông qua nút hành động.
+  - Gọi API `/api/order/orderDetail/{id}` trên C# Backend để lấy thông tin chi tiết hóa đơn (ngày đặt, trạng thái, ghi chú), thông tin giao nhận hàng và bảng kê chi tiết mặt hàng (hình ảnh, tên, đơn giá, số lượng, thành tiền, tổng cộng).
+- **Tách riêng CSS của Modal (`OrderDetail.css`)**:
+  - Tạo mới file CSS độc lập [OrderDetail.css](file:///e:/asp/Bailam/ChinhCMS_Solution/cms.frontend/src/assets/css/OrderDetail.css) để lưu trữ định dạng, màu sắc và hiệu ứng chuyển động riêng cho modal, giúp loại bỏ hoàn toàn CSS trùng lặp trong tệp tin chính.
+
 ---
 
-## HƯỚNG DẪN CÀI ĐẶT VÀ KHỞI CHẠY
+## HƯỚNG DẪN CÀI ĐẶT VÀ KHỞI CHẠY DỰ ÁN
 
-### 1. Chuẩn bị:
+### 1. Chuẩn bị môi trường:
+- **Hệ điều hành**: Windows (đã kích hoạt IIS Express và hỗ trợ ASP.NET Core Runtime).
+- **Bộ công cụ lập trình (IDE)**: Visual Studio 2019/2022 (khuyến nghị) hoặc VS Code.
+- **Phía Backend**: .NET 8.0 SDK.
+- **Phía Frontend**: Node.js (phiên bản v16 trở lên) và trình quản lý gói npm.
+- **Hệ quản trị cơ sở dữ liệu**: SQL Server LocalDB (`(localdb)\MSSQLLocalDB`) hoặc SQL Server Developer/Express Edition.
 
-- Visual Studio 2022 hoặc VS Code.
-- .NET 8.0 SDK.
-- SQL Server (khuyến nghị dùng LocalDB).
+### 2. Thiết lập cơ sở dữ liệu (Database Setup):
+1. Mở file cấu hình `CMS.Backend/appsettings.json` và điều chỉnh chuỗi kết nối SQL Server của bạn nếu cần thiết. Mặc định hệ thống được thiết lập chạy trên LocalDB:
+   ```json
+   "ConnectionStrings": {
+     "DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=ChinhCMS_DB;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"
+   }
+   ```
+2. Khởi chạy ứng dụng Visual Studio và mở file Solution `ChinhCMS_Solution.sln`.
+3. Mở cửa sổ dòng lệnh **Package Manager Console** (`Tools` -> `NuGet Package Manager` -> `Package Manager Console`).
+4. Thiết lập ô **Default project** trỏ về dự án **`CMS.Backend`**.
+5. Nhập lệnh sau đây để tự động tạo cơ sở dữ liệu, các bảng và chèn dữ liệu khởi tạo (Seed Data):
+   ```powershell
+   Update-Database
+   ```
 
-### 2. Cài đặt các thư viện (NuGet Packages):
+### 3. Khởi chạy Backend (ASP.NET Core Web API):
+1. Thiết lập dự án khởi chạy mặc định (Startup Project) là **`CMS.Backend`**.
+2. Nhấn phím **F5** (hoặc nút **Start** trên thanh công cụ) để chạy dự án bằng profile `IIS Express` hoặc `CMS.Backend`.
+3. Khi khởi chạy thành công, API sẽ hoạt động tại các cổng mặc định: `https://localhost:7291` và `http://localhost:5291`.
+4. Bạn có thể truy cập tài liệu hướng dẫn kiểm thử các API tự động thông qua **Swagger UI** tại địa chỉ: `https://localhost:7291/swagger`.
 
-Mở `Package Manager Console` trong Visual Studio và cài đặt các thư viện:
-
-```powershell
-Install-Package Microsoft.EntityFrameworkCore.SqlServer
-Install-Package Microsoft.EntityFrameworkCore.Tools
-```
-
-### 3. Cấu hình kết nối cơ sở dữ liệu:
-
-Mở file `CMS.Backend/appsettings.json` và điều chỉnh chuỗi kết nối đến SQL Server của bạn. Mặc định hệ thống sử dụng LocalDB:
-
-```json
-"ConnectionStrings": {
-  "DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=ChinhCMS_DB;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"
-}
-```
+### 4. Thiết lập và khởi chạy Frontend (ReactJS + Vite):
+1. Mở cửa sổ dòng lệnh (Terminal / PowerShell) trên máy tính và điều hướng vào thư mục chứa giao diện:
+   ```powershell
+   cd cms.frontend
+   ```
+2. Thực hiện tải và cài đặt toàn bộ thư viện cần thiết (Node Modules):
+   ```powershell
+   npm install
+   ```
+3. Xác minh tệp tin môi trường `.env` nằm trong thư mục gốc `cms.frontend/.env` đã cấu hình địa chỉ Backend API chính xác:
+   ```env
+   REACT_APP_API_URL=https://localhost:7291/api
+   REACT_APP_IMAGE_BASE_URL=https://localhost:7291
+   ```
+4. Khởi chạy máy chủ phát triển Frontend ReactJS:
+   ```powershell
+   npm run dev
+   ```
+5. Mở trình duyệt và truy cập trang web bán hàng theo cổng hiển thị trong cửa sổ terminal (thông thường là `http://localhost:5173`).
 
 ---
 
@@ -286,6 +323,7 @@ Mở file `CMS.Backend/appsettings.json` và điều chỉnh chuỗi kết nối
 | **Buổi 10** | Tích hợp Banner Carousel động, khóa danh mục hệ thống & Sửa lỗi cuộn Sidebar. | **Đã hoàn thành** | **Tạo bảng Banner, ApiBannerController, CRUD Banner Admin Dashboard upload ảnh và xóa tệp vật lý cũ, slider động HeroBanner. Khóa cứng danh mục 7 & 13. Sửa lỗi Sidebar cuộn.** |
 | **Buổi 11** | Tái cấu trúc SPA với React Router DOM, sửa lỗi cập nhật bài viết & Căn giữa Header. | **Đã hoàn thành** | **Tích hợp BrowserRouter/Link thay thế custom navigate, sửa tham số IFormFile? cho PostController, cân bằng flex Header căn giữa menu.** |
 | **Buổi 12** | Tích hợp giỏ hàng nâng cao, ô nhập số lượng bàn phím, trì hoãn luồng đặt hàng, đổi nhanh trạng thái Banner, Live Search Autocomplete, Tách nhỏ CSS, Phân trang 8 & Ẩn danh mục hệ thống. | **Đã hoàn thành** | **Thiết kế lại ProductCard; đệm đăng nhập tự động; ô nhập số lượng bàn phím giỏ hàng; giao diện Checkout 2 cột; AJAX đổi nhanh trạng thái Banner; phân tách Component Sidebar; tích hợp live-search Autocomplete trung tâm Header và SEO Slug cho bài viết (Post); phân rã main.css cồng kềnh thành các file CSS module riêng biệt (Header.css, Footer.css, Cart.css, ProductCard.css, ProductDetail.css); cấu hình phân trang hiển thị tối đa 8 thành phần mỗi trang cho cả sản phẩm và bài viết; loại bỏ danh mục mặc định "Tất cả" (ID: 7 và 13) khỏi dropdown list trong màn hình Thêm mới/Chỉnh sửa ở Admin; đồng nhất CSS phân trang toàn cục; thiết kế lại Header thông minh trên Mobile (tích hợp profile, search, và text giỏ hàng vào menu trượt); viết hệ thống chú thích tiếng Việt cho toàn bộ mã nguồn.** |
+| **Buổi 13** | Tái cấu trúc modular giao diện tài khoản, tách các subcomponents và CSS độc lập, hoàn thiện trang xem chi tiết đơn hàng (OrderDetail). | **Đã hoàn thành** | **Phân tách thành UserProfileHeader, OrderHistoryTable, OrderDetailModal; cấu hình liên kết API lấy chi tiết đơn hàng; tách riêng tệp CSS OrderDetail.css.** |
 ---
 
 

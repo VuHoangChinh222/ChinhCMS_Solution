@@ -11,6 +11,12 @@ const orderService = {
     checkout: (orderData) => {
         const url = '/order/checkout';
         return axiosClient.post(url, orderData);
+    },
+
+    // API lấy chi tiết một đơn hàng (bao gồm danh sách mặt hàng và tổng tiền)
+    getOrderDetailById: (orderId) => {
+        const url = `/order/orderDetail/${orderId}`;
+        return axiosClient.get(url);
     }
 };
 
