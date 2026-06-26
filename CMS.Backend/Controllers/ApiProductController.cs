@@ -61,15 +61,38 @@ namespace CMS.Backend.Controllers
         // ==========================================
         // GET: api/product?pageNumber=1&pageSize=10
         [HttpGet]
-        public IActionResult GetAll([FromQuery] string? keyword = null, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public IActionResult GetAll(
+            [FromQuery] string? keyword = null, 
+            [FromQuery] decimal? minPrice = null, 
+            [FromQuery] decimal? maxPrice = null, 
+            [FromQuery] int pageNumber = 1, 
+            [FromQuery] int pageSize = 10)
         {
             // Ràng buộc dữ liệu đầu vào tối thiểu
             if (pageNumber < 1) pageNumber = 1;
             if (pageSize < 1) pageSize = 10;
 
+            // Ràng buộc đơn giá tối thiểu không cao hơn đơn giá tối đa
+            if (minPrice.HasValue && maxPrice.HasValue && minPrice.Value > maxPrice.Value)
+            {
+                return BadRequest(new { message = "Đơn giá tối thiểu (minPrice) không được cao hơn đơn giá tối đa (maxPrice)." });
+            }
+
             try
             {
                 IQueryable<Product> query = _context.Products;
+
+                // Lọc theo khoảng giá minPrice nếu có
+                if (minPrice.HasValue)
+                {
+                    query = query.Where(p => p.Price >= minPrice.Value);
+                }
+
+                // Lọc theo khoảng giá maxPrice nếu có
+                if (maxPrice.HasValue)
+                {
+                    query = query.Where(p => p.Price <= maxPrice.Value);
+                }
 
                 // Thực hiện lọc theo từ khóa tìm kiếm nếu có
                 if (!string.IsNullOrEmpty(keyword))

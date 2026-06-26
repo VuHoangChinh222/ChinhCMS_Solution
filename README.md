@@ -30,6 +30,134 @@ Dự án `ChinhCMS_Solution` được chia làm 3 dự án nhỏ bên trong:
 
 ---
 
+## SƠ ĐỒ QUAN HỆ THỰC THỂ (ERD) & KIẾN TRÚC GIAO TIẾP
+
+### 1. Sơ đồ quan hệ các thực thể (Entity Relationship Diagram - ERD)
+
+Dưới đây là sơ đồ quan hệ giữa các bảng cơ sở dữ liệu trong hệ thống:
+
+```mermaid
+erDiagram
+    USER {
+        int Id PK
+        string Username
+        string Email
+        string Password
+        string Role
+        int Status
+    }
+
+    CATEGORY {
+        int Id PK
+        string Name
+        string Description
+        string ImageUrl
+    }
+
+    POST {
+        int Id PK
+        string Title
+        string Description
+        string Content
+        string ImageUrl
+        DateTime CreatedDate
+        int CategoryId FK
+    }
+
+    CATEGORY_PRODUCT {
+        int Id PK
+        string Name
+        string Description
+        string ImageUrl
+    }
+
+    PRODUCT {
+        int Id PK
+        string Name
+        string Slug
+        string Description
+        decimal Price
+        int StockQuantity
+        string ImageUrl
+        int CategoryProductId FK
+    }
+
+    CUSTOMER {
+        int Id PK
+        string FullName
+        string Email
+        string Password
+        string Phone
+        string Address
+        string Role
+        DateTime CreatedDate
+    }
+
+    ORDER {
+        int Id PK
+        int CustomerId FK
+        DateTime OrderDate
+        decimal TotalAmount
+        string Note
+        int Status
+    }
+
+    ORDER_DETAIL {
+        int Id PK
+        int OrderId FK
+        int ProductId FK
+        decimal Price
+        int Quantity
+    }
+
+    CATEGORY ||--o{ POST : "chứa"
+    CATEGORY_PRODUCT ||--o{ PRODUCT : "phân loại"
+    CUSTOMER ||--o{ ORDER : "đặt hàng"
+    ORDER ||--|{ ORDER_DETAIL : "có"
+    PRODUCT ||--o{ ORDER_DETAIL : "được đặt"
+```
+
+### 2. Sơ đồ luồng giao tiếp giữa các thành phần dự án
+
+Mô tả luồng giao tiếp giữa lớp Dữ liệu (`CMS.Data`), Giao diện quản trị & API (`CMS.Backend`) và Ứng dụng khách hàng (`cms.frontend`):
+
+```mermaid
+graph TD
+    subgraph Client ["Ứng dụng Khách hàng (Client View)"]
+        React["cms.frontend (ReactJS App)"]
+    end
+
+    subgraph Server ["Hệ thống Máy chủ (Backend Panel & Web API)"]
+        API["Web API Controllers<br/>(ApiProduct, ApiOrder, ApiPost)"]
+        MVC["Admin Razor Views<br/>(MVC Controllers & Views)"]
+    end
+
+    subgraph Data ["Lớp Dữ liệu (Database Layer)"]
+        EF["CMS.Data (EF Core & ApplicationDbContext)"]
+        DB[(SQL Server Database)]
+    end
+
+    %% Luồng tương tác
+    React -- "1. Gửi HTTP Request (Axios / CORS)" --> API
+    API -- "2. Lấy dữ liệu dạng JSON" --> React
+    
+    MVC -- "Xem/Sửa dữ liệu quản trị" --> EF
+    API -- "Truy vấn dữ liệu" --> EF
+    EF -- "Kết nối & Đồng bộ thực thể" --> DB
+    
+    style Client fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#fff
+    style Server fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff
+    style Data fill:#14532d,stroke:#4ade80,stroke-width:2px,color:#fff
+```
+
+* **Lớp dữ liệu (`CMS.Data`)**: Đóng vai trò là nền tảng quản lý thực thể (Entities) và kết nối trực tiếp với SQL Server qua Entity Framework Core. Cả hai luồng quản trị (MVC) và API đều sử dụng chung `CMS.Data`.
+* **Trang quản trị & API (`CMS.Backend`)**: 
+  * Cung cấp giao diện Razor hoàn chỉnh cho Admin/Editor quản lý các thực thể.
+  * Đồng thời mở cổng giao tiếp Web API (JSON RESTful) và thiết lập CORS để ReactJS có thể truy cập từ xa.
+* **Giao diện Client (`cms.frontend`)**: Hoạt động hoàn toàn độc lập ở máy khách (ReactJS), kết nối lấy dữ liệu thông tin, sản phẩm, bài viết và đẩy đơn hàng về server qua Axios.
+
+---
+
 ## CÁC TÍNH NĂNG ĐÃ HOÀN THÀNH
 
 ### 1. Giao diện quản trị (Admin Layout) & Nhúng Thông tin tài khoản
@@ -334,7 +462,7 @@ Dự án `ChinhCMS_Solution` được chia làm 3 dự án nhỏ bên trong:
 | **Buổi 10** | Tích hợp Banner Carousel động, khóa danh mục hệ thống & Sửa lỗi cuộn Sidebar. | **Đã hoàn thành** | **Tạo bảng Banner, ApiBannerController, CRUD Banner Admin Dashboard upload ảnh và xóa tệp vật lý cũ, slider động HeroBanner. Khóa cứng danh mục 7 & 13. Sửa lỗi Sidebar cuộn.** |
 | **Buổi 11** | Tái cấu trúc SPA với React Router DOM, sửa lỗi cập nhật bài viết & Căn giữa Header. | **Đã hoàn thành** | **Tích hợp BrowserRouter/Link thay thế custom navigate, sửa tham số IFormFile? cho PostController, cân bằng flex Header căn giữa menu.** |
 | **Buổi 12** | Tích hợp giỏ hàng nâng cao, ô nhập số lượng bàn phím, trì hoãn luồng đặt hàng, đổi nhanh trạng thái Banner, Live Search Autocomplete, Tách nhỏ CSS, Phân trang 8 & Ẩn danh mục hệ thống. | **Đã hoàn thành** | **Thiết kế lại ProductCard; đệm đăng nhập tự động; ô nhập số lượng bàn phím giỏ hàng; giao diện Checkout 2 cột; AJAX đổi nhanh trạng thái Banner; phân tách Component Sidebar; tích hợp live-search Autocomplete trung tâm Header và SEO Slug cho bài viết (Post); phân rã main.css cồng kềnh thành các file CSS module riêng biệt (Header.css, Footer.css, Cart.css, ProductCard.css, ProductDetail.css); cấu hình phân trang hiển thị tối đa 8 thành phần mỗi trang cho cả sản phẩm và bài viết; loại bỏ danh mục mặc định "Tất cả" (ID: 7 và 13) khỏi dropdown list trong màn hình Thêm mới/Chỉnh sửa ở Admin; đồng nhất CSS phân trang toàn cục; thiết kế lại Header thông minh trên Mobile (tích hợp profile, search, và text giỏ hàng vào menu trượt); viết hệ thống chú thích tiếng Việt cho toàn bộ mã nguồn.** |
-| **Buổi 13** | Tái cấu trúc modular giao diện tài khoản, tách các subcomponents và CSS độc lập, hoàn thiện trang xem chi tiết đơn hàng (OrderDetail), tối ưu hóa quy tắc trừ tồn kho và xóa sản phẩm trong đơn hàng tại trang quản trị, tích hợp trình soạn thảo giàu nội dung CKEditor 5 cho thuộc tính mô tả sản phẩm (Description). | **Đã hoàn thành** | **Phân tách thành UserProfileHeader, OrderHistoryTable, OrderDetailModal; cấu hình liên kết API lấy chi tiết đơn hàng; tách riêng tệp CSS OrderDetail.css; thiết lập cơ chế trừ tồn kho khi phê duyệt đơn hàng; tích hợp danh sách sản phẩm và hành động xóa sản phẩm khi ở trạng thái Chờ duyệt vào trang cập nhật đơn hàng (Edit.cshtml); tích hợp CKEditor 5 cho mô tả sản phẩm ở backend và render HTML ở frontend.** |
+| **Buổi 13** | Tái cấu trúc modular giao diện tài khoản, tách các subcomponents và CSS độc lập, hoàn thiện trang xem chi tiết đơn hàng (OrderDetail), tối ưu hóa quy tắc trừ tồn kho và xóa sản phẩm trong đơn hàng tại trang quản trị, tích hợp trình soạn thảo giàu nội dung CKEditor 5 cho thuộc tính mô tả sản phẩm (Description), bổ sung bộ lọc giá API sản phẩm, và xây dựng giao diện xem chi tiết sản phẩm cho Admin. | **Đã hoàn thành** | **Phân tách thành UserProfileHeader, OrderHistoryTable, OrderDetailModal; cấu hình liên kết API lấy chi tiết đơn hàng; tách riêng tệp CSS OrderDetail.css; thiết lập cơ chế trừ tồn kho khi phê duyệt đơn hàng; tích hợp danh sách sản phẩm và hành động xóa sản phẩm khi ở trạng thái Chờ duyệt vào trang cập nhật đơn hàng (Edit.cshtml); tích hợp CKEditor 5 cho mô tả sản phẩm ở backend và render HTML ở frontend; thêm tham số `minPrice`, `maxPrice` cho API sản phẩm; xây dựng trang Details sản phẩm cho Admin và vẽ sơ đồ ERD & giao tiếp hệ thống.** |
 ---
 
 
