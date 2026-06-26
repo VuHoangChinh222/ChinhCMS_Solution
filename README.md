@@ -76,6 +76,7 @@ Dự án `ChinhCMS_Solution` được chia làm 3 dự án nhỏ bên trong:
 - **Trình soạn thảo CKEditor 5:** Tích hợp trực tiếp giúp viết bài có thể định dạng chữ, chèn bảng dễ dàng.
 - **Tải ảnh trực tiếp lên máy chủ:** Hỗ trợ tải file ảnh lên thư mục `wwwroot/uploads/` bằng tên ngẫu nhiên `Guid`.
 - **Dọn dẹp ảnh khi sửa/xóa**: Tự động dọn sạch file ảnh vật lý trên ổ cứng khi sửa đổi ảnh mới hoặc xóa hẳn bài viết.
+- **Tương thích hiển thị nội dung CKEditor 5 - [MỚI]**: Tích hợp hệ thống CSS tự động dàn trang bảng biểu cân đối, kẻ viền rõ ràng cùng với Script tự động ánh xạ thẻ video `<oembed>` của CKEditor thành thẻ `<iframe>` phát trực tuyến (hỗ trợ Youtube và Vimeo) trên cả trang chi tiết Backend MVC (`Details.cshtml`) và Frontend ReactJS (`Detail.jsx`).
 
 ### 6. Quản lý thành viên (User CRUD)
 

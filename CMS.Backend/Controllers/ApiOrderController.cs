@@ -103,6 +103,9 @@ namespace CMS.Backend.Controllers
                             });
                         }
 
+                        // Trừ bớt số lượng sản phẩm tồn kho trong database
+                        product.StockQuantity -= item.Quantity;
+
                         // Tính tiền và tạo chi tiết đơn hàng
                         var orderDetail = new OrderDetail
                         {

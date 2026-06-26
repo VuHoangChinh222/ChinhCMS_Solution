@@ -62,7 +62,7 @@
                 </div>
 
                 <!-- Nút quay lại danh sách bài viết -->
-                <div class="mt-5 border-top pt-3">
+                <div class="mt-5 border-top pt-3 text-end">
                     <a href="/Post" class="btn btn-secondary">
                         Quay lại danh sách
                     </a>
@@ -78,3 +78,84 @@
         </div>
     }
 </div>
+
+<style>
+    /* Styling cho bảng tạo từ CKEditor 5 */
+    .post-content table {
+        width: 100% !important;
+        margin: 1.5rem 0;
+        border-collapse: collapse;
+        border: 1px solid #dee2e6;
+    }
+    .post-content table th, 
+    .post-content table td {
+        padding: 0.75rem;
+        border: 1px solid #dee2e6;
+        vertical-align: middle;
+    }
+    .post-content table th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+    }
+    .post-content figure.table {
+        margin: 1.5rem 0;
+        width: 100%;
+        overflow-x: auto;
+    }
+    /* Styling cho khung nhúng video */
+    .post-content figure.media {
+        margin: 1.5rem auto;
+        max-width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var container = document.querySelector('.post-content');
+        if (!container) return;
+
+        // Chuyển đổi thẻ oembed của CKEditor 5 thành iframe phát được video
+        var oembeds = container.querySelectorAll('oembed');
+        oembeds.forEach(function (oembed) {
+            var url = oembed.getAttribute('url');
+            if (url) {
+                var embedUrl = '';
+                
+                // Trích xuất ID youtube
+                var ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+                var ytMatch = url.match(ytRegex);
+                if (ytMatch && ytMatch[1]) {
+                    embedUrl = 'https://www.youtube.com/embed/' + ytMatch[1];
+                }
+
+                // Trích xuất ID vimeo
+                var vimeoRegex = /vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]+)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:$|\/|\?)/i;
+                var vimeoMatch = url.match(vimeoRegex);
+                if (vimeoMatch && vimeoMatch[1]) {
+                    embedUrl = 'https://player.vimeo.com/video/' + vimeoMatch[1];
+                }
+
+                if (embedUrl) {
+                    var iframe = document.createElement('iframe');
+                    iframe.src = embedUrl;
+                    iframe.width = "100%";
+                    iframe.height = "480";
+                    iframe.setAttribute('frameborder', '0');
+                    iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+                    iframe.setAttribute('allowfullscreen', 'true');
+                    iframe.style.borderRadius = "8px";
+                    iframe.style.marginTop = "10px";
+                    iframe.style.marginBottom = "10px";
+                    iframe.style.boxShadow = "0 4px 15px rgba(0,0,0,0.1)";
+                    
+                    // Thay thế thẻ oembed bằng iframe
+                    if (oembed.parentNode) {
+                        oembed.parentNode.replaceChild(iframe, oembed);
+                    }
+                }
+            }
+        });
+    });
+</script>
