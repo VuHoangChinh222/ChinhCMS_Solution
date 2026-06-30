@@ -70,6 +70,20 @@ const ProductView = ({ params, navigate, addToCart }) => {
         }
     }, [tempMinPrice, tempMaxPrice]);
 
+    // Debounce tìm kiếm từ khóa để tự động gọi API khi người dùng gõ phím (sau 400ms)
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            if (tempKeyword !== keyword) {
+                setKeyword(tempKeyword);
+                setPageNumber(1);
+            }
+        }, 400);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [tempKeyword, keyword]);
+
     // ==========================================
     // GỌI API LẤY SẢN PHẨM (Chạy lại khi có bất kỳ thay đổi nào từ bộ lọc hoặc phân trang)
     // ==========================================

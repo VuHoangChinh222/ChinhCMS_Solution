@@ -221,14 +221,14 @@ graph TD
    - **Bước 5 (API - Gửi SMTP)**: API đọc thông số cấu hình SMTP từ file `appsettings.json` (bao gồm địa chỉ máy chủ `smtp.gmail.com`, cổng `587`, email gửi `vuhoangchinh222@gmail.com` và Mật khẩu ứng dụng Gmail (App Password)). Sau đó sử dụng lớp `System.Net.Mail` thiết lập kết nối SSL để gửi đi.
    - **Bước 6 (Nhận Email)**: Khách hàng nhận được email thật, đăng nhập bằng mật khẩu tạm 16 ký tự này và tiến hành đổi mật khẩu mới trong trang cá nhân.
 
-2. **Luồng Xác nhận Đơn hàng (Order Confirmation)**:
-   - **Bước 1 (Client)**: Sau khi hoàn tất lựa chọn sản phẩm và thanh toán tại trang `/payment`, client gửi yêu cầu hoàn tất đơn hàng về API.
-   - **Bước 2 (API - Xử lý DB)**: `ApiOrderController.cs` tiếp nhận đơn hàng, ghi nhận chi tiết đơn hàng vào CSDL thông qua Database Transaction đảm bảo tính toàn vẹn dữ liệu.
-   - **Bước 3 (API - Thiết lập Email đính kèm ảnh sản phẩm)**:
-     - Duyệt danh sách các sản phẩm khách hàng đã đặt. Truy vấn đường dẫn ảnh đại diện (`ImageUrl`) của từng sản phẩm.
-     - Hệ thống kiểm tra: Nếu đường dẫn ảnh đang lưu trữ ở dạng tương đối (`/images/...`), hệ thống tự động nối với domain API gốc `https://localhost:7291` để tạo thành một URL hình ảnh tuyệt đối.
-     - Lắp ráp tóm tắt đơn hàng thành một bảng HTML gồm các cột: **Hình ảnh sản phẩm (ảnh hiển thị trực quan ở size 60px)**, Tên sản phẩm, Số lượng, Đơn giá và Thành tiền.
-     - Gửi email xác nhận kèm bảng thống kê hóa đơn qua SMTP Gmail cho khách hàng.
+    2. **Luồng Xác nhận Đơn hàng (Order Confirmation)**:
+       - **Bước 1 (Client)**: Sau khi hoàn tất lựa chọn sản phẩm và thanh toán tại trang `/payment`, client gửi yêu cầu hoàn tất đơn hàng về API.
+       - **Bước 2 (API - Xử lý DB)**: `ApiOrderController.cs` tiếp nhận đơn hàng, ghi nhận chi tiết đơn hàng vào CSDL thông qua Database Transaction đảm bảo tính toàn vẹn dữ liệu.
+       - **Bước 3 (API - Thiết lập Email đính kèm ảnh sản phẩm nội tuyến)**:
+         - Duyệt danh sách các sản phẩm khách hàng đã đặt. Truy vấn đường dẫn ảnh đại diện (`ImageUrl`) của từng sản phẩm.
+         - Hệ thống tự động xác định file ảnh tương ứng trong thư mục vật lý `wwwroot/uploads` trên máy chủ và đính kèm trực tiếp vào email dưới dạng tài nguyên liên kết nội tuyến (`System.Net.Mail.LinkedResource`) kèm mã hóa Content-ID (`cid:img_ProductId_random`).
+         - Lắp ráp tóm tắt đơn hàng thành một bảng HTML gồm các cột: **Hình ảnh sản phẩm (ảnh nhúng trực tiếp size 60px)**, Tên sản phẩm, Số lượng, Đơn giá và Thành tiền.
+         - Gửi email xác nhận kèm bảng thống kê hóa đơn qua SMTP Gmail cho khách hàng. Phương thức này khắc phục triệt để lỗi chặn tài nguyên chéo từ địa chỉ localhost của các email client như Gmail.
 
 ---
 
@@ -544,7 +544,7 @@ graph TD
 | **Buổi 11** | Tái cấu trúc SPA với React Router DOM, sửa lỗi cập nhật bài viết & Căn giữa Header. | **Đã hoàn thành** | **Tích hợp BrowserRouter/Link thay thế custom navigate, sửa tham số IFormFile? cho PostController, cân bằng flex Header căn giữa menu.** |
 | **Buổi 12** | Tích hợp giỏ hàng nâng cao, ô nhập số lượng bàn phím, trì hoãn luồng đặt hàng, đổi nhanh trạng thái Banner, Live Search Autocomplete, Tách nhỏ CSS, Phân trang 8 & Ẩn danh mục hệ thống. | **Đã hoàn thành** | **Thiết kế lại ProductCard; đệm đăng nhập tự động; ô nhập số lượng bàn phím giỏ hàng; giao diện Checkout 2 cột; AJAX đổi nhanh trạng thái Banner; phân tách Component Sidebar; tích hợp live-search Autocomplete trung tâm Header và SEO Slug cho bài viết (Post); phân rã main.css cồng kềnh thành các file CSS module riêng biệt (Header.css, Footer.css, Cart.css, ProductCard.css, ProductDetail.css); cấu hình phân trang hiển thị tối đa 8 thành phần mỗi trang cho cả sản phẩm và bài viết; loại bỏ danh mục mặc định "Tất cả" (ID: 7 và 13) khỏi dropdown list trong màn hình Thêm mới/Chỉnh sửa ở Admin; đồng nhất CSS phân trang toàn cục; thiết kế lại Header thông minh trên Mobile (tích hợp profile, search, và text giỏ hàng vào menu trượt); viết hệ thống chú thích tiếng Việt cho toàn bộ mã nguồn.** |
 | **Buổi 13** | Tái cấu trúc modular giao diện tài khoản, tách các subcomponents và CSS độc lập, hoàn thiện trang xem chi tiết đơn hàng (OrderDetail), tối ưu hóa quy tắc trừ tồn kho và xóa sản phẩm trong đơn hàng tại trang quản trị, tích hợp trình soạn thảo giàu nội dung CKEditor 5 cho thuộc tính mô tả sản phẩm (Description), bổ sung bộ lọc giá API sản phẩm, và xây dựng giao diện xem chi tiết sản phẩm cho Admin. | **Đã hoàn thành** | **Phân tách thành UserProfileHeader, OrderHistoryTable, OrderDetailModal; cấu hình liên kết API lấy chi tiết đơn hàng; tách riêng tệp CSS OrderDetail.css; thiết lập cơ chế trừ tồn kho khi phê duyệt đơn hàng; tích hợp danh sách sản phẩm và hành động xóa sản phẩm khi ở trạng thái Chờ duyệt vào trang cập nhật đơn hàng (Edit.cshtml); tích hợp CKEditor 5 cho mô tả sản phẩm ở backend và render HTML ở frontend; thêm tham số `minPrice`, `maxPrice` cho API sản phẩm; xây dựng trang Details sản phẩm cho Admin và vẽ sơ đồ ERD & giao tiếp hệ thống.** |
-| **Buổi 14** | Tách riêng biệt trang Quên mật khẩu, nâng cấp độ phức tạp mật khẩu khôi phục, bổ sung ảnh sản phẩm vào email xác nhận đơn hàng, hoàn thiện form đăng ký kiểm tra xác thực mật khẩu trùng khớp và tối thiểu 6 ký tự. | **Đã hoàn thành** | **Tạo trang mới ForgotPassword.jsx và file CSS riêng biệt; thay đổi mật khẩu tạm sang độ dài 16 ký tự ngẫu nhiên đầy đủ tập ký tự; tự động ghép đầu domain API để gửi ảnh tuyệt đối đính kèm trong thư HTML hóa đơn; tích hợp ô "Nhập lại mật khẩu" tại trang Register cùng các validation logic.** |
+| **Buổi 14** | Tách riêng biệt trang Quên mật khẩu, nâng cấp độ phức tạp mật khẩu khôi phục, bổ sung ảnh sản phẩm vào email xác nhận đơn hàng (sử dụng LinkedResource), hoàn thiện form đăng ký kiểm tra xác thực mật khẩu trùng khớp và tối thiểu 6 ký tự. | **Đã hoàn thành** | **Tạo trang mới ForgotPassword.jsx và file CSS riêng biệt; thay đổi mật khẩu tạm sang độ dài 16 ký tự ngẫu nhiên đầy đủ tập ký tự; tự động đính kèm hình ảnh sản phẩm dưới dạng LinkedResource MIME để hiển thị hình ảnh cục bộ trực quan trên Gmail; tích hợp ô "Nhập lại mật khẩu" tại trang Register cùng các validation logic.** |
 ---
 
 
