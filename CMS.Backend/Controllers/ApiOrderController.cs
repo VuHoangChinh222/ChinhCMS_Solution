@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using CMS.Data;
 using CMS.Data.Entities;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Hosting;
 
 namespace CMS.Backend.Controllers
 {
@@ -22,12 +23,14 @@ namespace CMS.Backend.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _env;
 
-        // Hàm khởi tạo (Constructor): Tiêm ApplicationDbContext và IConfiguration vào
-        public ApiOrderController(ApplicationDbContext context, IConfiguration configuration)
+        // Hàm khởi tạo (Constructor): Tiêm ApplicationDbContext, IConfiguration và IWebHostEnvironment vào
+        public ApiOrderController(ApplicationDbContext context, IConfiguration configuration, IWebHostEnvironment env)
         {
             _context = context;
             _configuration = configuration;
+            _env = env;
         }
 
         // DTO nhận dữ liệu chi tiết giỏ hàng khi checkout
@@ -185,20 +188,52 @@ namespace CMS.Backend.Controllers
                                 </thead>
                                 <tbody>";
 
+                var linkedResources = new List<System.Net.Mail.LinkedResource>();
+
                 foreach (var detail in details)
                 {
                     var product = _context.Products.Find(detail.ProductId);
                     var productName = product != null ? product.Name : "Sản phẩm";
                     var imgUrl = product?.ImageUrl ?? "";
-                    if (!string.IsNullOrEmpty(imgUrl) && !imgUrl.StartsWith("http", System.StringComparison.OrdinalIgnoreCase))
+                    string imgTag = "";
+
+                    if (!string.IsNullOrEmpty(imgUrl))
                     {
-                        imgUrl = "https://localhost:7291" + (imgUrl.StartsWith("/") ? imgUrl : "/" + imgUrl);
+                        // Chuẩn hóa đường dẫn tương đối của ảnh để tìm trên ổ đĩa
+                        string relativePath = imgUrl.Replace("/", "\\");
+                        if (relativePath.StartsWith("\\"))
+                        {
+                            relativePath = relativePath.Substring(1);
+                        }
+                        
+                        string absolutePath = System.IO.Path.Combine(_env.WebRootPath, relativePath);
+                        
+                        if (System.IO.File.Exists(absolutePath))
+                        {
+                            string cidName = $"img_{detail.ProductId}_{System.Guid.NewGuid().ToString("N").Substring(0, 8)}";
+                            var res = new System.Net.Mail.LinkedResource(absolutePath);
+                            res.ContentId = cidName;
+                            
+                            string ext = System.IO.Path.GetExtension(absolutePath).ToLower();
+                            if (ext == ".png") res.ContentType.MediaType = "image/png";
+                            else if (ext == ".gif") res.ContentType.MediaType = "image/gif";
+                            else res.ContentType.MediaType = "image/jpeg";
+                            
+                            linkedResources.Add(res);
+                            imgTag = $"<img src='cid:{cidName}' alt='{productName}' style='width: 60px; height: auto; border-radius: 4px;' />";
+                        }
+                        else
+                        {
+                            // Nếu không tìm thấy file ảnh trên đĩa, fallback về địa chỉ localhost tuyệt đối
+                            var fullUrl = "https://localhost:7291" + (imgUrl.StartsWith("/") ? imgUrl : "/" + imgUrl);
+                            imgTag = $"<img src='{fullUrl}' alt='{productName}' style='width: 60px; height: auto; border-radius: 4px;' />";
+                        }
                     }
 
                     body += $@"
                                     <tr>
                                         <td style='padding: 8px; border: 1px solid #cbd5e1; text-align: center; vertical-align: middle;'>
-                                            {(string.IsNullOrEmpty(imgUrl) ? "" : $"<img src='{imgUrl}' alt='{productName}' style='width: 60px; height: auto; border-radius: 4px;' />")}
+                                            {imgTag}
                                         </td>
                                         <td style='padding: 8px; border: 1px solid #cbd5e1; vertical-align: middle;'>{productName}</td>
                                         <td style='padding: 8px; border: 1px solid #cbd5e1; text-align: center; vertical-align: middle;'>{detail.Quantity}</td>
@@ -239,8 +274,13 @@ namespace CMS.Backend.Controllers
                     mail.From = new System.Net.Mail.MailAddress(senderEmail, senderName);
                     mail.To.Add(customer.Email);
                     mail.Subject = $"[Chinh Hoops] Xác nhận đặt hàng thành công đơn # {order.Id}";
-                    mail.Body = body;
-                    mail.IsBodyHtml = true;
+                    
+                    var htmlView = System.Net.Mail.AlternateView.CreateAlternateViewFromString(body, null, "text/html");
+                    foreach (var lr in linkedResources)
+                    {
+                        htmlView.LinkedResources.Add(lr);
+                    }
+                    mail.AlternateViews.Add(htmlView);
 
                     using (var smtp = new System.Net.Mail.SmtpClient(smtpServer))
                     {
