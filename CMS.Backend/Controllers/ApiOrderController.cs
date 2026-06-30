@@ -115,6 +115,9 @@ namespace CMS.Backend.Controllers
                             UnitPrice = product.Price // Lấy giá sản phẩm tại thời điểm mua hàng
                         };
 
+                        // Giảm số lượng hàng tồn kho (Đáp ứng tiêu chí 30)
+                        product.StockQuantity -= item.Quantity;
+
                         totalOrderAmount += (product.Price * item.Quantity);
 
                         _context.OrderDetails.Add(orderDetail);
