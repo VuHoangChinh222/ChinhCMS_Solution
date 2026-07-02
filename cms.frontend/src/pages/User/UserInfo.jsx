@@ -10,6 +10,7 @@ import { getCookie, setCookie } from '../../utils/cookieHelper';
 import customerService from '../../services/customerService';
 import IsLoading from '../../components/IsLoading';
 import '../../assets/css/UserInfoView.css';
+import '../../assets/css/CompleteGoogleProfile.css';
 
 const UserInfo = ({ navigate }) => {
   const [customer, setCustomer] = useState(null);
@@ -21,6 +22,8 @@ const UserInfo = ({ navigate }) => {
   const [address, setAddress] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // States quản lý trạng thái tải & thông báo lỗi/thành công
   const [loading, setLoading] = useState(true);
@@ -188,25 +191,43 @@ const UserInfo = ({ navigate }) => {
           {/* Trường Mật khẩu mới */}
           <div className="user-info-form-group" style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)' }}>
             <label>Mật khẩu mới (Bỏ trống nếu không muốn đổi)</label>
-            <input
-              type="password"
-              className="user-info-input"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                className="user-info-input cgp-password-input"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
+              />
+              <button
+                type="button"
+                className="cgp-password-toggle-btn"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+              </button>
+            </div>
           </div>
 
           {/* Xác nhận mật khẩu mới */}
           <div className="user-info-form-group">
             <label>Xác nhận mật khẩu mới</label>
-            <input
-              type="password"
-              className="user-info-input"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Nhập lại mật khẩu mới để xác nhận"
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                className="user-info-input cgp-password-input"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Nhập lại mật khẩu mới để xác nhận"
+              />
+              <button
+                type="button"
+                className="cgp-password-toggle-btn"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                <i className={`fa-solid ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+              </button>
+            </div>
           </div>
 
           {/* Hàng nút bấm gửi form / hủy quay lại */}

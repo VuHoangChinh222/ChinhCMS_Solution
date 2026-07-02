@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import customerService from '../../services/customerService';
 import { setCookie, getCookie } from '../../utils/cookieHelper';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 const LoginView = () => {
   const navigate = useNavigate();
@@ -42,6 +43,31 @@ const LoginView = () => {
     } catch (err) {
       console.error("Lỗi xác thực:", err);
       const msg = err.response?.data?.message || "Đã xảy ra lỗi hệ thống, vui lòng thử lại sau.";
+      setErrorMessage(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setLoading(true);
+    setErrorMessage('');
+    try {
+      const response = await customerService.googleLogin(credentialResponse.credential);
+      
+      if (response && response.isNewUser) {
+        // Tài khoản mới, chuyển hướng qua trang hoàn tất thông tin
+        navigate('/complete-google-profile', { state: { draftData: response.draftData } });
+      } else if (response && response.customer) {
+        // Đã có tài khoản
+        setCookie('customer', response.customer, 2);
+        alert("Đăng nhập bằng Google thành công!");
+        navigate('/products');
+        window.location.reload();
+      }
+    } catch (err) {
+      console.error("Lỗi Google Login:", err);
+      const msg = err.response?.data?.message || "Đăng nhập Google thất bại.";
       setErrorMessage(msg);
     } finally {
       setLoading(false);
@@ -129,6 +155,19 @@ const LoginView = () => {
               'Đăng Nhập'
             )}
           </button>
+
+          {/* NÚT GOOGLE */}
+          <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center' }}>
+            <GoogleOAuthProvider clientId="1005144408689-siit18bqj1ub8r6fggtbeh7u207rti7v.apps.googleusercontent.com">
+               <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => {
+                    setErrorMessage('Đăng nhập Google bị hủy hoặc thất bại');
+                  }}
+                  useOneTap
+               />
+            </GoogleOAuthProvider>
+          </div>
 
           <div style={{ textAlign: 'center', marginTop: '1.5rem', color: 'var(--text-muted)' }}>
             Chưa có tài khoản khách hàng?{' '}

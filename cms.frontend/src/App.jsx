@@ -18,6 +18,7 @@ import PaymentView from './pages/Checkout/PaymentView';
 import LoginView from './pages/Login/Index';
 import RegisterView from './pages/Register/Index';
 import ForgotPasswordView from './pages/ForgotPassword/ForgotPassword';
+import CompleteGoogleProfile from './pages/Login/CompleteGoogleProfile';
 import UserInfoView from './pages/User/Index';
 import UserInfo from './pages/User/UserInfo';
 import AboutView from './pages/About/Index';
@@ -153,6 +154,9 @@ const AppContent = ({ cart, addToCart, updateQty, removeFromCart, clearCart }) =
           <Route path="/login" element={<LoginView />} />
           <Route path="/register" element={<RegisterView />} />
           <Route path="/forgot-password" element={<ForgotPasswordView />} />
+          <Route path="/complete-google-profile" element={<CompleteGoogleProfile />} />
+
+          {/* User Account Route */}
           <Route path="/user" element={<UserInfoView navigate={navigate} />} />
           <Route path="/user-info" element={<UserInfo navigate={navigate} />} />
           <Route path="/about" element={<AboutView />} />

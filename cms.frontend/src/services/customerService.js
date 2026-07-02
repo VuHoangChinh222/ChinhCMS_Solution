@@ -23,6 +23,18 @@ const customerService = {
     forgotPassword: (email) => {
         const url = '/customer/forgot-password';
         return axiosClient.post(url, { email });
+    },
+
+    // API Đăng nhập bằng Google
+    googleLogin: (credential) => {
+        const url = '/customer/google-login';
+        return axiosClient.post(url, { credential });
+    },
+
+    // API Hoàn tất đăng ký Google
+    registerGoogle: (customerData) => {
+        const url = '/customer/register-google';
+        return axiosClient.post(url, customerData);
     }
 };
 

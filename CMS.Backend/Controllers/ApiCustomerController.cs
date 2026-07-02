@@ -12,6 +12,9 @@ using CMS.Data;
 using CMS.Data.Entities;
 using CMS.Backend.Helpers;
 using Microsoft.Extensions.Configuration;
+using Google.Apis.Auth;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace CMS.Backend.Controllers
 {
@@ -377,6 +380,140 @@ namespace CMS.Backend.Controllers
             catch (System.Exception ex)
             {
                 return StatusCode(500, new { message = "Lỗi hệ thống khi khôi phục mật khẩu", error = ex.Message });
+            }
+        }
+
+        // DTO nhận Token từ Frontend
+        public class GoogleLoginRequest
+        {
+            public string Credential { get; set; }
+        }
+
+        // ==========================================
+        // 5. API ĐĂNG NHẬP BẰNG GOOGLE
+        // ==========================================
+        [HttpPost("google-login")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
+        {
+            try
+            {
+                // 1. Cấu hình xác thực với Client ID
+                var settings = new GoogleJsonWebSignature.ValidationSettings()
+                {
+                    Audience = new List<string> { "1005144408689-siit18bqj1ub8r6fggtbeh7u207rti7v.apps.googleusercontent.com" }
+                };
+
+                // 2. Xác minh token gửi từ ReactJS với máy chủ Google
+                var payload = await GoogleJsonWebSignature.ValidateAsync(request.Credential, settings);
+
+                if (payload == null)
+                    return BadRequest(new { message = "Token Google không hợp lệ hoặc đã hết hạn." });
+
+                // 3. Xử lý Logic Database (Đã có tài khoản hay chưa)
+                var customer = _context.Customers.FirstOrDefault(c => c.Email == payload.Email);
+
+                if (customer == null)
+                {
+                    // Tài khoản chưa tồn tại -> Yêu cầu người dùng cập nhật thông tin
+                    return Ok(new
+                    {
+                        message = "Tài khoản mới, cần cập nhật thông tin",
+                        isNewUser = true,
+                        draftData = new
+                        {
+                            email = payload.Email,
+                            fullName = payload.Name
+                        }
+                    });
+                }
+
+                // 4. Trả về thông tin đăng nhập thành công
+                return Ok(new
+                {
+                    message = "Đăng nhập Google thành công",
+                    customer = new
+                    {
+                        customer.Id,
+                        customer.FullName,
+                        customer.Email,
+                        customer.Phone,
+                        customer.Address
+                    }
+                });
+            }
+            catch (InvalidJwtException)
+            {
+                return BadRequest(new { message = "Xác thực Google thất bại." });
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi hệ thống khi đăng nhập Google", error = ex.Message });
+            }
+        }
+
+        // DTO cho hoàn tất đăng ký Google
+        public class CompleteGoogleRegisterRequest
+        {
+            public string FullName { get; set; }
+            public string Email { get; set; }
+            public string Phone { get; set; }
+            public string Address { get; set; }
+            public string Password { get; set; } 
+        }
+
+        // ==========================================
+        // 6. API HOÀN TẤT ĐĂNG KÝ BẰNG GOOGLE
+        // ==========================================
+        [HttpPost("register-google")]
+        public IActionResult RegisterGoogle([FromBody] CompleteGoogleRegisterRequest request)
+        {
+            try
+            {
+                if (_context.Customers.Any(c => c.Email == request.Email))
+                {
+                    return BadRequest(new { message = "Email này đã được đăng ký trong hệ thống." });
+                }
+
+                if (string.IsNullOrWhiteSpace(request.Phone))
+                {
+                    return BadRequest(new { message = "Vui lòng nhập số điện thoại." });
+                }
+
+                if (string.IsNullOrWhiteSpace(request.Address))
+                {
+                    return BadRequest(new { message = "Vui lòng nhập địa chỉ." });
+                }
+
+                string pwd = !string.IsNullOrWhiteSpace(request.Password) ? request.Password : Guid.NewGuid().ToString();
+                
+                var customer = new Customer
+                {
+                    FullName = request.FullName?.Trim(),
+                    Email = request.Email?.Trim(),
+                    Phone = request.Phone?.Trim(),
+                    Address = request.Address?.Trim(),
+                    Password = PasswordHelper.HashPassword(pwd)
+                };
+                
+                _context.Customers.Add(customer);
+                _context.SaveChanges();
+
+                return StatusCode(201, new
+                {
+                    message = "Hoàn tất tạo tài khoản thành công",
+                    customer = new
+                    {
+                        customer.Id,
+                        customer.FullName,
+                        customer.Email,
+                        customer.Phone,
+                        customer.Address
+                    }
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi hệ thống khi tạo tài khoản", error = ex.Message });
             }
         }
     }

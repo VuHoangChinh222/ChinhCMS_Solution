@@ -230,6 +230,52 @@ graph TD
          - Lắp ráp tóm tắt đơn hàng thành một bảng HTML gồm các cột: **Hình ảnh sản phẩm (ảnh nhúng trực tiếp size 60px)**, Tên sản phẩm, Số lượng, Đơn giá và Thành tiền.
          - Gửi email xác nhận kèm bảng thống kê hóa đơn qua SMTP Gmail cho khách hàng. Phương thức này khắc phục triệt để lỗi chặn tài nguyên chéo từ địa chỉ localhost của các email client như Gmail.
 
+### 4. Sơ đồ luồng Đăng nhập bằng Google (Google OAuth 2.0 Flow)
+
+Dưới đây là sơ đồ mô tả luồng xác thực an toàn thông qua Google OAuth 2.0, kết hợp bắt buộc bổ sung thông tin đối với tài khoản mới:
+
+```mermaid
+sequenceDiagram
+    participant U as Khách hàng
+    participant F as Frontend (ReactJS)
+    participant G as Google OAuth Servers
+    participant B as Backend API (ASP.NET)
+    participant D as Database
+
+    U->>F: Bấm nút "Đăng nhập bằng Google"
+    F->>G: Yêu cầu xác thực OAuth 2.0 (Google Client ID)
+    G-->>F: Trả về JWT Credential Token
+    F->>B: Gửi Token tới API /api/customer/google-login
+    B->>G: Xác thực tính hợp lệ của JWT Token (Google.Apis.Auth)
+    G-->>B: Trả về thông tin thật (Email, Name, Picture)
+    B->>D: Tra cứu Email trong cơ sở dữ liệu (SQL Server)
+    
+    alt Khách hàng cũ (Email đã tồn tại)
+        D-->>B: Dữ liệu Customer
+        B-->>F: JSON { isNewUser: false, customer: {...} }
+        F-->>U: Đăng nhập thành công & Chuyển vào hệ thống
+    else Khách hàng mới (Email chưa tồn tại)
+        B-->>F: JSON { isNewUser: true, draftData: { email, fullName } }
+        F-->>U: Chuyển hướng sang trang CompleteGoogleProfile
+        U->>F: Bổ sung Số điện thoại, Địa chỉ & Tạo Mật khẩu mới
+        F->>B: POST /api/customer/register-google
+        B->>B: Băm mật khẩu (BCrypt)
+        B->>D: Lưu tài khoản mới vào Database
+        B-->>F: JSON { customer: {...} }
+        F-->>U: Hoàn tất đăng ký & Đăng nhập thành công
+    end
+```
+
+#### Chi tiết Luồng & Cấu hình Đăng nhập Google:
+1. **Cấu hình Google Cloud Console**: Tạo Project, thiết lập màn hình **OAuth Consent Screen** ở chế độ *External*, cấu hình Scopes (Email, Profile). Tạo thông tin xác thực **OAuth Client ID** (Loại: Web Application) với URI nguồn gốc `http://localhost:5173`.
+2. **Backend (ASP.NET Core)**: 
+   - Cài đặt thư viện `Google.Apis.Auth`.
+   - Hàm `GoogleJsonWebSignature.ValidateAsync` chịu trách nhiệm giải mã và chứng thực tính toàn vẹn của Token được cấp bởi Google.
+   - Nếu là **tài khoản mới**, hệ thống KHÔNG lưu vào DB ngay lập tức mà trả về cờ hiệu `isNewUser: true` để yêu cầu khách hàng cung cấp các thông tin bắt buộc (như Số điện thoại và Địa chỉ giao hàng).
+3. **Frontend (ReactJS)**: 
+   - Cài đặt gói `@react-oauth/google` và bọc toàn bộ ứng dụng bằng `<GoogleOAuthProvider>`.
+   - Giao diện `CompleteGoogleProfile.jsx` khóa trường Email để chống giả mạo, ép buộc nhập SĐT, Địa chỉ và tùy chọn tạo Mật khẩu. Sau khi đăng ký thành công, lần sau người dùng có thể linh hoạt đăng nhập bằng Nút Google HOẶC dùng Email + Mật khẩu vừa tạo.
+
 ---
 
 ## CÁC TÍNH NĂNG ĐÃ HOÀN THÀNH
@@ -545,6 +591,7 @@ graph TD
 | **Buổi 12** | Tích hợp giỏ hàng nâng cao, ô nhập số lượng bàn phím, trì hoãn luồng đặt hàng, đổi nhanh trạng thái Banner, Live Search Autocomplete, Tách nhỏ CSS, Phân trang 8 & Ẩn danh mục hệ thống. | **Đã hoàn thành** | **Thiết kế lại ProductCard; đệm đăng nhập tự động; ô nhập số lượng bàn phím giỏ hàng; giao diện Checkout 2 cột; AJAX đổi nhanh trạng thái Banner; phân tách Component Sidebar; tích hợp live-search Autocomplete trung tâm Header và SEO Slug cho bài viết (Post); phân rã main.css cồng kềnh thành các file CSS module riêng biệt (Header.css, Footer.css, Cart.css, ProductCard.css, ProductDetail.css); cấu hình phân trang hiển thị tối đa 8 thành phần mỗi trang cho cả sản phẩm và bài viết; loại bỏ danh mục mặc định "Tất cả" (ID: 7 và 13) khỏi dropdown list trong màn hình Thêm mới/Chỉnh sửa ở Admin; đồng nhất CSS phân trang toàn cục; thiết kế lại Header thông minh trên Mobile (tích hợp profile, search, và text giỏ hàng vào menu trượt); viết hệ thống chú thích tiếng Việt cho toàn bộ mã nguồn.** |
 | **Buổi 13** | Tái cấu trúc modular giao diện tài khoản, tách các subcomponents và CSS độc lập, hoàn thiện trang xem chi tiết đơn hàng (OrderDetail), tối ưu hóa quy tắc trừ tồn kho và xóa sản phẩm trong đơn hàng tại trang quản trị, tích hợp trình soạn thảo giàu nội dung CKEditor 5 cho thuộc tính mô tả sản phẩm (Description), bổ sung bộ lọc giá API sản phẩm, và xây dựng giao diện xem chi tiết sản phẩm cho Admin. | **Đã hoàn thành** | **Phân tách thành UserProfileHeader, OrderHistoryTable, OrderDetailModal; cấu hình liên kết API lấy chi tiết đơn hàng; tách riêng tệp CSS OrderDetail.css; thiết lập cơ chế trừ tồn kho khi phê duyệt đơn hàng; tích hợp danh sách sản phẩm và hành động xóa sản phẩm khi ở trạng thái Chờ duyệt vào trang cập nhật đơn hàng (Edit.cshtml); tích hợp CKEditor 5 cho mô tả sản phẩm ở backend và render HTML ở frontend; thêm tham số `minPrice`, `maxPrice` cho API sản phẩm; xây dựng trang Details sản phẩm cho Admin và vẽ sơ đồ ERD & giao tiếp hệ thống.** |
 | **Buổi 14** | Tách riêng biệt trang Quên mật khẩu, nâng cấp độ phức tạp mật khẩu khôi phục, bổ sung ảnh sản phẩm vào email xác nhận đơn hàng (sử dụng LinkedResource), hoàn thiện form đăng ký kiểm tra xác thực mật khẩu trùng khớp và tối thiểu 6 ký tự. | **Đã hoàn thành** | **Tạo trang mới ForgotPassword.jsx và file CSS riêng biệt; thay đổi mật khẩu tạm sang độ dài 16 ký tự ngẫu nhiên đầy đủ tập ký tự; tự động đính kèm hình ảnh sản phẩm dưới dạng LinkedResource MIME để hiển thị hình ảnh cục bộ trực quan trên Gmail; tích hợp ô "Nhập lại mật khẩu" tại trang Register cùng các validation logic.** |
+| **Buổi 15** | Tích hợp Xác thực và Đăng nhập một chạm bằng Google (Google OAuth 2.0 Flow), hệ thống điều hướng thu thập thông tin người dùng mới thông minh. | **Đã hoàn thành** | **Cấu hình Google Cloud Console (OAuth Client ID); cài đặt Google.Apis.Auth ở Backend xác thực JWT Token; cài đặt @react-oauth/google ở Frontend. Thiết kế luồng xử lý `isNewUser`: tài khoản cũ vào thẳng hệ thống, tài khoản mới bắt buộc qua trang CompleteGoogleProfile.jsx điền thêm SĐT, Địa chỉ và tùy chọn Đặt mật khẩu phụ. Tách file CSS CompleteGoogleProfile.css tái sử dụng và nâng cấp trang UserInfo.jsx kèm tính năng Show/Hide password toggle.** |
 ---
 
 
