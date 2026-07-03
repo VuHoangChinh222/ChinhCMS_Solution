@@ -105,8 +105,8 @@
 </div>
 
 @section Scripts {
-    <!-- Nạp thư viện trình soạn thảo CKEditor 5 từ CDN -->
-    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+    <!-- Nạp thư viện trình soạn thảo CKEditor 5 Super Build (Hỗ trợ đầy đủ Căn lề, Đổi màu chữ...) -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/super-build/ckeditor.js"></script>
     
     <script>
         // Định nghĩa Custom Upload Adapter để xử lý chuyển ảnh thành Base64 inline
@@ -139,10 +139,37 @@
             };
         }
 
-        // Kích hoạt khởi tạo trình soạn thảo giàu nội dung CKEditor 5
-        ClassicEditor
+        // Kích hoạt CKEditor 5 Super Build với thanh công cụ mở rộng (có Căn lề)
+        CKEDITOR.ClassicEditor
             .create(document.querySelector('#editor'), {
                 placeholder: 'Hãy viết nội dung bài viết phong phú và chuyên nghiệp tại đây...',
+                // Không dùng mảng plugins thủ công, thay vào đó loại bỏ các plugin gây xung đột
+                removePlugins: [
+                    'CKBox', 'CKFinder', 'EasyImage', 'RealTimeCollaborativeComments', 
+                    'RealTimeCollaborativeTrackChanges', 'RealTimeCollaborativeRevisionHistory',
+                    'PresenceList', 'Comments', 'TrackChanges', 'TrackChangesData', 
+                    'RevisionHistory', 'Pagination', 'WProofreader', 'MathType', 
+                    'SlashCommand', 'Template', 'DocumentOutline', 'FormatPainter', 
+                    'TableOfContents', 'PasteFromOfficeEnhanced', 'ExportPdf', 'ExportWord', 'AIAssistant'
+                ],
+                toolbar: {
+                    items: [
+                        'heading', '|',
+                        'bold', 'italic', 'underline', 'strikethrough', '|',
+                        'alignment', '|', /* Nút Căn lề Trái/Giữa/Phải ở đây */
+                        'bulletedList', 'numberedList', '|',
+                        'outdent', 'indent', '|',
+                        'insertImage', 'mediaEmbed', 'link', 'blockQuote', 'insertTable', '|',
+                        'undo', 'redo'
+                    ],
+                    shouldNotGroupWhenFull: true
+                },
+                image: {
+                    toolbar: [
+                        'imageTextAlternative', 'toggleImageCaption', 'imageStyle:inline',
+                        'imageStyle:block', 'imageStyle:side', 'imageStyle:alignLeft', 'imageStyle:alignRight', 'imageStyle:alignCenter'
+                    ]
+                },
                 extraPlugins: [MyCustomUploadAdapterPlugin]
             })
             .catch(error => {

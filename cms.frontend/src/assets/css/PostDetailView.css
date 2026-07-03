@@ -62,3 +62,55 @@
     display: flex;
     justify-content: center;
 }
+
+/* ====================================================
+ * ĐẢM BẢO TƯƠNG THÍCH HOÀN TOÀN CÁC TÍNH NĂNG CĂN LỀ TỪ CKEDITOR
+ * ==================================================== */
+
+/* Căn lề chữ (Text Alignment) */
+.post-detail-content .text-align-left {
+    text-align: left !important;
+}
+
+.post-detail-content .text-align-center {
+    text-align: center !important;
+}
+
+.post-detail-content .text-align-right {
+    text-align: right !important;
+}
+
+.post-detail-content .text-align-justify {
+    text-align: justify !important;
+}
+
+/* Căn lề hình ảnh (Image Alignment) */
+.post-detail-content figure.image {
+    display: table;
+    clear: both;
+    text-align: center;
+    margin: 1.5rem auto;
+    /* Mặc định hình ảnh nằm giữa */
+}
+
+.post-detail-content figure.image.image-style-align-left {
+    float: left;
+    margin: 0.5rem 1.5rem 0.5rem 0;
+}
+
+.post-detail-content figure.image.image-style-align-right {
+    float: right;
+    margin: 0.5rem 0 0.5rem 1.5rem;
+}
+
+.post-detail-content figure.image.image-style-align-center {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Clear fix cho float image */
+.post-detail-content::after {
+    content: "";
+    display: table;
+    clear: both;
+}
