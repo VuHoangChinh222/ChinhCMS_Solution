@@ -17,6 +17,12 @@ const orderService = {
     getOrderDetailById: (orderId) => {
         const url = `/order/orderDetail/${orderId}`;
         return axiosClient.get(url);
+    },
+
+    // API kích hoạt gửi email chạy ngầm
+    sendOrderEmail: (orderId) => {
+        const url = `/order/send-mail/${orderId}`;
+        return axiosClient.post(url);
     }
 };
 

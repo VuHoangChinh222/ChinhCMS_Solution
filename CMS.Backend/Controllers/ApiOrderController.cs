@@ -130,12 +130,8 @@ namespace CMS.Backend.Controllers
                     transaction.Commit(); // Hoàn tất giao dịch thành công
 
                     // Gửi email xác nhận đơn hàng cho khách hàng
-                    var customer = _context.Customers.Find(request.CustomerId);
-                    if (customer != null && !string.IsNullOrEmpty(customer.Email))
-                    {
-                        var detailsList = _context.OrderDetails.Where(od => od.OrderId == order.Id).ToList();
-                        SendOrderConfirmationEmail(customer, order, detailsList, totalOrderAmount);
-                    }
+                    // TÁCH API: Không gửi email ở đây nữa để tăng tốc độ tạo đơn hàng (trả về trong 0.1s)
+                    // Thay vào đó, Frontend sẽ tự động gọi API /send-mail/{orderId} sau khi nhận được orderId.
 
                     return StatusCode(201, new {
                         message = "Đặt hàng thành công",
@@ -150,6 +146,36 @@ namespace CMS.Backend.Controllers
                     transaction.Rollback(); // Thu hồi lại toàn bộ thay đổi nếu xảy ra lỗi bất kỳ
                     return StatusCode(500, new { message = "Lỗi hệ thống trong quá trình đặt hàng", error = ex.Message });
                 }
+            }
+        }
+
+        // ====================================================
+        // API GỬI EMAIL CHẠY NGẦM ĐỂ TĂNG UX FRONTEND
+        // ====================================================
+        // POST: api/order/send-mail/{orderId}
+        [HttpPost("send-mail/{orderId}")]
+        public IActionResult TriggerOrderEmail(int orderId)
+        {
+            try
+            {
+                var order = _context.Orders.Find(orderId);
+                if (order == null) return NotFound(new { message = "Không tìm thấy đơn hàng" });
+
+                var customer = _context.Customers.Find(order.CustomerId);
+                if (customer == null || string.IsNullOrEmpty(customer.Email)) 
+                    return Ok(new { message = "Khách hàng không có email, bỏ qua." });
+
+                var detailsList = _context.OrderDetails.Where(od => od.OrderId == order.Id).ToList();
+                decimal totalOrderAmount = detailsList.Sum(od => od.UnitPrice * od.Quantity);
+
+                // Thực hiện thao tác gửi email tốn thời gian (3-5 giây)
+                SendOrderConfirmationEmail(customer, order, detailsList, totalOrderAmount);
+
+                return Ok(new { message = "Gửi email xác nhận thành công" });
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi gửi email", error = ex.Message });
             }
         }
 
