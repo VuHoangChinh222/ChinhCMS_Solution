@@ -1,0 +1,72 @@
+/* 
+ * CATEGORY MENU - HOMEPAGE CIRCULAR CARDS
+ * Sinh viên: Vũ Hoàng Chính
+ */
+
+.home-category-menu {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    padding: 2rem 0;
+    flex-wrap: wrap;
+}
+
+.home-category-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 120px;
+}
+
+.home-category-item:hover {
+    transform: translateY(-8px);
+}
+
+.home-category-img-container {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%; /* Tròn */
+    background: var(--bg-card);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.home-category-item.active .home-category-img-container,
+.home-category-item:hover .home-category-img-container {
+    border-color: var(--accent);
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.3);
+}
+
+.home-category-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.home-category-item:hover .home-category-img {
+    transform: scale(1.15);
+}
+
+.home-category-name {
+    margin-top: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-align: center;
+    transition: color 0.3s ease;
+}
+
+.home-category-item.active .home-category-name,
+.home-category-item:hover .home-category-name {
+    color: var(--accent);
+}

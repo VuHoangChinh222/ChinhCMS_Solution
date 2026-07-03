@@ -10,6 +10,8 @@ import productService from '../../services/productService';
 import postService from '../../services/postService';
 import FeaturedProducts from './FeaturedProducts';
 import LatestBlogs from './LatestBlogs';
+import CategoryMenu from './CategoryMenu';
+import PostCategoryMenu from './PostCategoryMenu';
 
 // Import các file CSS cần thiết
 import '../../assets/css/HomeView.css';
@@ -19,40 +21,65 @@ const HomeView = ({ navigate, addToCart }) => {
   const [bestSellers, setBestSellers] = useState([]);
   const [latestPosts, setLatestPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeCategoryId, setActiveCategoryId] = useState('all');
+  const [activePostCategoryId, setActivePostCategoryId] = useState('all');
 
-  // 1. Tải dữ liệu Trang chủ (Top 5 sản phẩm mới, top 5 bán chạy, top 5 tin tức)
+  // 1. Tải dữ liệu bài viết (chạy lại mỗi khi chọn danh mục bài viết khác)
   useEffect(() => {
-    const loadHomeData = async () => {
+    const loadPosts = async () => {
       try {
-        setLoading(true);
-
-        // Tải top 5 sản phẩm mới nhất
-        const newestRes = await productService.getNewestProducts();
-        if (newestRes && Array.isArray(newestRes)) {
-          setNewestProducts(newestRes.slice(0, 5));
+        let postRes;
+        if (activePostCategoryId === 'all') {
+          postRes = await postService.getLatestPosts(1, 5);
+        } else {
+          postRes = await postService.getPostsByCategory(activePostCategoryId, 1, 5);
         }
 
-        // Tải top 5 sản phẩm bán chạy nhất
-        const sellerRes = await productService.getBestSellers();
-        if (sellerRes && Array.isArray(sellerRes)) {
-          setBestSellers(sellerRes.slice(0, 5));
-        }
-
-        // Tải top 5 bài viết mới nhất
-        const postRes = await postService.getLatestPosts(1, 5);
         const postsArray = postRes?.data || postRes?.Data || postRes;
         if (postsArray && Array.isArray(postsArray)) {
           setLatestPosts(postsArray.slice(0, 5));
+        } else {
+          setLatestPosts([]);
         }
       } catch (err) {
-        console.error("Lỗi khi đồng bộ dữ liệu trang chủ từ CSDL:", err);
+        console.error("Lỗi khi đồng bộ bài viết trang chủ:", err);
+      }
+    };
+
+    loadPosts();
+  }, [activePostCategoryId]);
+
+  // 2. Tải sản phẩm (chạy lại mỗi khi chọn danh mục khác)
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+
+        // Tải top 5 sản phẩm mới nhất theo danh mục
+        const newestRes = await productService.getNewestProducts(activeCategoryId);
+        if (newestRes && Array.isArray(newestRes)) {
+          setNewestProducts(newestRes.slice(0, 5));
+        } else {
+          setNewestProducts([]);
+        }
+
+        // Tải top 5 sản phẩm bán chạy nhất theo danh mục
+        const sellerRes = await productService.getBestSellers(activeCategoryId);
+        if (sellerRes && Array.isArray(sellerRes)) {
+          setBestSellers(sellerRes.slice(0, 5));
+        } else {
+          setBestSellers([]);
+        }
+
+      } catch (err) {
+        console.error("Lỗi khi đồng bộ sản phẩm trang chủ từ CSDL:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    loadHomeData();
-  }, []);
+    loadProducts();
+  }, [activeCategoryId]);
 
   return (
     <div className="page-transition">
@@ -66,6 +93,14 @@ const HomeView = ({ navigate, addToCart }) => {
         onButtonClick={() => navigate('products')}
       />
 
+      {/* SECTION 2: DANH MỤC SẢN PHẨM */}
+      <section style={{ padding: '0 4%' }}>
+        <CategoryMenu
+          activeCategoryId={activeCategoryId}
+          onSelectCategory={(id) => setActiveCategoryId(id)}
+        />
+      </section>
+
       {/* SECTION 3: SẢN PHẨM NỔI BẬT & BÁN CHẠY */}
       <FeaturedProducts
         loading={loading}
@@ -75,7 +110,15 @@ const HomeView = ({ navigate, addToCart }) => {
         addToCart={addToCart}
       />
 
-      {/* SECTION 3: BẢNG TIN XU HƯỚNG THỜI TRANG (TOP 5 LATEST BLOGS) */}
+      {/* SECTION 4: DANH MỤC BÀI VIẾT */}
+      <section style={{ padding: '2rem 4% 0' }}>
+        <PostCategoryMenu
+          activeCategoryId={activePostCategoryId}
+          onSelectCategory={(id) => setActivePostCategoryId(id)}
+        />
+      </section>
+
+      {/* SECTION 5: BẢNG TIN XU HƯỚNG THỜI TRANG (TOP 5 LATEST BLOGS) */}
       <LatestBlogs
         loading={loading}
         latestPosts={latestPosts}

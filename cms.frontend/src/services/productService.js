@@ -38,14 +38,20 @@ const productService = {
     },
 
     // API lấy 5 sản phẩm mới nhất
-    getNewestProducts: () => {
-        const url = '/product/newest';
+    getNewestProducts: (categoryId = null) => {
+        let url = '/product/newest';
+        if (categoryId && categoryId !== 'all') {
+            url += `?categoryId=${categoryId}`;
+        }
         return axiosClient.get(url);
     },
 
     // API lấy 5 sản phẩm bán chạy nhất
-    getBestSellers: () => {
-        const url = '/product/best-sellers';
+    getBestSellers: (categoryId = null) => {
+        let url = '/product/best-sellers';
+        if (categoryId && categoryId !== 'all') {
+            url += `?categoryId=${categoryId}`;
+        }
         return axiosClient.get(url);
     }
 };

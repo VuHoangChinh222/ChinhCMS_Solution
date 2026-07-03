@@ -12,7 +12,7 @@ import { IMAGE_BASE_URL } from '../../config';
 
 const BASE_URL = IMAGE_BASE_URL;
 
-const ProductCategoryList = ({ activeCategoryId, onSelectCategory, onCategoriesLoaded }) => {
+const ProductCategoryList = ({ activeCategoryId, onSelectCategory, onCategoriesLoaded, layout = "vertical" }) => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,11 +22,17 @@ const ProductCategoryList = ({ activeCategoryId, onSelectCategory, onCategoriesL
       try {
         setLoading(true);
         const data = await categoryProductService.getAllCategoryProducts();
+
+        // Ép ID của danh mục "Tất cả sản phẩm" thành 'all' để Frontend gửi đúng biến
+        let dynamicCategories = (data || []).map(c => 
+          c.name === 'Tất cả sản phẩm' ? { ...c, id: 'all' } : c
+        );
         
-        // Kiểm tra xem backend đã trả về "Tất cả sản phẩm" chưa
-        const hasAll = (data || []).some(c => c.name === 'Tất cả sản phẩm');
-        const dynamicCategories = hasAll ? (data || []) : [{ id: 'all', name: 'Tất cả sản phẩm' }, ...(data || [])];
-        
+        const hasAll = dynamicCategories.some(c => c.id === 'all');
+        if (!hasAll) {
+          dynamicCategories = [{ id: 'all', name: 'Tất cả sản phẩm' }, ...dynamicCategories];
+        }
+
         setCategories(dynamicCategories);
         if (onCategoriesLoaded) {
           onCategoriesLoaded(dynamicCategories);
@@ -49,17 +55,19 @@ const ProductCategoryList = ({ activeCategoryId, onSelectCategory, onCategoriesL
   }
 
   return (
-    <div className="product-category-card">
-      <h5 className="product-category-title">
-        <i className="fa-solid fa-tags"></i> Danh mục sản phẩm
-      </h5>
-      <div className="product-category-list">
+    <div className={`product-category-container ${layout === 'horizontal' ? 'horizontal-mode' : 'product-category-card'}`}>
+      {layout !== 'horizontal' && (
+        <h5 className="product-category-title">
+          <i className="fa-solid fa-tags"></i> Danh mục sản phẩm
+        </h5>
+      )}
+      <div className={`product-category-list ${layout === 'horizontal' ? 'horizontal' : ''}`}>
         {categories.map(cat => {
-          const imageSrc = cat.id === 'all'
-            ? 'src/assets/images/hero_basketball_1778727871576.png'
-            : (cat.imageUrl
-              ? (cat.imageUrl.startsWith('http') ? cat.imageUrl : `${BASE_URL}${cat.imageUrl}`)
-              : 'src/assets/images/shoe_product_1_1778727884422.png');
+          const imageSrc = cat.imageUrl
+            ? (cat.imageUrl.startsWith('http') ? cat.imageUrl : `${BASE_URL}${cat.imageUrl}`)
+            : (cat.id === 'all' 
+               ? 'src/assets/images/hero_basketball_1778727871576.png' 
+               : 'src/assets/images/shoe_product_1_1778727884422.png');
 
           return (
             <button
@@ -71,7 +79,7 @@ const ProductCategoryList = ({ activeCategoryId, onSelectCategory, onCategoriesL
                 <img src={imageSrc} alt={cat.name} className="product-category-img" />
                 <span className="product-category-name">{cat.name}</span>
               </span>
-              <span className="product-category-badge">Xem</span>
+              {layout !== 'horizontal' && <span className="product-category-badge">Xem</span>}
             </button>
           );
         })}

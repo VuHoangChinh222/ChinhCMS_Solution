@@ -206,11 +206,17 @@ namespace CMS.Backend.Controllers
         // ==========================================
         // GET: api/product/newest
         [HttpGet("newest")]
-        public IActionResult GetNewest()
+        public IActionResult GetNewest([FromQuery] int? categoryId = null)
         {
             try
             {
-                var products = _context.Products
+                IQueryable<Product> query = _context.Products;
+                if (categoryId.HasValue && categoryId.Value > 0 && categoryId.Value != 7)
+                {
+                    query = query.Where(p => p.CategoryProductId == categoryId.Value);
+                }
+
+                var products = query
                     .OrderByDescending(p => p.Id) // Sắp xếp ID lớn nhất (mới nhất) lên đầu
                     .Take(5) // Chỉ lấy đúng 5 sản phẩm
                     .Select(p => new {
@@ -239,12 +245,18 @@ namespace CMS.Backend.Controllers
         // ==========================================
         // GET: api/product/best-sellers
         [HttpGet("best-sellers")]
-        public IActionResult GetBestSellers()
+        public IActionResult GetBestSellers([FromQuery] int? categoryId = null)
         {
             try
             {
+                IQueryable<Product> query = _context.Products;
+                if (categoryId.HasValue && categoryId.Value > 0 && categoryId.Value != 7)
+                {
+                    query = query.Where(p => p.CategoryProductId == categoryId.Value);
+                }
+
                 // Truy vấn tính tổng số lượng bán dựa trên bảng OrderDetails
-                var products = _context.Products
+                var products = query
                     .Select(p => new {
                         p.Id,
                         p.Name,

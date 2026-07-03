@@ -119,3 +119,30 @@
     text-align: center;
     padding: 1rem 0;
 }
+
+/* HORIZONTAL LAYOUT STYLES (FOR HOMEPAGE) */
+.product-category-list.horizontal {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.product-category-list.horizontal .product-category-item {
+    width: auto;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-size: 1.05rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.product-category-list.horizontal .product-category-item:hover {
+    transform: translateY(-4px);
+}
+
+.product-category-list.horizontal .product-category-img {
+    width: 44px;
+    height: 44px;
+}
