@@ -241,8 +241,18 @@ namespace CMS.Backend.Controllers
 
                 // Cập nhật thông tin cơ bản
                 customer.FullName = request.FullName.Trim();
-                customer.Phone = request.Phone?.Trim();
-                customer.Address = request.Address?.Trim();
+                
+                // Chỉ cập nhật Số điện thoại nếu có dữ liệu truyền vào (không bị rỗng)
+                if (!string.IsNullOrWhiteSpace(request.Phone))
+                {
+                    customer.Phone = request.Phone.Trim();
+                }
+
+                // Chỉ cập nhật Địa chỉ nếu có dữ liệu truyền vào (không bị rỗng)
+                if (!string.IsNullOrWhiteSpace(request.Address))
+                {
+                    customer.Address = request.Address.Trim();
+                }
 
                 // Cập nhật mật khẩu mới nếu được cung cấp
                 if (!string.IsNullOrWhiteSpace(request.Password))
